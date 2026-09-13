@@ -14,199 +14,80 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root[data-theme="dark"] {
-  --bg-app: #05070a;
-  --bg-surface: #0b101b;
-  --bg-elevated: #111827;
-  --bg-active: #1f293d;
-  --border: #1e293b;
-  --border-focus: #38bdf8;
-  --text-main: #f8fafc;
-  --text-muted: #94a3b8;
-  --text-dim: #64748b;
-  --accent: #38bdf8;
-  --accent-glow: rgba(56, 189, 248, 0.18);
-  --primary: #0284c7;
-  --primary-hover: #0369a1;
-  --success: #10b981;
-  --success-bg: rgba(16, 185, 129, 0.12);
-  --warning: #f59e0b;
-  --warning-bg: rgba(245, 158, 11, 0.12);
-  --danger: #ef4444;
-  --danger-bg: rgba(239, 68, 68, 0.12);
-  --purple: #a855f7;
-  --purple-bg: rgba(168, 85, 247, 0.12);
-  --shadow-sm: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 20px 50px -10px rgba(0,0,0,0.8);
-  --corporate-pink: #c80062;
-  --corporate-pink-hover: #a30050;
+  --bg-app: #05070a; --bg-surface: #0b101b; --bg-elevated: #111827; --bg-active: #1f293d;
+  --border: #1e293b; --border-focus: #38bdf8; --text-main: #f8fafc; --text-muted: #94a3b8;
+  --text-dim: #64748b; --accent: #38bdf8; --accent-glow: rgba(56, 189, 248, 0.18);
+  --primary: #0284c7; --primary-hover: #0369a1; --success: #10b981; --success-bg: rgba(16, 185, 129, 0.12);
+  --warning: #f59e0b; --warning-bg: rgba(245, 158, 11, 0.12); --danger: #ef4444; --danger-bg: rgba(239, 68, 68, 0.12);
+  --corporate-pink: #c80062; --corporate-pink-hover: #a30050;
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.4); --shadow-lg: 0 20px 50px -10px rgba(0,0,0,0.8);
 }
 
 :root[data-theme="light"] {
-  --bg-app: #f4f6f9;
-  --bg-surface: #ffffff;
-  --bg-elevated: #f8fafc;
-  --bg-active: #e2e8f0;
-  --border: #cbd5e1;
-  --border-focus: #0284c7;
-  --text-main: #0f172a;
-  --text-muted: #475569;
-  --text-dim: #94a3b8;
-  --accent: #0284c7;
-  --accent-glow: rgba(2, 132, 199, 0.1);
-  --primary: #0284c7;
-  --primary-hover: #0369a1;
-  --success: #059669;
-  --success-bg: #d1fae5;
-  --warning: #d97706;
-  --warning-bg: #fef3c7;
-  --danger: #dc2626;
-  --danger-bg: #fee2e2;
-  --purple: #7c3aed;
-  --purple-bg: #ede9fe;
-  --shadow-sm: 0 4px 12px rgba(15,23,42,0.05);
-  --shadow-lg: 0 20px 40px -10px rgba(15,23,42,0.1);
-  --corporate-pink: #c80062;
-  --corporate-pink-hover: #a30050;
+  --bg-app: #f4f6f9; --bg-surface: #ffffff; --bg-elevated: #f8fafc; --bg-active: #e2e8f0;
+  --border: #cbd5e1; --border-focus: #0284c7; --text-main: #0f172a; --text-muted: #475569;
+  --text-dim: #94a3b8; --accent: #0284c7; --accent-glow: rgba(2, 132, 199, 0.1);
+  --primary: #0284c7; --primary-hover: #0369a1; --success: #059669; --success-bg: #d1fae5;
+  --warning: #d97706; --warning-bg: #fef3c7; --danger: #dc2626; --danger-bg: #fee2e2;
+  --corporate-pink: #c80062; --corporate-pink-hover: #a30050;
+  --shadow-sm: 0 4px 12px rgba(15,23,42,0.05); --shadow-lg: 0 24px 60px -10px rgba(15,23,42,0.15);
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  background-color: var(--bg-app);
-  color: var(--text-main);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
-  min-height: 100vh;
-  padding-bottom: 60px;
-  transition: background-color 0.2s ease, color 0.2s ease;
-}
+body { background-color: var(--bg-app); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-height: 100vh; padding-bottom: 60px; transition: background-color 0.2s ease, color 0.2s ease; }
 
-/* =========================================================
-   REFINED TOP NAVIGATION HEADER
-========================================================= */
-.nav-header {
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 12px 30px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+/* 1. TOP ALERT MARQUEE (TICKER) */
+.port-alert-ticker {
+  background: #0f172a; color: #38bdf8; font-size: 11.5px; font-weight: 700; padding: 6px 0;
+  overflow: hidden; white-space: nowrap; border-bottom: 1px solid #1e293b; display: flex; align-items: center;
 }
-.nav-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
+.ticker-content { display: inline-block; animation: tickerScroll 25s linear infinite; padding-left: 100%; }
+@keyframes tickerScroll { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
+
+/* NAVIGATION */
+.nav-header { background: var(--bg-surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; padding: 12px 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.nav-container { max-width: 1400px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
 .brand-box { display: flex; align-items: center; gap: 12px; }
-.brand-icon {
-  width: 44px; height: 44px; border-radius: 8px;
-  background: linear-gradient(135deg, #0284c7, #2563eb);
-  display: grid; place-items: center; font-size: 22px;
-  color: #fff; font-weight: 900;
-}
+.brand-icon { width: 44px; height: 44px; border-radius: 8px; background: var(--corporate-pink); display: grid; place-items: center; font-size: 22px; color: #fff; font-weight: 900; }
 .brand-title { font-size: 18px; font-weight: 900; color: var(--text-main); letter-spacing: -0.03em; margin-bottom: 2px; }
 .brand-sub { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
 .header-tools { display: flex; align-items: center; gap: 8px; }
-.header-segment {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--bg-elevated);
-  padding: 3px 6px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-.header-divider {
-  width: 1px;
-  height: 20px;
-  background: var(--border);
-  margin: 0 4px;
-}
+.header-segment { display: flex; align-items: center; gap: 4px; background: var(--bg-elevated); padding: 3px 6px; border-radius: 8px; border: 1px solid var(--border); }
+.header-divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
 
-.btn {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  padding: 7px 14px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
+.btn { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-main); padding: 7px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; white-space: nowrap; }
 .btn:hover { border-color: var(--border-focus); background: var(--bg-active); }
-.btn-primary {
-  background: var(--primary);
-  border: none;
-  color: #fff !important;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
-}
+.btn-primary { background: var(--primary); border: none; color: #fff !important; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3); }
 .btn-primary:hover { background: var(--primary-hover); }
 .btn-emerald { background: var(--success-bg); border-color: rgba(16, 185, 129, 0.3); color: var(--success); }
-.btn-gold { background: var(--warning-bg); border-color: rgba(245, 158, 11, 0.3); color: var(--warning); }
 .btn-danger { background: var(--danger-bg); border-color: rgba(239, 68, 68, 0.3); color: var(--danger); }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
 .btn-ghost:hover { background: var(--bg-active); color: var(--text-main); }
 
 .nav-dropdown { position: relative; }
-.nav-dropdown-content {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  box-shadow: var(--shadow-lg);
-  display: none;
-  flex-direction: column;
-  min-width: 200px;
-  z-index: 100;
-  padding: 6px;
-}
+.nav-dropdown-content { position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; box-shadow: var(--shadow-lg); display: none; flex-direction: column; min-width: 200px; z-index: 100; padding: 6px; }
 .nav-dropdown-content.show { display: flex; }
-.dropdown-item {
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-main);
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-}
+.dropdown-item { padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--text-main); border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 8px; border: none; background: transparent; width: 100%; text-align: left; }
 .dropdown-item:hover { background: var(--accent-glow); color: var(--accent); }
 
 /* =========================================================
-   ENTERPRISE HERO LANDING PAGE
+   ENTERPRISE PARALLAX HERO LANDING 
 ========================================================= */
 .public-hero-section {
   position: relative;
-  height: 540px;
+  min-height: 550px;
   display: flex;
   align-items: center;
   background-image: url('https://images.unsplash.com/photo-1586528116311-ad8ed7c1590f?q=80&w=2070');
   background-size: cover;
   background-position: center 60%;
+  background-attachment: fixed;
   border-bottom: 4px solid var(--corporate-pink);
 }
 .public-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(0, 15, 40, 0.85) 0%, rgba(0, 15, 40, 0.2) 100%);
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, rgba(0, 15, 40, 0.9) 0%, rgba(0, 15, 40, 0.4) 100%);
   z-index: 1;
 }
 .public-hero-container {
@@ -215,159 +96,144 @@ body {
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 30px;
+  padding: 60px 30px;
   display: grid;
-  grid-template-columns: 1fr 480px;
-  gap: 40px;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 60px;
   align-items: center;
 }
 @media (max-width: 968px) {
-  .public-hero-container {
-    grid-template-columns: 1fr;
-    justify-content: center;
-    padding-top: 40px;
-  }
+  .public-hero-container { grid-template-columns: 1fr; text-align: center; }
 }
 
 .hero-text-content h1 {
-  font-size: 56px;
-  font-weight: 900;
-  color: #ffffff;
-  line-height: 1.1;
-  margin-bottom: 24px;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  letter-spacing: -0.02em;
+  font-size: 60px; font-weight: 900; color: #ffffff; line-height: 1.1; margin-bottom: 20px;
+  text-shadow: 0 10px 30px rgba(0,0,0,0.5); letter-spacing: -0.03em;
+}
+.hero-text-content p {
+  font-size: 17px; color: #cbd5e1; font-weight: 500; line-height: 1.6; margin-bottom: 40px; max-width: 500px;
+}
+@media (max-width: 968px) { .hero-text-content p { margin: 0 auto 40px auto; } }
+
+/* PREMIUM GLASSMORPHISM TRACKING WIDGET */
+.hero-widget-card {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 12px;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+  overflow: hidden;
+  display: flex; flex-direction: column;
+}
+[data-theme="dark"] .hero-widget-card {
+  background: rgba(15, 23, 42, 0.95);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-/* TRACKING WIDGET CARD */
-.hero-widget-card {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
 .widget-tabs-header {
-  display: flex;
-  background: #f8fafc;
-  border-bottom: 1px solid #cbd5e1;
-  padding: 0 20px;
+  display: flex; background: rgba(0,0,0,0.03); border-bottom: 1px solid var(--border); padding: 0 24px;
 }
 .widget-tab-active {
-  padding: 16px 20px;
-  font-size: 14px;
-  font-weight: 800;
-  color: var(--corporate-pink);
-  border-bottom: 3px solid var(--corporate-pink);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: -1px; /* Overlaps border */
+  padding: 18px 20px; font-size: 14px; font-weight: 800; color: var(--corporate-pink);
+  border-bottom: 3px solid var(--corporate-pink); display: flex; align-items: center; gap: 8px; margin-bottom: -1px;
 }
-.widget-tab-active svg {
-  width: 16px; height: 16px; fill: currentColor;
-}
+.widget-tab-active svg { width: 16px; height: 16px; fill: currentColor; }
 
-.widget-body {
-  padding: 32px 28px;
-}
+.widget-body { padding: 36px 32px; text-align: left; }
 .widget-body label {
-  display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 12px;
+  display: block; font-size: 12px; font-weight: 800; color: var(--text-main); margin-bottom: 12px; letter-spacing: 0.05em;
 }
-.widget-body label span {
-  color: var(--corporate-pink);
-}
+.widget-body label span { color: var(--corporate-pink); }
 
-.widget-input-wrapper {
-  margin-bottom: 10px;
-}
+.widget-input-wrapper { position: relative; margin-bottom: 14px; }
 .widget-input-wrapper input {
-  width: 100%;
-  background: #ffffff;
-  border: 1px solid #94a3b8;
-  padding: 14px 16px;
-  border-radius: 4px;
-  font-size: 15px;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 600;
-  color: #0f172a;
-  outline: none;
-  transition: all 0.2s ease;
+  width: 100%; background: var(--bg-surface); border: 2px solid var(--border); padding: 16px 20px;
+  border-radius: 6px; font-size: 16px; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+  color: var(--text-main); outline: none; transition: all 0.2s ease;
 }
-.widget-input-wrapper input:focus {
-  border-color: var(--corporate-pink);
-  box-shadow: 0 0 0 3px rgba(200, 0, 98, 0.15);
-}
-.widget-input-wrapper input::placeholder {
-  color: #94a3b8;
-  font-weight: 500;
-}
+.widget-input-wrapper input:focus { border-color: var(--corporate-pink); box-shadow: 0 0 0 4px rgba(200, 0, 98, 0.15); }
 
-.widget-helper-text {
-  font-size: 12px;
-  color: #64748b;
-  margin-bottom: 28px;
-  line-height: 1.4;
-}
+.widget-helper-text { font-size: 12px; color: var(--text-muted); margin-bottom: 28px; line-height: 1.5; }
 
-.widget-footer {
-  display: flex;
-  justify-content: flex-end;
-}
+.widget-footer { display: flex; justify-content: flex-end; align-items: center; gap: 16px; }
+
+/* LOADING ANIMATION BUTTON */
 .btn-track-action {
-  background: var(--corporate-pink);
-  color: #ffffff;
-  border: none;
-  padding: 14px 42px;
-  font-size: 16px;
-  font-weight: 800;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background 0.2s ease;
-  letter-spacing: 0.03em;
+  background: var(--corporate-pink); color: #ffffff; border: none; padding: 16px 48px;
+  font-size: 16px; font-weight: 900; border-radius: 6px; cursor: pointer; transition: all 0.2s ease;
+  letter-spacing: 0.03em; display: flex; align-items: center; justify-content: center; gap: 10px;
 }
-.btn-track-action:hover {
-  background: var(--corporate-pink-hover);
+.btn-track-action:hover { background: var(--corporate-pink-hover); transform: translateY(-2px); box-shadow: 0 10px 20px rgba(200, 0, 98, 0.3); }
+.btn-track-action.loading { pointer-events: none; opacity: 0.9; }
+.spinner { display: none; width: 18px; height: 18px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.quick-sample-chips { margin-top: 24px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--border); padding-top: 16px; }
+.sample-chip { background: var(--bg-elevated); border: 1px solid var(--border); padding: 5px 12px; border-radius: 6px; font-size: 11.5px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-muted); cursor: pointer; transition: all 0.15s ease; }
+.sample-chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+
+/* VISUAL PROGRESS TIMELINE (STEPPER) */
+.timeline-stepper {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  position: relative; margin: 30px 20px 20px 20px; padding-top: 10px;
 }
+.timeline-stepper::before {
+  content: ''; position: absolute; top: 22px; left: 30px; right: 30px; height: 4px;
+  background: var(--border); z-index: 1; border-radius: 4px;
+}
+.timeline-progress-bar {
+  position: absolute; top: 22px; left: 30px; height: 4px;
+  background: var(--success); z-index: 2; border-radius: 4px; transition: width 1s ease;
+}
+.stepper-node {
+  position: relative; z-index: 3; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 80px;
+}
+.node-circle {
+  width: 28px; height: 28px; border-radius: 50%; background: var(--bg-surface);
+  border: 4px solid var(--border); display: grid; place-items: center; transition: all 0.3s ease;
+}
+.node-label { font-size: 10.5px; font-weight: 800; color: var(--text-muted); text-align: center; text-transform: uppercase; line-height: 1.2; }
+.node-date { font-size: 10px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); font-weight: 600; margin-top: 2px; text-align: center;}
+
+/* Active / Completed States for Stepper */
+.stepper-node.completed .node-circle { border-color: var(--success); background: var(--success); box-shadow: 0 0 15px rgba(16, 185, 129, 0.4); }
+.stepper-node.completed .node-label { color: var(--text-main); }
+.stepper-node.completed .node-date { color: var(--success); font-weight: 700; }
+.stepper-node.current .node-circle { border-color: var(--accent); background: var(--bg-surface); box-shadow: 0 0 0 4px var(--accent-glow); }
+.stepper-node.current .node-label { color: var(--accent); }
 
 /* PUBLIC SEARCH RESULT CARD */
 .public-result-card {
-  max-width: 1100px;
-  margin: -30px auto 60px auto;
-  position: relative;
-  z-index: 10;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  display: none;
-  text-align: left;
+  max-width: 1100px; margin: 40px auto 80px auto; position: relative; z-index: 10;
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: 16px;
+  overflow: hidden; box-shadow: var(--shadow-lg); display: none; text-align: left;
+  animation: slideUp 0.4s ease-out forwards;
 }
+@keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+/* FLOATING WHATSAPP BUBBLE */
+.floating-support {
+  position: fixed; bottom: 24px; right: 24px; width: 56px; height: 56px;
+  background: #25D366; color: white; border-radius: 50%;
+  display: grid; place-items: center; font-size: 28px; text-decoration: none;
+  box-shadow: 0 10px 25px rgba(37, 211, 102, 0.4); z-index: 999;
+  transition: transform 0.2s ease;
+}
+.floating-support:hover { transform: scale(1.1); }
 
 /* DATA MODULE SECTIONS */
-.ref-module-section { padding: 24px; }
-.ref-module-card {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 18px;
-  margin-bottom: 16px;
-}
-.ref-module-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 800; font-size: 12px; color: var(--accent); text-transform: uppercase; }
-.ref-data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-@media(max-width: 768px) { .ref-data-grid { grid-template-columns: 1fr; } }
-.ref-data-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
-.ref-data-box label { display: block; font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
-.ref-data-box val { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-main); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ref-module-section { padding: 0 30px 30px 30px; }
+.ref-module-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+.ref-module-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; font-weight: 800; font-size: 13px; color: var(--text-main); text-transform: uppercase; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+.ref-data-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+@media(max-width: 900px) { .ref-data-grid { grid-template-columns: repeat(2, 1fr); } }
+.ref-data-box { display: flex; flex-direction: column; gap: 4px; }
+.ref-data-box label { font-size: 9.5px; font-weight: 800; text-transform: uppercase; color: var(--text-dim); }
+.ref-data-box val { font-size: 14px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-main); word-break: break-all; }
 
 /* =================================================================
-   DASHBOARD UI STYLES (Keep Intact for Staff view)
+   DASHBOARD UI STYLES (Staff view)
 ==================================================================== */
 .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
 .kpi-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
@@ -386,7 +252,7 @@ body {
 .control-tray-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
 .filter-inputs { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
 .search-input-wrapper { position: relative; min-width: 240px; flex: 1; max-width: 380px; }
-.search-input-wrapper input { width: 100%; padding-left: 30px; }
+.search-input-wrapper input { width: 100%; padding-left: 30px; border: 1px solid var(--border); border-radius: 7px; height: 34px; background: var(--bg-elevated); color: var(--text-main); font-weight: 600; outline:none; }
 .search-input-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-dim); pointer-events: none; }
 .input, .select { height: 34px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-main); padding: 0 10px; border-radius: 7px; font-size: 12px; font-weight: 600; outline: none; transition: all 0.15s ease; }
 .input:focus, .select:focus { border-color: var(--border-focus); background: var(--bg-surface); }
@@ -458,6 +324,12 @@ body {
 </head>
 <body>
 
+<div class="port-alert-ticker">
+  <div class="ticker-content">
+    ⚠️ <strong>LIVE ALERT:</strong> High congestion at Chennai Gate 2. Expect +4hr delays. &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 🚢 <strong>VESSEL ARRIVAL:</strong> 'STARSHIP NEPTUNE' berthed successfully. &nbsp;&nbsp;&nbsp; | &nbsp;&nbsp;&nbsp; 📢 CFS Operations normalized.
+  </div>
+</div>
+
 <header class="nav-header">
   <div class="nav-container">
     <div class="brand-box">
@@ -488,9 +360,8 @@ body {
 
         <div class="header-segment">
           <button class="btn btn-ghost" id="exportBtn" title="Export to Excel">📤 Export</button>
-          <label class="btn btn-ghost action-editor-only" style="cursor:pointer" title="Import from Excel">
-            📂 Import<input id="excelInput" type="file" accept=".xlsx,.xls,.csv" style="display:none">
-          </label>
+          <button class="btn btn-ghost action-editor-only" id="importBtnTrigger" title="Import from Excel">📂 Import</button>
+          <input id="excelInput" type="file" accept=".xlsx,.xls,.csv" style="display:none">
         </div>
 
         <div class="header-divider"></div>
@@ -518,6 +389,7 @@ body {
       
       <div class="hero-text-content">
         <h1>Your Shipping Partner</h1>
+        <p>Real-time visibility across terminal discharge gates, CFS warehousing schedules, and automated D&D demurrage safeguards.</p>
       </div>
       
       <div class="hero-widget-card">
@@ -538,7 +410,16 @@ body {
           <div class="widget-helper-text">Enter your tracking numbers. Separate multiple entries with a space or comma.</div>
           
           <div class="widget-footer">
-            <button class="btn-track-action" id="publicSearchBtn">Track</button>
+            <button class="btn-track-action" id="publicSearchBtn">
+              <span class="btn-text">Track</span>
+              <div class="spinner" id="searchSpinner"></div>
+            </button>
+          </div>
+
+          <div class="quick-sample-chips">
+            <span style="font-size:10.5px; font-weight:700; color:var(--text-dim); text-transform:uppercase;">Try Sample:</span>
+            <span class="sample-chip" onclick="document.getElementById('publicSearchInput').value='SKHU9422886'; document.getElementById('publicSearchBtn').click();">SKHU9422886</span>
+            <span class="sample-chip" onclick="document.getElementById('publicSearchInput').value='SKHU6385027'; document.getElementById('publicSearchBtn').click();">SKHU6385027</span>
           </div>
         </div>
       </div>
@@ -547,6 +428,8 @@ body {
   </div>
 
   <div id="publicResultContainer" class="public-result-card"></div>
+  
+  <a href="https://wa.me/" class="floating-support" title="Live Port Support">💬</a>
 </section>
 
 <main class="main-wrapper" id="opsDashboardView" style="display:none;">
@@ -834,12 +717,25 @@ body {
 <div class="toast-popup" id="toast"></div>
 
 <script>
+// =========================================================
+// SYSTEM INITIALIZATION
+// =========================================================
 const SUPABASE_URL = "https://ykeucqritoexykqrggzz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_olbFhK5Wu6hGiaGGDdXMeA_6szko2wZ";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const USD_TO_INR = 84;
 let activeCurrency = localStorage.getItem("gml_curr") || "INR";
+let currentUser = null;
+let selectedIndices = new Set();
+let currentView = 'cards';
+let activeQuickFilter = 'active';
+let editingIndex = -1;
+let sortField = null;
+let sortAsc = true;
+let routeMapInstance = null;
+let activeTruckSlipIndex = -1;
+let auditLogs = [];
 
 const COLS = [
   'CONTAINER NO.', 'TYPE', 'MBL NO', 'LINER', 'GATEWAY PORT', 'CFS NAME', 
@@ -848,7 +744,14 @@ const COLS = [
   'DRIVER CONTACT', 'PLANNING', 'DESTUFFING DATE', 'CONTAINER RETURN DATE', 'REMARKS'
 ];
 const DATE_COLS = new Set(['ETD', 'ETA', 'SPLIT DATE', 'INWARD DATE', 'PORT IN', 'PORT OUT', 'CFS IN', 'DESTUFFING DATE', 'CONTAINER RETURN DATE']);
+const PORT_COORDS = {
+  "SHEKOU": [22.48, 113.91], "BUSAN": [35.10, 129.04], "SHANGHAI": [31.23, 121.47],
+  "NINGBO": [29.86, 121.54], "QINGDAO": [36.06, 120.38], "SINGAPORE": [1.29, 103.85],
+  "PORT KLANG": [3.00, 101.40], "CCTL": [13.085, 80.298], "CITPL": [13.098, 80.305],
+  "KATTUPALLI": [13.315, 80.345], "ENNORE": [13.250, 80.332], "CHENNAI": [13.0827, 80.2707]
+};
 
+// Default Dummy Data 
 let rows = [
   {
     "CONTAINER NO.": "SKHU9422886", "TYPE": "40' DC", "MBL NO": "SNK003C260801543", "LINER": "PAREKH", 
@@ -866,56 +769,13 @@ let rows = [
   }
 ];
 
-let currentUser = null;
-let selectedIndices = new Set();
-let currentView = 'cards';
-let activeQuickFilter = 'active';
-let editingIndex = -1;
-let sortField = null;
-let sortAsc = true;
-let routeMapInstance = null;
-let activeTruckSlipIndex = -1;
-
-let auditLogs = [];
-try {
-  const savedLogs = localStorage.getItem("gml_audit_trail");
-  if (savedLogs) auditLogs = JSON.parse(savedLogs);
-} catch(e) {}
-
-const PORT_COORDS = {
-  "SHEKOU": [22.48, 113.91], "BUSAN": [35.10, 129.04], "SHANGHAI": [31.23, 121.47],
-  "NINGBO": [29.86, 121.54], "QINGDAO": [36.06, 120.38], "SINGAPORE": [1.29, 103.85],
-  "PORT KLANG": [3.00, 101.40], "CCTL": [13.085, 80.298], "CITPL": [13.098, 80.305],
-  "KATTUPALLI": [13.315, 80.345], "ENNORE": [13.250, 80.332], "CHENNAI": [13.0827, 80.2707]
-};
-
+// Utility Helpers
 const el = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
-function formatCurrency(valUSD) {
-  if (activeCurrency === "USD") return `$${Math.round(valUSD).toLocaleString()}`;
-  return `₹${Math.round(valUSD * USD_TO_INR).toLocaleString()}`;
-}
-
-el("opsMenuBtn").addEventListener("click", (e) => {
-  e.stopPropagation();
-  el("opsMenuDropdown").classList.toggle("show");
-});
-document.addEventListener("click", () => el("opsMenuDropdown").classList.remove("show"));
-
-el("currencyToggleBtn").addEventListener("click", () => {
-  activeCurrency = activeCurrency === "INR" ? "USD" : "INR";
-  localStorage.setItem("gml_curr", activeCurrency);
-  el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
-  renderUI();
-});
-el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
-
 function toast(msg) {
   const t = el("toast");
-  t.textContent = msg;
-  t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
+  if(t) { t.textContent = msg; t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 2500); }
 }
 
 function parseLocalDate(str) {
@@ -928,952 +788,6 @@ function parseLocalDate(str) {
   const d = new Date(clean);
   return isNaN(d) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
-
-/* =================================================================
-   AUTOMATIC VESSEL BERTH & ETA/DELAY ENGINE
-==================================================================== */
-function handleAutomaticVesselBerth(vesselName, berthDate) {
-  let updatedCount = 0;
-  rows.forEach((r, idx) => {
-    const vsl = (r["VESSEL & VOY"] || "").trim();
-    if (vsl.toLowerCase() === vesselName.toLowerCase() && !validDate(r["PORT IN"])) {
-      const oldVal = r["PORT IN"];
-      r["PORT IN"] = berthDate;
-      updatedCount++;
-      logAuditEvent("AUTO_BERTH_UPDATE", r["CONTAINER NO."], "PORT IN", oldVal, berthDate);
-    }
-  });
-  if (updatedCount > 0) {
-    saveAndRefresh();
-    toast(`Auto-updated ${updatedCount} containers to Port In based on vessel berth!`);
-  }
-}
-
-function getVesselDelayStatus(r) {
-  const eta = getField(r, ["ETA"]);
-  const portIn = getField(r, ["PORT IN"]);
-  if (!validDate(eta)) return { isDelayed: false, delayDays: 0 };
-  
-  const etaDate = parseLocalDate(eta);
-  const compDate = validDate(portIn) ? parseLocalDate(portIn) : new Date();
-  if (!etaDate) return { isDelayed: false, delayDays: 0 };
-  
-  const diffDays = Math.floor((compDate - etaDate) / (1000 * 60 * 60 * 24));
-  return { isDelayed: diffDays > 2 && !isFullyCompleted(r), delayDays: diffDays };
-}
-
-/* =================================================================
-   EXACT REFERENCE MODULES (TIMELINE BAR COMPLETELY REMOVED)
-==================================================================== */
-function generatePublicVoyageTimelineHtml(r) {
-  const mblNo = esc(r["MBL NO"] || "—");
-  const vesselName = esc(r["VESSEL & VOY"] || "—");
-  const cfsName = esc(r["CFS NAME"] || "—");
-  const liner = esc(r["LINER"] || "—");
-  const pol = esc(r["POL"] || "—");
-  const eta = formatDate(r["ETA"]) || 'Pending';
-
-  const igmSplit = formatDate(r["SPLIT DATE"]) || 'Pending';
-  const berthedPort = formatDate(r["PORT IN"]) || 'Pending';
-  const portOut = formatDate(r["PORT OUT"]) || 'Pending';
-  const cfsIn = formatDate(r["CFS IN"]) || 'Pending';
-  const destuffed = formatDate(r["DESTUFFING DATE"]) || 'Pending';
-  const containerReturned = formatDate(r["CONTAINER RETURN DATE"]) || 'Pending';
-
-  return `
-    <div>
-      <div style="background:var(--bg-elevated); padding:20px 28px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div>
-          <div style="font-size:10px; font-weight:800; color:var(--text-dim); text-transform:uppercase;">Container Number</div>
-          <div style="font-size:24px; font-weight:900; font-family:'JetBrains Mono'; color:var(--accent);">${esc(r["CONTAINER NO."])}</div>
-        </div>
-      </div>
-
-      <div class="ref-module-section">
-        <div class="ref-module-card">
-          <div class="ref-module-title-bar">
-            <span>1. Vessel & Voyage Information</span>
-            <span style="font-size:10px; color:var(--text-muted);">Line: ${liner}</span>
-          </div>
-          <div class="ref-data-grid">
-            <div class="ref-data-box normal-box">
-              <label>Master Bill of Lading (MBL)</label>
-              <val>${mblNo}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Vessel & Voyage</label>
-              <val>${vesselName}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Estimated Arrival (ETA)</label>
-              <val>${eta}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Port of Loading (POL)</label>
-              <val>${pol}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Designated CFS Depot</label>
-              <val>${cfsName}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Container Size</label>
-              <val>${esc(r["TYPE"] || "40' DC")}</val>
-            </div>
-          </div>
-        </div>
-
-        <div class="ref-module-card" style="margin-bottom:0;">
-          <div class="ref-module-title-bar">
-            <span>2. Port Discharge & Terminal Status</span>
-          </div>
-          <div class="ref-data-grid">
-            <div class="ref-data-box normal-box">
-              <label>IGM Split</label>
-              <val>${igmSplit}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Berthed Into Port</label>
-              <val>${berthedPort}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Port Out</label>
-              <val>${portOut}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>CFS In</label>
-              <val>${cfsIn}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Destuffing Completed</label>
-              <val>${destuffed}</val>
-            </div>
-            <div class="ref-data-box normal-box">
-              <label>Container Returned</label>
-              <val>${containerReturned}</val>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-/* =================================================================
-   FEATURE: AUDIT TRAIL LOGGING
-==================================================================== */
-function logAuditEvent(action, containerNo, field, oldVal, newVal) {
-  const operator = currentUser ? `${currentUser.id} (${currentUser.role})` : "System / Auto";
-  const entry = {
-    id: `LOG-${Date.now()}-${Math.floor(Math.random()*1000)}`,
-    timestamp: new Date().toISOString(),
-    operator,
-    action,
-    containerNo: containerNo || "—",
-    field: field || "—",
-    oldVal: String(oldVal ?? "—").trim() || "—",
-    newVal: String(newVal ?? "—").trim() || "—"
-  };
-
-  auditLogs.unshift(entry);
-  if (auditLogs.length > 500) auditLogs.pop();
-
-  try {
-    localStorage.setItem("gml_audit_trail", JSON.stringify(auditLogs));
-    sb.from('audit_logs').insert([entry]).then(() => {}).catch(() => {});
-  } catch(e) {}
-
-  updateAuditBadge();
-}
-
-function updateAuditBadge() {
-  const badge = el("auditCountBadge");
-  if (badge) badge.textContent = auditLogs.length;
-}
-
-function renderAuditTable(filteredList = auditLogs) {
-  const tbody = el("auditTableBody");
-  if (!filteredList.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="padding:24px; text-align:center; color:var(--text-muted);">No activity recorded yet.</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = filteredList.map(log => {
-    const d = new Date(log.timestamp);
-    const dateFormatted = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
-    const timeFormatted = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
-
-    let actionBadge = `<span style="background:var(--accent-glow); color:var(--accent); padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${esc(log.action)}</span>`;
-    if (log.action.includes("DELETE")) actionBadge = `<span style="background:var(--danger-bg); color:var(--danger); padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${esc(log.action)}</span>`;
-    if (log.action.includes("DESTUFF") || log.action.includes("RETURN")) actionBadge = `<span style="background:var(--success-bg); color:var(--success); padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${esc(log.action)}</span>`;
-
-    return `
-      <tr style="border-bottom:1px solid var(--border);">
-        <td style="padding:6px 10px; font-family:'JetBrains Mono'; white-space:nowrap; color:var(--text-muted);">${dateFormatted} ${timeFormatted}</td>
-        <td style="padding:6px 10px; font-weight:700;">${esc(log.operator)}</td>
-        <td style="padding:6px 10px;">${actionBadge}</td>
-        <td style="padding:6px 10px; font-family:'JetBrains Mono'; font-weight:800; color:var(--accent);">${esc(log.containerNo)}</td>
-        <td style="padding:6px 10px; font-weight:600;">${esc(log.field)}</td>
-        <td style="padding:6px 10px; font-family:'JetBrains Mono'; font-size:10.5px;">
-          <span style="color:var(--text-muted); text-decoration:line-through;">${esc(log.oldVal)}</span>
-          <span style="color:var(--text-muted); margin:0 4px;">➔</span>
-          <span style="color:var(--success); font-weight:700;">${esc(log.newVal)}</span>
-        </td>
-      </tr>
-    `;
-  }).join("");
-}
-
-el("openAuditLogBtn").addEventListener("click", () => {
-  renderAuditTable();
-  el("clearAuditBtn").style.display = (currentUser && currentUser.role === "Admin") ? "inline-block" : "none";
-  el("auditModalBg").classList.add("open");
-});
-el("auditClose").addEventListener("click", () => el("auditModalBg").classList.remove("open"));
-
-el("auditSearchInput").addEventListener("input", (e) => {
-  const q = e.target.value.toLowerCase();
-  const filtered = auditLogs.filter(l => 
-    l.containerNo.toLowerCase().includes(q) || 
-    l.operator.toLowerCase().includes(q) || 
-    l.field.toLowerCase().includes(q) ||
-    l.action.toLowerCase().includes(q)
-  );
-  renderAuditTable(filtered);
-});
-
-el("exportAuditBtn").addEventListener("click", () => {
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditLogs), "Audit_Trail");
-  XLSX.writeFile(wb, `Operations_Audit_Log_${new Date().toISOString().slice(0,10)}.xlsx`);
-});
-
-el("clearAuditBtn").addEventListener("click", () => {
-  if (confirm("Permanently clear the local audit trail?")) {
-    auditLogs = [];
-    localStorage.removeItem("gml_audit_trail");
-    renderAuditTable();
-    updateAuditBadge();
-    toast("Audit trail cleared");
-  }
-});
-
-/* =================================================================
-   FEATURE: ISO 6346 CONTAINER NUMBER VALIDATION ENGINE
-==================================================================== */
-function validateISO6346(cntr) {
-  if (!cntr) return { isValid: false, message: "Empty code" };
-  const clean = String(cntr).trim().toUpperCase();
-  if (clean.length !== 11) return { isValid: false, message: "Must be 11 characters" };
-
-  const charValues = {
-    'A':10,'B':12,'C':13,'D':14,'E':15,'F':16,'G':17,'H':18,'I':19,'J':20,
-    'K':21,'L':23,'M':24,'N':25,'O':26,'P':27,'Q':28,'R':29,'S':30,'T':31,
-    'U':32,'V':34,'W':35,'X':36,'Y':37,'Z':38
-  };
-
-  let sum = 0;
-  for (let i = 0; i < 10; i++) {
-    const c = clean[i];
-    let val;
-    if (c >= '0' && c <= '9') val = parseInt(c, 10);
-    else if (charValues[c]) val = charValues[c];
-    else return { isValid: false, message: "Invalid character" };
-    sum += val * Math.pow(2, i);
-  }
-
-  const checkDigit = (sum % 11) % 10;
-  const actualCheck = parseInt(clean[10], 10);
-  const isValid = checkDigit === actualCheck;
-
-  return { isValid, message: isValid ? "Valid ISO 6346" : `Checksum error (Expected ${checkDigit})` };
-}
-
-/* =================================================================
-   FEATURE: DUAL LAST FREE DAY (LFD) COUNTDOWN & FEE ENGINE
-==================================================================== */
-function calculateStandardFees(r) {
-  const is20ft = (r["TYPE"] || "").includes("20");
-  const demRatePerDay = is20ft ? 100 : 225;
-  const detRatePerDay = is20ft ? 75 : 150;
-
-  const portInDate = parseLocalDate(getField(r, ["PORT IN"]));
-  const portOutDate = parseLocalDate(getField(r, ["PORT OUT"])) || parseLocalDate(getField(r, ["CFS IN"]));
-  const returnDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
-  
-  const today = new Date();
-  const nowDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
-  let demDays = 0, demOverdue = false, demCostUSD = 0, portDwell = 0;
-  let detDays = 0, detOverdue = false, detCostUSD = 0, totalEquipmentDays = 0;
-
-  const portFreeDays = 3;
-  let terminalLFD = null;
-  let terminalDaysLeft = null;
-
-  if (portInDate) {
-    terminalLFD = new Date(portInDate);
-    terminalLFD.setDate(terminalLFD.getDate() + portFreeDays);
-    terminalDaysLeft = Math.floor((terminalLFD - nowDay) / (1000 * 60 * 60 * 24));
-
-    const endPortDate = portOutDate || nowDay;
-    portDwell = Math.max(0, Math.floor((endPortDate - portInDate) / (1000 * 60 * 60 * 24)));
-    if (portDwell > portFreeDays) {
-      demOverdue = true;
-      demDays = portDwell - portFreeDays;
-      demCostUSD = demDays * demRatePerDay;
-    }
-  }
-
-  const carrierFreeDays = parseInt(getField(r, ["FREE DAYS"]) || "14", 10);
-  let detentionLFD = null;
-  let detentionDaysLeft = null;
-
-  if (portInDate) {
-    detentionLFD = new Date(portInDate);
-    detentionLFD.setDate(detentionLFD.getDate() + carrierFreeDays);
-    detentionDaysLeft = Math.floor((detentionLFD - nowDay) / (1000 * 60 * 60 * 24));
-
-    const endDetDate = returnDate || nowDay;
-    totalEquipmentDays = Math.max(0, Math.floor((endDetDate - portInDate) / (1000 * 60 * 60 * 24)));
-    if (totalEquipmentDays > carrierFreeDays && !isFullyCompleted(r)) {
-      detOverdue = true;
-      detDays = totalEquipmentDays - carrierFreeDays;
-      detCostUSD = detDays * detRatePerDay;
-    }
-  }
-
-  return {
-    is20ft,
-    portDwell,
-    totalEquipmentDays,
-    terminalLFD: terminalLFD ? formatDate(terminalLFD.toISOString().slice(0,10)) : "—",
-    terminalDaysLeft,
-    detentionLFD: detentionLFD ? formatDate(detentionLFD.toISOString().slice(0,10)) : "—",
-    detentionDaysLeft,
-    demOverdue,
-    demDays,
-    demCostUSD,
-    detDays,
-    detCostUSD,
-    totalCostUSD: demCostUSD + detCostUSD,
-    isCompleted: isFullyCompleted(r)
-  };
-}
-
-/* =================================================================
-   CLEAN MANIFEST TABLE REPORT GENERATOR (MATCHING SAMPLES)
-==================================================================== */
-function generateCleanManifestHtml(containersList) {
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-
-  const rowsHtml = containersList.map(r => {
-    const st = getStatus(r);
-    const liner = getField(r, ["LINER"]) || detectLinerFromMBL(r["MBL NO"]) || "—";
-    const port = getGatewayPortInfo(r).name;
-    const cfs = getField(r, ["CFS NAME"]) || "—";
-    const vsl = getField(r, ["VESSEL & VOY"]) || "—";
-    const pol = getField(r, ["POL"]) || "—";
-    const etd = formatDate(getField(r, ["ETD"]));
-    const eta = formatDate(getField(r, ["ETA"]));
-    const portIn = formatDate(getField(r, ["PORT IN"]));
-    const destuff = formatDate(getField(r, ["DESTUFFING DATE"])) || "—";
-    const remarks = (r["REMARKS"] || "—").trim();
-
-    let pillStyle = "background:#e0f2fe; color:#0284c7;";
-    if (st.text.includes("DE-STUFF") || st.text.includes("RETURNED")) {
-      pillStyle = "background:#dcfce7; color:#15803d;";
-    } else if (st.text.includes("PORT IN") || st.text.includes("CFS IN")) {
-      pillStyle = "background:#e0f2fe; color:#0369a1;";
-    }
-
-    const isSpecialRemark = remarks !== "—" && !remarks.toLowerCase().includes("standard");
-    const remarkColor = isSpecialRemark ? "#b91c1c" : "#475569";
-
-    return `
-      <tr style="border-bottom:1px solid #e2e8f0; font-size:11px;">
-        <td style="padding:12px 10px; font-weight:800; font-family:'JetBrains Mono', monospace; color:#0284c7;">
-          ${esc(r["CONTAINER NO."])}
-          <div style="font-size:9.5px; font-weight:700; color:#64748b; margin-top:2px;">${esc(r["TYPE"] || "40' DC")}</div>
-        </td>
-        <td style="padding:12px 10px; color:#0f172a; font-weight:600;">
-          <div style="font-family:'JetBrains Mono', monospace; font-weight:700;">${esc(r["MBL NO"] || "—")}</div>
-          <div style="font-size:9.5px; color:#64748b; margin-top:2px; text-transform:uppercase;">${esc(liner)}</div>
-        </td>
-        <td style="padding:12px 10px; font-weight:700; color:#0f172a;">
-          ${esc(vsl)}
-        </td>
-        <td style="padding:12px 10px; font-weight:800; color:#b45309;">
-          ${esc(port)}
-        </td>
-        <td style="padding:12px 10px; color:#0f172a; font-weight:600;">
-          <div>${esc(pol)}</div>
-          <div style="font-size:9px; color:#64748b; margin-top:2px;">${etd ? 'ETD: ' + etd : ''}</div>
-        </td>
-        <td style="padding:12px 10px; font-weight:800; color:#0284c7;">
-          ${esc(cfs)}
-        </td>
-        <td style="padding:12px 10px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:600;">
-          ${eta || '—'} / <br><span style="color:#0284c7;">${portIn || '—'}</span>
-        </td>
-        <td style="padding:12px 10px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:700;">
-          ${destuff}
-        </td>
-        <td style="padding:12px 8px; text-align:center;">
-          <span style="display:inline-block; padding:4px 8px; border-radius:4px; font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.02em; ${pillStyle}">
-            ${st.text}
-          </span>
-        </td>
-        <td style="padding:12px 10px; font-weight:800; font-size:10px; text-transform:uppercase; color:${remarkColor};">
-          ${esc(remarks)}
-        </td>
-      </tr>
-    `;
-  }).join("");
-
-  return `
-    <div id="manifestCaptureContainer" style="width:1160px; background:#ffffff; padding:32px 36px; border:1px solid #cbd5e1; border-radius:12px; font-family:'Plus Jakarta Sans', sans-serif; color:#0f172a; box-sizing:border-box;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px;">
-        <div>
-          <h1 style="font-size:20px; font-weight:900; color:#091e42; margin:0; letter-spacing:-0.02em;">GREENWICH MERIDIAN LOGISTICS (INDIA) PVT. LTD.</h1>
-          <div style="font-size:12px; font-weight:700; color:#64748b; margin-top:4px;">Live Status Report • Chennai Operations Desk</div>
-        </div>
-        <div style="text-align:right;">
-          <div style="font-size:13px; font-weight:800; color:#0265dc; font-family:'JetBrains Mono', monospace;">${dateStr}</div>
-        </div>
-      </div>
-
-      <div style="height:2px; background:#0b1e36; margin-bottom:18px;"></div>
-
-      <table style="width:100%; border-collapse:collapse; text-align:left;">
-        <thead>
-          <tr style="background:#0b1e36; color:#ffffff; font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">
-            <th style="padding:10px; width:135px;">CONTAINER NO / TYPE</th>
-            <th style="padding:10px; width:130px;">MBL NO / LINE</th>
-            <th style="padding:10px; width:160px;">VESSEL & VOYAGE</th>
-            <th style="padding:10px; width:65px;">PORT</th>
-            <th style="padding:10px; width:95px;">POL / ETD</th>
-            <th style="padding:10px; width:75px;">CFS DEPOT</th>
-            <th style="padding:10px; width:95px;">ETA / PORT IN</th>
-            <th style="padding:10px; width:80px;">DESTUFF DATE</th>
-            <th style="padding:10px; width:120px; text-align:center;">STATUS</th>
-            <th style="padding:10px; width:140px;">REMARKS / NOTES</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
-      </table>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:14px; border-top:1px solid #e2e8f0; font-size:10px; color:#64748b; font-weight:600;">
-        <div>Greenwich Meridian Logistics (India) Pvt. Ltd. — Chennai</div>
-        <div>Inquiries: madhan@gmlindia.net</div>
-      </div>
-    </div>
-  `;
-}
-
-function downloadCardAsImage(idx, fileNameRef) {
-  const r = typeof idx === 'number' ? rows[idx] : rows.find(x => x["CONTAINER NO."] === fileNameRef);
-  if (!r) return toast("Container not found");
-  downloadMultipleStatusImage([r], r["CONTAINER NO."]);
-}
-
-function downloadMultipleStatusImage(containersList, titleRef = "Status_Report") {
-  if (!containersList || !containersList.length) return toast("No containers selected!");
-
-  toast("Generating table status report...");
-  const tempWrapper = document.createElement("div");
-  tempWrapper.style.position = "fixed";
-  tempWrapper.style.top = "-9999px";
-  tempWrapper.style.left = "-9999px";
-  tempWrapper.innerHTML = generateCleanManifestHtml(containersList);
-  document.body.appendChild(tempWrapper);
-
-  const target = document.getElementById("manifestCaptureContainer");
-
-  html2canvas(target, {
-    scale: 2.5,
-    useCORS: true,
-    backgroundColor: "#ffffff"
-  }).then(canvas => {
-    document.body.removeChild(tempWrapper);
-    const link = document.createElement("a");
-    link.download = `Report_${titleRef}_${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-    toast("Status report photo downloaded!");
-  }).catch(err => {
-    console.error("Capture failed:", err);
-    if (tempWrapper.parentNode) document.body.removeChild(tempWrapper);
-    toast("Failed to render photo.");
-  });
-}
-
-/* =================================================================
-   FEATURE: TRUCK DRIVER GATE DISPATCH SLIP GENERATOR (INTERACTIVE)
-==================================================================== */
-function openTruckDispatchSlip(idx) {
-  activeTruckSlipIndex = idx;
-  const r = rows[idx];
-  const cntr = getField(r, ["CONTAINER NO."]);
-  const liner = getField(r, ["LINER"]) || detectLinerFromMBL(r["MBL NO"]) || "Carrier Line";
-  const port = getGatewayPortInfo(r).name;
-  const cfs = getField(r, ["CFS NAME"]) || "Designated CFS";
-  const seal = getField(r, ["SEAL NO."]) || "—";
-  const passNo = `GML-DSP-${Math.floor(100000 + Math.random() * 900000)}`;
-
-  el("truckSlipArea").innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:14px;">
-      <div>
-        <div style="font-size:18px; font-weight:900; color:#0f172a;">CONTAINER YARD TRUCK DISPATCH SLIP</div>
-        <div style="font-size:10.5px; font-weight:700; color:#475569; text-transform:uppercase;">Greenwich Meridian Logistics (India) Pvt. Ltd.</div>
-      </div>
-      <div style="text-align:right;">
-        <div style="font-size:12px; font-weight:800; font-family:'JetBrains Mono'; color:#0265dc;">${passNo}</div>
-        <div style="font-size:10px; color:#64748b;">${new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
-      </div>
-    </div>
-
-    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:14px;">
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Container Number</label>
-        <span style="font-size:15px; font-weight:900; font-family:'JetBrains Mono'; color:#0265dc;">${esc(cntr)}</span>
-      </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Equipment / Line</label>
-        <span style="font-size:13px; font-weight:800; color:#0f172a;">${esc(r["TYPE"] || "40' DC")} • ${esc(liner)}</span>
-      </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Origin Terminal</label>
-        <span style="font-size:13px; font-weight:800; color:#d97706;">${esc(port)}</span>
-      </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Destination CFS Depot</label>
-        <span style="font-size:13px; font-weight:800; color:#059669;">${esc(cfs)}</span>
-      </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">High-Security Seal No.</label>
-        <span style="font-size:13px; font-weight:800; font-family:'JetBrains Mono'; color:#0f172a;">${esc(seal)}</span>
-      </div>
-
-      <!-- EDITABLE DISPATCH ASSIGNMENT FIELDS -->
-      <div style="border:2px solid #0284c7; border-radius:6px; padding:6px 10px; background:#eff6ff;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Assigned Vehicle / Trailer No. ✏️</label>
-        <input type="text" id="slipTruckInput" class="input" style="width:100%; font-family:'JetBrains Mono'; font-weight:800; background:#ffffff; color:#0f172a; margin-top:2px;" 
-               placeholder="e.g. TN-04-AR-8821" value="${esc(r["TRUCK NO."] || '')}" onchange="updateTruckInSlip(this.value)">
-      </div>
-
-      <div style="grid-column: span 2; border:2px solid #0284c7; border-radius:6px; padding:6px 10px; background:#eff6ff;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Driver Name & Mobile Contact ✏️</label>
-        <input type="text" id="slipDriverInput" class="input" style="width:100%; font-weight:700; background:#ffffff; color:#0f172a; margin-top:2px;" 
-               placeholder="e.g. Ravi Kumar (+91 98401 23456)" value="${esc(r["DRIVER CONTACT"] || '')}" onchange="updateDriverInSlip(this.value)">
-      </div>
-    </div>
-
-    <div class="barcode-visual">*${cntr}*</div>
-
-    <div style="display:flex; justify-content:space-between; margin-top:16px; padding-top:12px; border-top:1px dashed #cbd5e1; font-size:11px; font-weight:700;">
-      <div>Authorized Ops Signature: ______________</div>
-      <div>CFS Gate In Stamp: ______________</div>
-      <div>Driver Acceptance: ______________</div>
-    </div>
-  `;
-  el("truckSlipModalBg").classList.add("open");
-}
-
-function updateTruckInSlip(val) {
-  if (activeTruckSlipIndex === -1) return;
-  const oldVal = rows[activeTruckSlipIndex]["TRUCK NO."];
-  const newVal = val.trim().toUpperCase();
-  rows[activeTruckSlipIndex]["TRUCK NO."] = newVal;
-  logAuditEvent("TRUCK_ASSIGN", rows[activeTruckSlipIndex]["CONTAINER NO."], "TRUCK NO.", oldVal, newVal);
-  saveAndRefresh();
-  toast("Truck number updated!");
-}
-
-function updateDriverInSlip(val) {
-  if (activeTruckSlipIndex === -1) return;
-  const oldVal = rows[activeTruckSlipIndex]["DRIVER CONTACT"];
-  const newVal = val.trim();
-  rows[activeTruckSlipIndex]["DRIVER CONTACT"] = newVal;
-  logAuditEvent("DRIVER_ASSIGN", rows[activeTruckSlipIndex]["CONTAINER NO."], "DRIVER CONTACT", oldVal, newVal);
-  saveAndRefresh();
-  toast("Driver details updated!");
-}
-
-el("sendDriverWhatsAppBtn").addEventListener("click", () => {
-  if (activeTruckSlipIndex === -1) return;
-  const r = rows[activeTruckSlipIndex];
-  const cntr = getField(r, ["CONTAINER NO."]);
-  const port = getGatewayPortInfo(r).name;
-  const cfs = getField(r, ["CFS NAME"]) || "CFS Depot";
-  const seal = getField(r, ["SEAL NO."]) || "—";
-  const truck = r["TRUCK NO."] || "Pending Assignment";
-  
-  const text = `🚚 *CONTAINER MOVEMENT DISPATCH ORDER*\n` +
-               `━━━━━━━━━━━━━━━━━━━━━━\n` +
-               `*Container:* ${cntr} (${r["TYPE"] || "40' DC"})\n` +
-               `*Assigned Truck:* ${truck}\n` +
-               `*Pickup Terminal:* ${port}\n` +
-               `*Delivery CFS:* ${cfs}\n` +
-               `*Seal No:* ${seal}\n` +
-               `*Vessel:* ${r["VESSEL & VOY"] || '—'}\n` +
-               `━━━━━━━━━━━━━━━━━━━━━━\n` +
-               `Please report to gate officer upon arrival. Contact: madhan@gmlindia.net`;
-
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-});
-
-el("truckSlipClose").addEventListener("click", () => el("truckSlipModalBg").classList.remove("open"));
-el("truckSlipCancel").addEventListener("click", () => el("truckSlipModalBg").classList.remove("open"));
-
-/* =================================================================
-   FEATURE: WHATSAPP DIRECT MESSAGE COMPOSER
-==================================================================== */
-function openWhatsAppComposer(idx = -1) {
-  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  let text = "";
-
-  if (idx !== -1) {
-    const r = rows[idx];
-    const fees = calculateStandardFees(r);
-    text = `📦 *SHIPMENT TRACKING UPDATE* • ${dateStr}\n` +
-           `━━━━━━━━━━━━━━━━━━━━━━\n` +
-           `*Container:* ${r["CONTAINER NO."]} (${r["TYPE"] || "40' DC"})\n` +
-           `*Line / MBL:* ${r["LINER"] || '-'} | ${r["MBL NO"] || '-'}\n` +
-           `*Vessel:* ${r["VESSEL & VOY"] || '-'}\n` +
-           `*Port In:* ${formatDate(r["PORT IN"]) || 'Pending'}\n` +
-           `*Port Out:* ${formatDate(r["PORT OUT"]) || 'Pending'}\n` +
-           `*CFS Depot:* ${r["CFS NAME"] || '-'}\n` +
-           (r["TRUCK NO."] ? `*Truck No:* ${r["TRUCK NO."]}\n` : '') +
-           `*Status:* ${getStatus(r).text}\n` +
-           `*Free Time Left:* Terminal (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'}) | Detention (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})\n` +
-           (r["REMARKS"] ? `*Remark:* ${r["REMARKS"]}\n` : '') +
-           `━━━━━━━━━━━━━━━━━━━━━━\n` +
-           `Operations Support: madhan@gmlindia.net`;
-  } else {
-    const active = rows.filter(r => !isFullyCompleted(r));
-    text = `🚢 *GREENWICH MERIDIAN LOGISTICS (CHENNAI)*\n` +
-           `📋 *DAILY SHIPMENT DISPATCH BRIEF* • ${dateStr}\n` +
-           `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    active.forEach((r, i) => {
-      text += `${i + 1}. *${r["CONTAINER NO."]}* (${r["TYPE"] || "40' DC"})\n` +
-              `   • Vessel: ${r["VESSEL & VOY"] || '-'}\n` +
-              `   • Status: ${getStatus(r).text} | CFS: ${r["CFS NAME"] || '-'}\n` +
-              `   • Port In: ${formatDate(r["PORT IN"]) || 'Pending'} | Port Out: ${formatDate(r["PORT OUT"]) || 'Pending'}\n\n`;
-    });
-    text += `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
-  }
-
-  el("whatsappComposerText").value = text;
-  el("openDirectWhatsAppBtn").href = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  el("whatsappComposerModalBg").classList.add("open");
-}
-el("whatsappComposerClose").addEventListener("click", () => el("whatsappComposerModalBg").classList.remove("open"));
-el("whatsappQuickBtn").addEventListener("click", () => openWhatsAppComposer(-1));
-el("copyComposerTextBtn").addEventListener("click", () => {
-  navigator.clipboard.writeText(el("whatsappComposerText").value);
-  toast("Message copied to clipboard!");
-});
-
-el("loginBtn").addEventListener("click", () => el("loginModalBg").classList.add("open"));
-el("loginClose").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
-el("loginCancel").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
-
-// Unique Access Code Login Verification (With Username Tracking Support)
-el("loginSubmit").addEventListener("click", async () => {
-  const code = el("loginCodeInput").value.trim();
-  if (!code) return alert("Please enter your Access Code.");
-
-  const originalBtnText = el("loginSubmit").textContent;
-  el("loginSubmit").textContent = "Verifying...";
-
-  const { data, error } = await sb
-    .from('user_roles')
-    .select('user_id, role, username')
-    .eq('access_code', code)
-    .single();
-
-  if (error || !data) {
-    alert("Invalid Access Code.");
-    el("loginSubmit").textContent = originalBtnText;
-  } else {
-    currentUser = { 
-      id: data.username || code, 
-      role: data.role, 
-      uid: data.user_id 
-    };
-    
-    localStorage.setItem("gml_auth_code_user", JSON.stringify(currentUser));
-    el("loginModalBg").classList.remove("open");
-    el("loginSubmit").textContent = originalBtnText;
-    setAccessState(true);
-    toast(`Welcome back, ${currentUser.id}!`);
-  }
-});
-
-// Secure Logout
-el("logoutBtn").addEventListener("click", () => {
-  currentUser = null;
-  localStorage.removeItem("gml_auth_code_user");
-  setAccessState(false);
-  toast("Logged out");
-});
-
-// Check Local Storage Session on Load
-function checkActiveSession() {
-  const savedUser = localStorage.getItem("gml_auth_code_user");
-  if (savedUser) {
-    try {
-      currentUser = JSON.parse(savedUser);
-      setAccessState(true);
-    } catch(e) {
-      setAccessState(false);
-    }
-  } else {
-    setAccessState(false);
-  }
-}
-
-function setAccessState(isStaff) {
-  el("opsControls").style.display = isStaff ? "flex" : "none";
-  el("publicControls").style.display = isStaff ? "none" : "flex";
-  el("opsDashboardView").style.display = isStaff ? "block" : "none";
-  el("publicLandingView").style.display = isStaff ? "none" : "block";
-
-  if (isStaff && currentUser) {
-    el("userBadge").textContent = `${currentUser.id} (${currentUser.role})`;
-    const isViewer = currentUser.role === "Viewer";
-
-    document.querySelectorAll(".action-editor-only").forEach(elem => {
-      elem.style.display = isViewer ? "none" : "inline-flex";
-    });
-
-    renderUI();
-  }
-}
-
-function resolveCoords(name, defaultCoord) {
-  const upper = String(name || "").toUpperCase();
-  for (const [k, coord] of Object.entries(PORT_COORDS)) {
-    if (upper.includes(k)) return { name: k, coord };
-  }
-  return { name: upper || "PORT", coord: defaultCoord };
-}
-
-function getCleanVesselName(vsl) {
-  return String(vsl || "").replace(/\b(V|VOY|VOYAGE)\.?\s*[0-9A-Z\/\-]+$/i, "").trim();
-}
-
-function getVesselFinderUrl(vesselName) {
-  const clean = getCleanVesselName(vesselName);
-  return clean ? `https://www.vesselfinder.com/vessels?name=${encodeURIComponent(clean)}` : `https://www.vesselfinder.com/`;
-}
-
-function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
-  const cleanVessel = getCleanVesselName(vesselStr);
-  const vfUrl = getVesselFinderUrl(vesselStr);
-
-  el("mapModalTitle").innerHTML = `${esc(cleanVessel || 'Ocean Vessel')} • ${esc(originStr)} → ${esc(destStr)}`;
-  el("mapVesselText").textContent = `${cleanVessel || 'Container Vessel'} (${progressPercent}% Route)`;
-
-  const vfBtn = el("vesselFinderExternalBtn");
-  if (vfBtn) vfBtn.href = vfUrl;
-
-  el("mapModalBg").classList.add("open");
-
-  const origin = resolveCoords(originStr, [22.48, 113.91]);
-  const dest = resolveCoords(destStr, [13.0827, 80.2707]);
-  const waypoints = [origin.coord, [18.5, 115.0], [6.0, 108.0], [1.35, 104.4], [2.8, 101.2], [5.8, 95.5], dest.coord];
-
-  setTimeout(() => {
-    if (!routeMapInstance) {
-      routeMapInstance = L.map('leafletMap', { zoomControl: true, attributionControl: false });
-      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd' }).addTo(routeMapInstance);
-    } else {
-      routeMapInstance.eachLayer(layer => {
-        if (layer instanceof L.Polyline || layer instanceof L.Marker) routeMapInstance.removeLayer(layer);
-      });
-    }
-
-    routeMapInstance.invalidateSize();
-    const seaPath = L.polyline(waypoints, { color: '#38bdf8', weight: 3, dashArray: '4, 6', opacity: 0.8 }).addTo(routeMapInstance);
-
-    L.marker(origin.coord, { icon: L.divIcon({ html: `<div style="background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${origin.name}</div>` }) }).addTo(routeMapInstance);
-    L.marker(dest.coord, { icon: L.divIcon({ html: `<div style="background:#10b981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">⚓ ${dest.name}</div>` }) }).addTo(routeMapInstance);
-
-    let vesselPos = waypoints[0];
-    if (progressPercent >= 100) vesselPos = dest.coord;
-    else if (progressPercent >= 75) vesselPos = waypoints[5];
-    else if (progressPercent >= 50) vesselPos = waypoints[3];
-    else if (progressPercent >= 25) vesselPos = waypoints[1];
-
-    L.marker(vesselPos, { icon: L.divIcon({ html: `<div style="background:#2563eb; color:#fff; padding:3px 6px; border-radius:6px; font-weight:800; font-size:10px;">🚢 ${esc(cleanVessel || 'Vessel')}</div>` }) }).addTo(routeMapInstance);
-
-    routeMapInstance.fitBounds(seaPath.getBounds(), { padding: [30, 30] });
-  }, 120);
-}
-
-el("mapCloseBtn").addEventListener("click", () => el("mapModalBg").classList.remove("open"));
-
-function openEmailModal(idx) {
-  const r = rows[idx];
-  const cntr = getField(r, ["CONTAINER NO."]);
-  const liner = getField(r, ["LINER"]) || detectLinerFromMBL(r["MBL NO"]) || "Shipping Line";
-  const gwPort = getGatewayPortInfo(r).name;
-  const cfs = getField(r, ["CFS NAME"]) || "Designated CFS";
-  const st = getStatus(r).text;
-  const destuff = formatDate(getField(r, ["DESTUFFING DATE"]));
-  const emptyRet = formatDate(getField(r, ["CONTAINER RETURN DATE"]));
-
-  el("emailSubject").value = `Status Update: ${cntr} - ${st}`;
-  
-  const body = `Dear Customer,\n\n` +
-    `Current status for Container ${cntr} (${r["TYPE"] || "40' HC"}):\n` +
-    `• Line: ${liner}\n` +
-    `• MBL: ${r["MBL NO"] || 'N/A'}\n` +
-    `• Vessel: ${r["VESSEL & VOY"] || 'N/A'}\n` +
-    `• Port: ${gwPort} (In: ${formatDate(r["PORT IN"]) || 'Pending'} | Out: ${formatDate(r["PORT OUT"]) || 'Pending'})\n` +
-    `• CFS Depot: ${cfs} (In: ${formatDate(r["CFS IN"]) || 'Pending'})\n` +
-    `• Truck No: ${r["TRUCK NO."] || 'Pending Assignment'}\n` +
-    `• Destuffing: ${destuff || 'In Process'}\n` +
-    `• Empty Return: ${emptyRet || 'Pending'}\n` +
-    `• Status: ${st}\n\n` +
-    `Operations Support: madhan@gmlindia.net`;
-
-  el("emailBody").value = body;
-  el("sendMailtoBtn").href = `mailto:?subject=${encodeURIComponent(el("emailSubject").value)}&body=${encodeURIComponent(body)}`;
-  el("emailModalBg").classList.add("open");
-}
-el("emailModalClose").addEventListener("click", () => el("emailModalBg").classList.remove("open"));
-el("copyEmailBtn").addEventListener("click", () => {
-  navigator.clipboard.writeText(el("emailBody").value);
-  toast("Email text copied");
-});
-
-el("openAnalyticsBtn").addEventListener("click", () => {
-  const completed = rows.filter(r => isFullyCompleted(r));
-  let totalTransitDays = 0, countTransit = 0;
-
-  completed.forEach(r => {
-    const originDate = parseLocalDate(getField(r, ["ETD"]) || getField(r, ["ETA"]));
-    const retDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE"])) || parseLocalDate(getField(r, ["DESTUFFING DATE"]));
-    if (originDate && retDate) {
-      const days = Math.floor((retDate - originDate) / (1000 * 60 * 60 * 24));
-      if (days >= 0) { totalTransitDays += days; countTransit++; }
-    }
-  });
-
-  const avgTransit = countTransit > 0 ? (totalTransitDays / countTransit).toFixed(1) : "—";
-  const terminalBreakdown = {};
-  rows.forEach(r => {
-    const t = getGatewayPortInfo(r).name;
-    terminalBreakdown[t] = (terminalBreakdown[t] || 0) + 1;
-  });
-
-  el("analyticsBody").innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
-      <div class="kpi-card">
-        <small>Average Total Turnaround</small>
-        <strong>${avgTransit} Days</strong>
-      </div>
-      <div class="kpi-card">
-        <small>Completed & Returned</small>
-        <strong style="color:var(--success);">${completed.length}</strong>
-      </div>
-    </div>
-    <div style="background:var(--bg-elevated); padding:12px; border-radius:8px; border:1px solid var(--border);">
-      <div style="font-size:11px; font-weight:800; text-transform:uppercase; margin-bottom:8px;">Terminal Distribution</div>
-      ${Object.entries(terminalBreakdown).map(([term, num]) => `
-        <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11px; font-weight:600;">
-          <span>${esc(term)}</span>
-          <span>${num} units</span>
-        </div>
-      `).join("")}
-    </div>
-  `;
-  el("analyticsModalBg").classList.add("open");
-});
-el("analyticsModalClose").addEventListener("click", () => el("analyticsModalBg").classList.remove("open"));
-
-let publicSearchResults = [];
-
-function performPublicSearch() {
-  const rawInput = el("publicSearchInput").value.trim().toLowerCase();
-  const container = el("publicResultContainer");
-  if (!rawInput) { container.style.display = "none"; return; }
-
-  const queries = rawInput.split(/[\s,]+/).filter(Boolean);
-
-  publicSearchResults = rows.filter(r => {
-    const cntr = (getField(r, ["CONTAINER NO."]) || "").toLowerCase();
-    const mbl = (getField(r, ["MBL NO"]) || "").toLowerCase();
-    return queries.some(q => cntr === q || mbl === q || cntr.includes(q) || mbl.includes(q));
-  });
-
-  if (!publicSearchResults.length) {
-    container.innerHTML = `
-      <div style="text-align:center; padding:40px; color:var(--danger);">
-        <strong style="font-size:16px;">No matching shipments found.</strong>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">Please verify your MBL or Container Number.</div>
-      </div>
-    `;
-    container.style.display = "block";
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    return;
-  }
-
-  const cardsHtml = publicSearchResults.map((r, mIdx) => {
-    const st = getStatus(r);
-    const originPort = getField(r, ["POL"]) || "SHEKOU";
-    const gwPort = getGatewayPortInfo(r).name;
-    const destPort = `${gwPort}, INDIA`;
-    const publicTimelineHtml = generatePublicVoyageTimelineHtml(r);
-
-    return `
-      <div style="padding:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
-          <div>
-            <span style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Shipment Status Result</span>
-          </div>
-          <div style="display:flex; align-items:center; gap:8px;">
-            <button class="btn" style="border-radius:20px; font-size:11px; padding:6px 14px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(r["VESSEL & VOY"])}', 50)">🗺️ Route Map</button>
-            <span class="status-pill ${st.class}" style="font-size:11px; padding:6px 14px; border-radius:20px;">${st.text}</span>
-          </div>
-        </div>
-        ${publicTimelineHtml}
-      </div>
-    `;
-  }).join("<hr style='border:0; border-top:1px dashed var(--border); margin:24px 0;'>");
-
-  container.innerHTML = cardsHtml;
-  container.style.display = "block";
-  
-  // Smooth scroll to the result so the user isn't stuck on the hero section
-  setTimeout(() => {
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
-}
-
-el("publicSearchBtn").addEventListener("click", performPublicSearch);
-el("publicSearchInput").addEventListener("keypress", (e) => { if (e.key === "Enter") performPublicSearch(); });
-
-function toggleTheme() {
-  const current = document.documentElement.getAttribute("data-theme") || "light";
-  const target = current === "dark" ? "light" : "dark";
-  document.documentElement.setAttribute("data-theme", target);
-  localStorage.setItem("gml_theme", target);
-  el("themeBtn").textContent = target === "dark" ? "☀️" : "🌙";
-  el("publicThemeBtn").textContent = target === "dark" ? "☀️" : "🌙";
-}
-el("themeBtn").addEventListener("click", toggleTheme);
-el("publicThemeBtn").addEventListener("click", toggleTheme);
-const savedTheme = localStorage.getItem("gml_theme") || "light";
-document.documentElement.setAttribute("data-theme", savedTheme);
-el("themeBtn").textContent = savedTheme === "dark" ? "☀️" : "🌙";
-el("publicThemeBtn").textContent = savedTheme === "dark" ? "☀️" : "🌙";
 
 function formatDate(val) {
   const s = String(val ?? "").trim();
@@ -1890,12 +804,285 @@ function validDate(val) {
 }
 
 function getField(r, names) {
+  if(!r) return "";
   for (let name of names) {
     for (let k of Object.keys(r)) {
       if (k.trim().toLowerCase() === name.toLowerCase() && r[k]) return r[k];
     }
   }
   return "";
+}
+
+function isFullyCompleted(r) { return validDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"])); }
+
+// =========================================================
+// UI EVENT BINDINGS (Safe Loading)
+// =========================================================
+if(el("opsMenuBtn")) {
+  el("opsMenuBtn").addEventListener("click", (e) => { e.stopPropagation(); el("opsMenuDropdown").classList.toggle("show"); });
+  document.addEventListener("click", () => el("opsMenuDropdown").classList.remove("show"));
+}
+
+if(el("currencyToggleBtn")) {
+  el("currencyToggleBtn").addEventListener("click", () => {
+    activeCurrency = activeCurrency === "INR" ? "USD" : "INR";
+    localStorage.setItem("gml_curr", activeCurrency);
+    el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
+    renderUI();
+  });
+  el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
+}
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  const target = current === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", target);
+  localStorage.setItem("gml_theme", target);
+  if(el("themeBtn")) el("themeBtn").textContent = target === "dark" ? "☀️" : "🌙";
+  if(el("publicThemeBtn")) el("publicThemeBtn").textContent = target === "dark" ? "☀️" : "🌙";
+}
+if(el("themeBtn")) el("themeBtn").addEventListener("click", toggleTheme); 
+if(el("publicThemeBtn")) el("publicThemeBtn").addEventListener("click", toggleTheme);
+
+// Ensure the Import button correctly triggers the hidden file input
+if(el("importBtnTrigger") && el("excelInput")) {
+  el("importBtnTrigger").addEventListener("click", () => el("excelInput").click());
+}
+
+// Robust Excel Upload Logic
+if(el("excelInput")) {
+  el("excelInput").addEventListener("change", e => {
+    if (currentUser && currentUser.role === "Viewer") { alert("Read-only access."); e.target.value = ''; return; }
+    
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = evt => {
+      try {
+        const data = new Uint8Array(evt.target.result);
+        const wb = XLSX.read(data, {type: 'array', cellDates: true});
+        let imported = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval: ""});
+        
+        if (!imported || imported.length === 0) { alert("The Excel file is empty or invalid."); return; }
+
+        rows = imported.map(r => {
+          const out = {};
+          Object.keys(r).forEach(k => {
+            let val = r[k];
+            // Prevent timezone shift on dates during upload
+            if (val instanceof Date) { val = new Date(val.getTime() - (val.getTimezoneOffset() * 60000)).toISOString().split('T')[0]; }
+            out[k.trim()] = String(val ?? "").trim();
+          });
+          if (!out["LINER"] && out["MBL NO"]) out["LINER"] = detectLinerFromMBL(out["MBL NO"]);
+          return out;
+        });
+        
+        logAuditEvent("BULK_EXCEL_IMPORT", "ALL", "SHEET_DATA", "N/A", `${rows.length} units imported`);
+        populateFilters();
+        saveAndRefresh();
+        toast(`Successfully imported ${rows.length} records!`);
+        
+      } catch (err) {
+        console.error("Excel import failed:", err);
+        alert("Error reading Excel file. Please ensure it is a valid .xlsx or .csv format.");
+      } finally {
+        e.target.value = ''; // CRITICAL: Reset input so the same file can be uploaded again
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  });
+}
+
+// =========================================================
+// BULLETPROOF PUBLIC SEARCH LOGIC
+// =========================================================
+function performPublicSearch() {
+  const inputEl = document.getElementById("publicSearchInput");
+  const container = document.getElementById("publicResultContainer");
+  const btn = document.getElementById("publicSearchBtn");
+  const spinner = document.getElementById("searchSpinner");
+  
+  if (!inputEl) return;
+  const rawInput = inputEl.value.trim().toLowerCase();
+  
+  if (!rawInput) {
+    if(container) container.style.display = "none";
+    return;
+  }
+
+  // Safely Trigger UI Animation
+  let btnText = null;
+  if (btn) {
+    btnText = btn.querySelector('.btn-text');
+    btn.classList.add("loading");
+    if (btnText) btnText.style.display = "none";
+    if (spinner) spinner.style.display = "block";
+  }
+  if(container) container.style.display = "none"; 
+
+  // Simulate Network Delay & Process Data
+  setTimeout(() => {
+    // Revert Button State
+    if (btn) {
+      btn.classList.remove("loading");
+      if (btnText) btnText.style.display = "inline";
+      if (spinner) spinner.style.display = "none";
+    }
+
+    try {
+      const queries = rawInput.split(/[\s,]+/).filter(Boolean);
+      const safeRows = Array.isArray(rows) ? rows : []; // Protect against broken database fetches
+      
+      const results = safeRows.filter(r => {
+        const cntr = (getField(r, ["CONTAINER NO."]) || "").toString().toLowerCase();
+        const mbl = (getField(r, ["MBL NO"]) || "").toString().toLowerCase();
+        return queries.some(q => cntr === q || mbl === q || cntr.includes(q) || mbl.includes(q));
+      });
+
+      if (!container) return; // Failsafe
+
+      if (results.length === 0) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:40px; color:var(--danger);">
+            <strong style="font-size:16px;">No matching shipments found.</strong>
+            <div style="font-size:13px; color:var(--text-muted); margin-top:6px;">Please verify your MBL or Container Number.</div>
+          </div>
+        `;
+        container.style.display = "block";
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return;
+      }
+
+      const cardsHtml = results.map((r) => {
+        return generatePublicVoyageTimelineHtml(r);
+      }).join("<hr style='border:0; border-top:1px dashed var(--border); margin:10px 0;'>");
+
+      container.innerHTML = cardsHtml;
+      container.style.display = "block";
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+    } catch(err) {
+      console.error("Search failed", err);
+      if(container) {
+        container.innerHTML = `<div style="text-align:center; padding:20px; color:red;">An error occurred while tracking. Please refresh the page.</div>`;
+        container.style.display = "block";
+      }
+    }
+  }, 900); // 0.9s scan delay
+}
+
+if(el("publicSearchBtn")) el("publicSearchBtn").addEventListener("click", performPublicSearch);
+if(el("publicSearchInput")) el("publicSearchInput").addEventListener("keypress", (e) => { if (e.key === "Enter") performPublicSearch(); });
+
+/* =================================================================
+   HTML GENERATORS & STATUS LOGIC
+==================================================================== */
+function generatePublicVoyageTimelineHtml(r) {
+  const mblNo = esc(getField(r, ["MBL NO"]) || "—");
+  const vesselName = esc(getField(r, ["VESSEL & VOY"]) || "—");
+  const cfsName = esc(getField(r, ["CFS NAME"]) || "—");
+  const liner = esc(getField(r, ["LINER"]) || "—");
+  const pol = esc(getField(r, ["POL"]) || "—");
+  const eta = formatDate(getField(r, ["ETA"])) || 'Pending';
+
+  const origPort = esc(getField(r, ["POL"])) || "POL";
+  const inPort = formatDate(getField(r, ["PORT IN"]));
+  const inCfs = formatDate(getField(r, ["CFS IN"]));
+  const destuffed = formatDate(getField(r, ["DESTUFFING DATE"]));
+  const returned = formatDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
+
+  let pWidth = 0;
+  if (returned) pWidth = 100;
+  else if (destuffed) pWidth = 75;
+  else if (inCfs) pWidth = 50;
+  else if (inPort) pWidth = 25;
+  else pWidth = 0;
+
+  return `
+    <div>
+      <div style="background:var(--bg-elevated); padding:20px 30px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <div style="font-size:10px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.04em;">Shipment Status Result</div>
+          <div style="font-size:26px; font-weight:900; font-family:'JetBrains Mono'; color:var(--accent); letter-spacing:-0.03em;">${esc(getField(r, ["CONTAINER NO."]))}</div>
+        </div>
+      </div>
+
+      <div class="timeline-stepper">
+        <div class="timeline-progress-bar" style="width: ${pWidth}%;"></div>
+        
+        <div class="stepper-node ${pWidth >= 0 ? 'completed' : ''}">
+          <div class="node-circle">🚢</div>
+          <div>
+            <div class="node-label">Origin (${origPort})</div>
+            <div class="node-date">${formatDate(getField(r, ["ETD"])) || 'Departed'}</div>
+          </div>
+        </div>
+        
+        <div class="stepper-node ${pWidth >= 25 ? 'completed' : (pWidth === 0 && !inPort ? 'current' : '')}">
+          <div class="node-circle">⚓</div>
+          <div>
+            <div class="node-label">Discharge Port</div>
+            <div class="node-date">${inPort || 'Pending'}</div>
+          </div>
+        </div>
+        
+        <div class="stepper-node ${pWidth >= 50 ? 'completed' : (pWidth === 25 ? 'current' : '')}">
+          <div class="node-circle">🏢</div>
+          <div>
+            <div class="node-label">CFS Arrival</div>
+            <div class="node-date">${inCfs || 'Pending'}</div>
+          </div>
+        </div>
+        
+        <div class="stepper-node ${pWidth >= 75 ? 'completed' : (pWidth === 50 ? 'current' : '')}">
+          <div class="node-circle">📦</div>
+          <div>
+            <div class="node-label">Destuffed</div>
+            <div class="node-date">${destuffed || 'Pending'}</div>
+          </div>
+        </div>
+        
+        <div class="stepper-node ${pWidth === 100 ? 'completed' : (pWidth === 75 ? 'current' : '')}">
+          <div class="node-circle">✅</div>
+          <div>
+            <div class="node-label">Empty Return</div>
+            <div class="node-date">${returned || 'Pending'}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ref-module-section">
+        <div class="ref-module-card">
+          <div class="ref-module-title-bar">
+            <span>Vessel & Manifest Information</span>
+          </div>
+          <div class="ref-data-grid">
+            <div class="ref-data-box">
+              <label>Carrier Line</label>
+              <val style="color:var(--primary);">${liner}</val>
+            </div>
+            <div class="ref-data-box">
+              <label>Master Bill of Lading</label>
+              <val>${mblNo}</val>
+            </div>
+            <div class="ref-data-box">
+              <label>Vessel & Voyage</label>
+              <val>${vesselName}</val>
+            </div>
+            <div class="ref-data-box">
+              <label>Est. Arrival (ETA)</label>
+              <val>${eta}</val>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display:flex; justify-content:flex-end; padding-top:10px;">
+           <button class="btn btn-primary" onclick="openRouteMap('${esc(getField(r, ["POL"]) || "POL")}', '${esc(getField(r, ["GATEWAY PORT"]) || "CCTL")}', '${esc(getField(r, ["VESSEL & VOY"]))}', ${pWidth})">🗺️ View Live Route Map</button>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function getStatus(r) {
@@ -1907,10 +1094,6 @@ function getStatus(r) {
   if (validDate(getField(r, ["ETA"]))) return { text: "ETA SCHEDULED", class: "progress" };
   if (validDate(getField(r, ["ETD"]))) return { text: "ETD DEPARTED", class: "progress" };
   return { text: "PENDING", class: "progress" };
-}
-
-function isFullyCompleted(r) {
-  return validDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
 }
 
 function detectLinerFromMBL(mbl) {
@@ -1954,47 +1137,18 @@ function getCfsDepotInfo(cfsName) {
   return { name: name || "CFS", url: `https://www.google.com/search?q=${encodeURIComponent(cfsName + ' cfs chennai')}` };
 }
 
-function setGatewayPort(idx, val) {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const old = rows[idx]["GATEWAY PORT"];
-  rows[idx]["GATEWAY PORT"] = val;
-  logAuditEvent("PORT_CHANGE", rows[idx]["CONTAINER NO."], "GATEWAY PORT", old, val);
-  saveAndRefresh();
-  toast(`Port: ${val}`);
-}
-
-el("bulkDestuffBtn").addEventListener("click", () => {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  if (!selectedIndices.size) return alert("Select containers first.");
-  const todayStr = new Date().toISOString().slice(0, 10);
-  
-  if (confirm(`Mark ${selectedIndices.size} containers as Destuffed today?`)) {
-    selectedIndices.forEach(idx => {
-      const oldVal = rows[idx]["DESTUFFING DATE"];
-      rows[idx]["DESTUFFING DATE"] = todayStr;
-      if (!rows[idx]["REMARKS"]) rows[idx]["REMARKS"] = "DE-STUFF COMPLETED";
-      logAuditEvent("BULK_DESTUFF", rows[idx]["CONTAINER NO."], "DESTUFFING DATE", oldVal, todayStr);
-    });
-    saveAndRefresh();
-    selectedIndices.clear();
-    toast(`Marked destuffed`);
-  }
-});
-
-el("bulkPhotoBtn").addEventListener("click", () => {
-  if (!selectedIndices.size) return alert("Select at least one container to generate clean table photo!");
-  const selectedRows = Array.from(selectedIndices).map(idx => rows[idx]);
-  downloadMultipleStatusImage(selectedRows, "Selection");
-});
-
+/* =================================================================
+   DASHBOARD & OPERATIONS LOGIC
+==================================================================== */
 function getFilteredRows() {
   const q = el("search").value.toLowerCase();
   const vf = el("vesselFilter").value;
   const gw = el("gatewayFilter").value;
   const cf = el("cfsFilter").value;
   const todayStr = new Date().toISOString().slice(0, 10);
+  const safeRows = Array.isArray(rows) ? rows : [];
 
-  let filtered = rows.map((r, i) => ({r, i})).filter(({r}) => {
+  let filtered = safeRows.map((r, i) => ({r, i})).filter(({r}) => {
     const cntr = (getField(r, ["CONTAINER NO."]) || "").toLowerCase();
     const vsl = (getField(r, ["VESSEL & VOY"]) || "").toLowerCase();
     const mbl = (getField(r, ["MBL NO"]) || "").toLowerCase();
@@ -2026,54 +1180,38 @@ function getFilteredRows() {
       return sortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
     });
   }
-
   return filtered;
 }
 
 function updateKPIs() {
-  const active = rows.filter(r => !isFullyCompleted(r));
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const active = safeRows.filter(r => !isFullyCompleted(r));
   let demAlerts = 0, detAlerts = 0, totalExposureUSD = 0;
-
   active.forEach(r => {
     const fees = calculateStandardFees(r);
     if (fees.demOverdue) demAlerts++;
     if (fees.detOverdue) detAlerts++;
     totalExposureUSD += fees.totalCostUSD;
   });
-
-  el("kActive").textContent = active.length;
-  el("kCompleted").textContent = rows.filter(r => isFullyCompleted(r)).length;
+  el("kActive").textContent = active.length; el("kCompleted").textContent = safeRows.filter(r => isFullyCompleted(r)).length;
   el("kPortInPending").textContent = active.filter(r => !validDate(getField(r, ["PORT IN"]))).length;
-  el("kDemurrageAlert").textContent = demAlerts;
-  el("kDetentionAlert").textContent = detAlerts;
-  el("kTotalExposure").textContent = formatCurrency(totalExposureUSD);
+  el("kDemurrageAlert").textContent = demAlerts; el("kDetentionAlert").textContent = detAlerts; el("kTotalExposure").textContent = formatCurrency(totalExposureUSD);
 }
 
 function renderUI() {
   const filtered = getFilteredRows();
   updateKPIs();
-
-  if (currentView === 'cards') renderCards(filtered);
-  else if (currentView === 'sheet') renderSheet(filtered);
-  else if (currentView === 'kanban') renderKanban(filtered);
-
-  el("selectionNotice").textContent = `${selectedIndices.size} selected`;
-  el("btnSelectCount").textContent = selectedIndices.size;
+  if (currentView === 'cards') renderCards(filtered); else if (currentView === 'sheet') renderSheet(filtered); else if (currentView === 'kanban') renderKanban(filtered);
+  el("selectionNotice").textContent = `${selectedIndices.size} selected`; el("btnSelectCount").textContent = selectedIndices.size;
 }
 
 function renderCards(items) {
   const isViewer = currentUser && currentUser.role === "Viewer";
-
   el("cardsView").innerHTML = items.map(({r, i}) => {
-    const st = getStatus(r);
-    const isChecked = selectedIndices.has(i) ? "checked" : "";
+    const st = getStatus(r); const isChecked = selectedIndices.has(i) ? "checked" : "";
     const liner = getField(r, ["LINER"]) || detectLinerFromMBL(getField(r, ["MBL NO"])) || "Line";
-    const trackUrl = getCarrierTrackingUrl(r);
-    const fees = calculateStandardFees(r);
-    const delay = getVesselDelayStatus(r);
-    const gwPort = getGatewayPortInfo(r);
-    const cfsDepot = getCfsDepotInfo(r["CFS NAME"]);
-
+    const trackUrl = getCarrierTrackingUrl(r); const fees = calculateStandardFees(r);
+    const delay = getVesselDelayStatus(r); const gwPort = getGatewayPortInfo(r); const cfsDepot = getCfsDepotInfo(r["CFS NAME"]);
     const isTerminalCritical = fees.terminalDaysLeft !== null && fees.terminalDaysLeft <= 2 && !validDate(r["PORT OUT"]);
     const isDetentionCritical = fees.detentionDaysLeft !== null && fees.detentionDaysLeft <= 2 && !fees.isCompleted;
 
@@ -2082,70 +1220,30 @@ function renderCards(items) {
         <div>
           <div class="card-header-top">
             <div>
-              <div class="card-title-group">
-                <input type="checkbox" class="chk-item photo-exclude" value="${i}" ${isChecked}>
-                <span class="card-cntr-code">${esc(getField(r, ["CONTAINER NO."]))}</span>
-              </div>
+              <div class="card-title-group"><input type="checkbox" class="chk-item photo-exclude" value="${i}" ${isChecked}><span class="card-cntr-code">${esc(getField(r, ["CONTAINER NO."]))}</span></div>
               <div class="card-vessel">${esc(getField(r, ["VESSEL & VOY"]) || "—")} (${esc(r["TYPE"] || "40' HC")})</div>
             </div>
-
-            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
-              <span class="status-pill ${st.class}">${st.text}</span>
-            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;"><span class="status-pill ${st.class}">${st.text}</span></div>
           </div>
-
           <div class="badge-row">
             ${fees.demOverdue ? `<span class="tag-badge danger">Port Dem: +${fees.demDays}d (${formatCurrency(fees.demCostUSD)})</span>` : ''}
             ${fees.detOverdue ? `<span class="tag-badge danger">Detention: +${fees.detDays}d (${formatCurrency(fees.detCostUSD)})</span>` : ''}
             ${isTerminalCritical && !fees.demOverdue ? `<span class="tag-badge danger alert-pulse">Terminal LFD: ${fees.terminalDaysLeft}d Left</span>` : ''}
             ${isDetentionCritical && !fees.demOverdue ? `<span class="tag-badge danger alert-pulse">Carrier LFD: ${fees.detentionDaysLeft}d Left</span>` : ''}
             ${!fees.demOverdue && !fees.detOverdue && !isTerminalCritical && !isDetentionCritical ? `<span class="tag-badge success">Free Time Clear</span>` : ''}
-            ${delay.isDelayed ? `<span class="tag-badge warning">+${delay.delayDays}d Delayed</span>` : ''}
-          </div>
-
-          <div class="badge-links-group">
-            <a href="${trackUrl}" target="_blank" class="link-pill">🌐 ${esc(liner)} ↗</a>
-            <a href="${gwPort.url}" target="_blank" class="link-pill">⚓ ${esc(gwPort.name)}</a>
-            <a href="${cfsDepot.url}" target="_blank" class="link-pill">🏢 ${esc(cfsDepot.name)}</a>
           </div>
         </div>
-
         <div class="card-details-grid">
-          <div class="detail-item">
-            <label>Port In / Out</label>
-            <val style="color:var(--warning)">${formatDate(getField(r, ["PORT IN"])) || "—"} / ${formatDate(getField(r, ["PORT OUT"])) || "—"}</val>
-          </div>
-          <div class="detail-item">
-            <label>Terminal LFD / Dwell</label>
-            <val style="${fees.demOverdue ? 'color:var(--danger)' : ''}">${fees.terminalLFD} (${fees.portDwell}d / Free 3d)</val>
-          </div>
-          <div class="detail-item">
-            <label>CFS Depot / Truck</label>
-            <val style="color:var(--accent);">${esc(r["CFS NAME"] || "—")} / <span style="color:#f8fafc;">${esc(r["TRUCK NO."] || "No Truck")}</span></val>
-          </div>
-          <div class="detail-item">
-            <label>Detention LFD / Dwell</label>
-            <val style="${fees.detOverdue ? 'color:var(--danger)' : ''}">${fees.detentionLFD} (${fees.totalEquipmentDays}d / Free ${esc(r["FREE DAYS"] || "14")}d)</val>
-          </div>
+          <div class="detail-item"><label>Port In / Out</label><val style="color:var(--warning)">${formatDate(getField(r, ["PORT IN"])) || "—"} / ${formatDate(getField(r, ["PORT OUT"])) || "—"}</val></div>
+          <div class="detail-item"><label>Terminal LFD / Dwell</label><val style="${fees.demOverdue ? 'color:var(--danger)' : ''}">${fees.terminalLFD} (${fees.portDwell}d / Free 3d)</val></div>
+          <div class="detail-item"><label>CFS Depot / Truck</label><val style="color:var(--accent);">${esc(r["CFS NAME"] || "—")} / <span style="color:#f8fafc;">${esc(r["TRUCK NO."] || "No Truck")}</span></val></div>
+          <div class="detail-item"><label>Detention LFD / Dwell</label><val style="${fees.detOverdue ? 'color:var(--danger)' : ''}">${fees.detentionLFD} (${fees.totalEquipmentDays}d / Free ${esc(r["FREE DAYS"] || "14")}d)</val></div>
         </div>
-
-        ${fees.totalCostUSD > 0 ? `
-          <div class="fee-breakdown-box">
-            <span style="font-weight:700; color:var(--danger)">⚠️ Total D&D Exposure</span>
-            <strong style="font-family:'JetBrains Mono'; color:var(--danger); font-size:12.5px;">${formatCurrency(fees.totalCostUSD)}</strong>
-          </div>
-        ` : ''}
-
         <div>
           <input type="text" class="input" style="width:100%; margin-bottom:8px;" value="${esc(r["REMARKS"] || "")}" placeholder="Remark..." onchange="updateRemark(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
-
           <div class="card-footer-btns photo-exclude">
-            <button class="btn btn-emerald" style="padding:3px 7px;" onclick="downloadCardAsImage(${i}, '${esc(r["CONTAINER NO."])}')">📷 Photo</button>
-            <button class="btn" style="padding:3px 7px;" onclick="openTruckDispatchSlip(${i})">🚚 Truck Slip</button>
             <button class="btn" style="padding:3px 7px;" onclick="openWhatsAppComposer(${i})">💬 WhatsApp</button>
-            <button class="btn" style="padding:3px 7px;" onclick="openEmailModal(${i})">✉️ Email</button>
             ${!isViewer ? `<button class="btn" style="padding:3px 7px;" onclick="openModal(${i})">✏️ Edit</button>` : ''}
-            ${currentUser && currentUser.role === 'Admin' ? `<button class="btn btn-danger" style="padding:3px 7px;" onclick="deleteRow(${i})">🗑️</button>` : ''}
           </div>
         </div>
       </div>
@@ -2154,178 +1252,13 @@ function renderCards(items) {
   bindCheckboxes();
 }
 
-function renderSheet(items) {
-  const isViewer = currentUser && currentUser.role === "Viewer";
+function bindCheckboxes() { document.querySelectorAll(".chk-item").forEach(chk => { chk.addEventListener("change", (e) => { const idx = Number(e.target.value); if (e.target.checked) selectedIndices.add(idx); else selectedIndices.delete(idx); el("selectionNotice").textContent = `${selectedIndices.size} selected`; el("btnSelectCount").textContent = selectedIndices.size; }); }); }
 
-  el("sheetTableBody").innerHTML = items.map(({r, i}) => {
-    const isChecked = selectedIndices.has(i) ? "checked" : "";
-    const gwPort = getGatewayPortInfo(r);
-    const fees = calculateStandardFees(r);
-    const isoStatus = validateISO6346(r["CONTAINER NO."]);
-    const isoClass = isoStatus.isValid ? "valid-iso" : "invalid-iso";
+function inlineEdit(idx, field, val) { if (currentUser && currentUser.role === "Viewer") return alert("Read-only access."); const oldVal = rows[idx][field]; const newVal = val.trim(); if (oldVal !== newVal) { logAuditEvent("INLINE_EDIT", rows[idx]["CONTAINER NO."], field, oldVal, newVal); } rows[idx][field] = newVal; saveAndRefresh(); }
 
-    return `
-      <tr>
-        <td><input type="checkbox" class="chk-item" value="${i}" ${isChecked}></td>
-        <td>
-          <input class="cell-input ${isoClass}" style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" value="${esc(r["CONTAINER NO."] || "")}" title="${isoStatus.message}" onchange="inlineEditContainerNo(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
-        </td>
-        <td><input class="cell-input" style="width:50px;" value="${esc(r["TYPE"] || "40' DC")}" onchange="inlineEdit(${i}, 'TYPE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:90px;" value="${esc(r["MBL NO"] || "")}" onchange="inlineEditMBL(${i}, this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:80px;" value="${esc(r["LINER"] || "")}" onchange="inlineEdit(${i}, 'LINER', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td>
-          <select class="cell-select" style="width:85px;" onchange="setGatewayPort(${i}, this.value)" ${isViewer ? 'disabled' : ''}>
-            <option value="CITPL" ${gwPort.key === 'CITPL' ? 'selected' : ''}>CITPL</option>
-            <option value="CCTL" ${gwPort.key === 'CCTL' ? 'selected' : ''}>CCTL</option>
-            <option value="Kattupalli" ${gwPort.key === 'Kattupalli' ? 'selected' : ''}>Kattupalli</option>
-            <option value="Ennore" ${gwPort.key === 'Ennore' ? 'selected' : ''}>Ennore</option>
-          </select>
-        </td>
-        <td><input class="cell-input" type="date" value="${r["PORT IN"] || ""}" onchange="inlineEdit(${i}, 'PORT IN', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${r["PORT OUT"] || ""}" onchange="inlineEdit(${i}, 'PORT OUT', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:85px;" value="${esc(r["CFS NAME"] || "")}" onchange="inlineEdit(${i}, 'CFS NAME', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:95px; font-family:'JetBrains Mono';" value="${esc(r["TRUCK NO."] || "")}" placeholder="Vehicle No" onchange="inlineEdit(${i}, 'TRUCK NO.', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${r["DESTUFFING DATE"] || ""}" onchange="inlineEdit(${i}, 'DESTUFFING DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${r["CONTAINER RETURN DATE"] || ""}" onchange="inlineEdit(${i}, 'CONTAINER RETURN DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td style="font-weight:700; color:${fees.demOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.terminalLFD} (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'})</td>
-        <td style="font-weight:700; color:${fees.detOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.detentionLFD} (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})</td>
-        <td style="font-weight:800; font-family:'JetBrains Mono'; color:${fees.totalCostUSD > 0 ? 'var(--danger)' : 'var(--success)'};">${formatCurrency(fees.totalCostUSD)}</td>
-        <td><input class="cell-input" value="${esc(r["REMARKS"] || "")}" onchange="inlineEdit(${i}, 'REMARKS', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td>
-          <div style="display:flex; gap:3px;">
-            <button class="btn" style="padding:2px 5px;" title="Truck Dispatch Slip" onclick="openTruckDispatchSlip(${i})">🚚</button>
-            ${!isViewer ? `<button class="btn" style="padding:2px 5px; color:var(--accent)" title="Mark Returned Today" onclick="markSingleReturned(${i})">🔄</button>` : ''}
-            ${currentUser && currentUser.role === 'Admin' ? `<button class="btn btn-danger" style="padding:2px 5px;" onclick="deleteRow(${i})">🗑️</button>` : ''}
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join("");
-  bindCheckboxes();
-}
-
-function inlineEditContainerNo(idx, val) {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const oldVal = rows[idx]["CONTAINER NO."];
-  const newVal = val.trim().toUpperCase();
-  rows[idx]["CONTAINER NO."] = newVal;
-  logAuditEvent("CONTAINER_RENAME", oldVal, "CONTAINER NO.", oldVal, newVal);
-  saveAndRefresh();
-}
-
-function markSingleReturned(idx) {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const today = new Date().toISOString().slice(0, 10);
-  const oldVal = rows[idx]["CONTAINER RETURN DATE"];
-  rows[idx]["CONTAINER RETURN DATE"] = today;
-  if (!rows[idx]["REMARKS"]) rows[idx]["REMARKS"] = "Empty container returned to depot";
-  logAuditEvent("EMPTY_RETURN", rows[idx]["CONTAINER NO."], "CONTAINER RETURN DATE", oldVal, today);
-  saveAndRefresh();
-  toast("Marked Container Returned");
-}
-
-function renderKanban(items) {
-  const lanes = { "Terminal In": [], "Port Out / CFS": [], "Destuffed": [], "Completed Return": [] };
-  items.forEach(({r, i}) => {
-    const st = getStatus(r);
-    if (st.text === "EMPTY RETURNED") lanes["Completed Return"].push({r, i});
-    else if (st.text.includes("DE-STUFF")) lanes["Destuffed"].push({r, i});
-    else if (st.text === "CFS IN" || st.text === "PORT OUT") lanes["Port Out / CFS"].push({r, i});
-    else lanes["Terminal In"].push({r, i});
-  });
-
-  el("kanbanView").innerHTML = Object.entries(lanes).map(([title, list]) => `
-    <div class="kanban-column">
-      <div class="kanban-header-strip">
-        <span>${title}</span>
-        <span class="status-pill progress">${list.length}</span>
-      </div>
-      <div class="kanban-body-list">
-        ${list.map(({r, i}) => `
-          <div class="card-box" style="padding:8px;">
-            <div style="display:flex; justify-content:space-between;">
-              <span class="card-cntr-code" style="font-size:12.5px;">${esc(r["CONTAINER NO."])}</span>
-            </div>
-            <div class="card-vessel" style="font-size:10px;">${esc(r["VESSEL & VOY"] || "—")}</div>
-            <div style="font-size:10px; color:var(--accent); margin-top:2px;">${esc(r["CFS NAME"] || "—")}</div>
-          </div>
-        `).join("")}
-      </div>
-    </div>
-  `).join("");
-}
-
-function bindCheckboxes() {
-  document.querySelectorAll(".chk-item").forEach(chk => {
-    chk.addEventListener("change", (e) => {
-      const idx = Number(e.target.value);
-      if (e.target.checked) selectedIndices.add(idx);
-      else selectedIndices.delete(idx);
-      el("selectionNotice").textContent = `${selectedIndices.size} selected`;
-      el("btnSelectCount").textContent = selectedIndices.size;
-    });
-  });
-}
-
-function sortSheet(field) {
-  if (sortField === field) sortAsc = !sortAsc;
-  else { sortField = field; sortAsc = true; }
-  renderUI();
-}
-
-function inlineEdit(idx, field, val) {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const oldVal = rows[idx][field];
-  const newVal = val.trim();
-  if (oldVal !== newVal) {
-    logAuditEvent("INLINE_EDIT", rows[idx]["CONTAINER NO."], field, oldVal, newVal);
-  }
-  rows[idx][field] = newVal;
-  saveAndRefresh();
-}
-
-function inlineEditMBL(idx, val) {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const oldMBL = rows[idx]["MBL NO"];
-  const newMBL = val.trim();
-  rows[idx]["MBL NO"] = newMBL;
-  logAuditEvent("MBL_EDIT", rows[idx]["CONTAINER NO."], "MBL NO", oldMBL, newMBL);
-  const detected = detectLinerFromMBL(val);
-  if (detected && !rows[idx]["LINER"]) rows[idx]["LINER"] = detected;
-  saveAndRefresh();
-}
-
-function updateRemark(idx, val) {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const oldVal = rows[idx]["REMARKS"];
-  const newVal = val.trim();
-  rows[idx]["REMARKS"] = newVal;
-  logAuditEvent("REMARK_UPDATE", rows[idx]["CONTAINER NO."], "REMARKS", oldVal, newVal);
-  saveAndRefresh();
-  toast("Remark saved");
-}
-
-function deleteRow(idx) {
-  if (!currentUser || currentUser.role !== "Admin") return alert("Admin only.");
-  if (confirm("Delete container record?")) {
-    const target = rows[idx];
-    logAuditEvent("DELETE_UNIT", target["CONTAINER NO."], "ALL_FIELDS", JSON.stringify(target), "DELETED");
-    rows.splice(idx, 1);
-    selectedIndices.delete(idx);
-    saveAndRefresh();
-    toast("Deleted");
-  }
-}
-
-document.querySelectorAll(".chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-    chip.classList.add("active");
-    activeQuickFilter = chip.dataset.filter;
-    renderUI();
-  });
-});
-
+// =========================================================
+// CLOUD SYNC & AUTHENTICATION
+// =========================================================
 async function saveAndRefresh() {
   renderUI();
   try {
@@ -2349,224 +1282,78 @@ async function loadFromCloud() {
 }
 
 function populateFilters() {
+  const safeRows = Array.isArray(rows) ? rows : [];
   const vSet = new Set(), cSet = new Set();
-  rows.forEach(r => {
+  safeRows.forEach(r => {
     if (r["VESSEL & VOY"]) vSet.add(r["VESSEL & VOY"].trim());
     if (r["CFS NAME"]) cSet.add(r["CFS NAME"].trim());
   });
-  el("vesselFilter").innerHTML = `<option value="">All Vessels</option>` + [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
-  el("cfsFilter").innerHTML = `<option value="">All CFS</option>` + [...cSet].sort().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  if(el("vesselFilter")) el("vesselFilter").innerHTML = `<option value="">All Vessels</option>` + [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  if(el("cfsFilter")) el("cfsFilter").innerHTML = `<option value="">All CFS</option>` + [...cSet].sort().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
 }
 
-function setView(mode) {
-  currentView = mode;
-  document.querySelectorAll(".view-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.view === mode));
-  el("cardsView").style.display = mode === 'cards' ? 'grid' : 'none';
-  el("sheetView").style.display = mode === 'sheet' ? 'block' : 'none';
-  el("kanbanView").style.display = mode === 'kanban' ? 'grid' : 'none';
-  renderUI();
-}
-document.querySelectorAll(".view-btn").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+el("loginBtn").addEventListener("click", () => el("loginModalBg").classList.add("open"));
+el("loginClose").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
+el("loginCancel").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
 
-function openModal(idx = -1) {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  editingIndex = idx;
-  el("modalTitle").textContent = idx === -1 ? "Add Container" : "Edit Container";
-  const r = idx === -1 ? {} : rows[idx];
+el("loginSubmit").addEventListener("click", async () => {
+  const code = el("loginCodeInput").value.trim();
+  if (!code) return alert("Please enter your Access Code.");
+  const btn = el("loginSubmit");
+  const origText = btn.textContent;
+  btn.textContent = "Verifying...";
   
-  el("modalForm").innerHTML = COLS.map(c => {
-    if (c === 'GATEWAY PORT') {
-      const cur = r[c] || getGatewayPortInfo(r).key || "CCTL";
-      return `
-        <div>
-          <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Gateway Port</label>
-          <select id="modal_GATEWAY_PORT" class="select" style="width:100%; margin-top:3px;" data-field="${c}">
-            <option value="CCTL" ${cur === 'CCTL' ? 'selected' : ''}>CCTL (DP World)</option>
-            <option value="CITPL" ${cur === 'CITPL' ? 'selected' : ''}>CITPL (PSA)</option>
-            <option value="Kattupalli" ${cur === 'Kattupalli' ? 'selected' : ''}>Kattupalli Port</option>
-            <option value="Ennore" ${cur === 'Ennore' ? 'selected' : ''}>Ennore Port</option>
-          </select>
-        </div>
-      `;
-    }
-    return `
-      <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">${c}</label>
-        <input type="${DATE_COLS.has(c) ? 'date' : 'text'}" 
-               id="modal_${c.replace(/[^a-zA-Z0-9]/g, '_')}"
-               class="input" style="width:100%; margin-top:3px;" 
-               data-field="${c}" 
-               value="${esc(r[c] || '')}">
-      </div>
-    `;
-  }).join("");
+  const { data, error } = await sb.from('user_roles').select('user_id, role, username').eq('access_code', code).single();
 
-  const cntrInp = document.getElementById("modal_CONTAINER_NO_");
-  if (cntrInp) {
-    cntrInp.addEventListener("input", (e) => {
-      const iso = validateISO6346(e.target.value);
-      cntrInp.style.borderColor = iso.isValid ? "#10b981" : "#ef4444";
-      cntrInp.title = iso.message;
-    });
-  }
-
-  const mblInp = document.getElementById("modal_MBL_NO");
-  const linerInp = document.getElementById("modal_LINER");
-  if (mblInp && linerInp) {
-    mblInp.addEventListener("input", (e) => {
-      const detected = detectLinerFromMBL(e.target.value);
-      if (detected) linerInp.value = detected;
-    });
-  }
-
-  el("modalBg").classList.add("open");
-}
-el("modalClose").addEventListener("click", () => el("modalBg").classList.remove("open"));
-el("modalCancel").addEventListener("click", () => el("modalBg").classList.remove("open"));
-el("modalSave").addEventListener("click", () => {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const item = {};
-  el("modalForm").querySelectorAll("[data-field]").forEach(input => { item[input.dataset.field] = input.value.trim(); });
-  if (!item["CONTAINER NO."]) return alert("Container number required.");
-  item["CONTAINER NO."] = item["CONTAINER NO."].toUpperCase();
-  if (!item["LINER"] && item["MBL NO"]) item["LINER"] = detectLinerFromMBL(item["MBL NO"]);
-
-  if (editingIndex === -1) {
-    rows.unshift(item);
-    logAuditEvent("CREATE_UNIT", item["CONTAINER NO."], "ALL", "NEW", JSON.stringify(item));
+  if (error || !data) {
+    alert("Invalid Access Code.");
+    btn.textContent = origText;
   } else {
-    const old = rows[editingIndex];
-    rows[editingIndex] = item;
-    logAuditEvent("MODAL_UPDATE", item["CONTAINER NO."], "RECORD", JSON.stringify(old), JSON.stringify(item));
+    currentUser = { id: data.username || code, role: data.role, uid: data.user_id };
+    localStorage.setItem("gml_auth_code_user", JSON.stringify(currentUser));
+    el("loginModalBg").classList.remove("open");
+    btn.textContent = origText;
+    setAccessState(true);
+    toast(`Welcome back, ${currentUser.id}!`);
   }
-  
-  saveAndRefresh();
-  el("modalBg").classList.remove("open");
-  toast("Saved & Synced");
-});
-el("addBtn").addEventListener("click", () => openModal(-1));
-
-el("dailyDispatchBtn").addEventListener("click", () => {
-  const todayStr = new Date().toISOString().slice(0, 10);
-  const activeToday = rows.filter(r => !isFullyCompleted(r) && (r["ETA"] === todayStr || r["PORT IN"] === todayStr || r["PORT OUT"] === todayStr));
-  
-  if (!activeToday.length) return alert("No active shipments scheduled for today.");
-
-  let summary = `📋 *DAILY DISPATCH BRIEF*\nTotal: *${activeToday.length}*\n━━━━━━━━━━━━━━\n`;
-  activeToday.forEach((r, idx) => {
-    summary += `${idx + 1}. *${r["CONTAINER NO."]}* | ${r["CFS NAME"] || '-'} | ${getStatus(r).text}\n`;
-  });
-  window.open("https://wa.me/?text=" + encodeURIComponent(summary), "_blank");
 });
 
-el("vesselEditBtn").addEventListener("click", () => {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const vSet = new Set();
-  rows.forEach(r => { if(r["VESSEL & VOY"]) vSet.add(r["VESSEL & VOY"].trim()); });
-  el("targetVesselSelect").innerHTML = [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
-  el("vesselModalBg").classList.add("open");
-});
-el("vesselModalClose").addEventListener("click", () => el("vesselModalBg").classList.remove("open"));
-el("vesselModalCancel").addEventListener("click", () => el("vesselModalBg").classList.remove("open"));
-el("vesselModalSave").addEventListener("click", () => {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const vsl = el("targetVesselSelect").value;
-  const fld = el("targetFieldSelect").value;
-  const val = el("targetNewValue").value.trim();
-  rows.forEach(r => { 
-    if (r["VESSEL & VOY"] === vsl) {
-      logAuditEvent("BULK_VESSEL_UPDATE", r["CONTAINER NO."], `${vsl}:${fld}`, r[fld], val);
-      r[fld] = val; 
-    }
-  });
-  saveAndRefresh();
-  el("vesselModalBg").classList.remove("open");
-  toast("Schedule updated");
+el("logoutBtn").addEventListener("click", () => {
+  currentUser = null; localStorage.removeItem("gml_auth_code_user"); setAccessState(false); toast("Logged out");
 });
 
-el("sheetSelectAll").addEventListener("change", (e) => {
-  if (e.target.checked) getFilteredRows().forEach(({i}) => selectedIndices.add(i));
-  else selectedIndices.clear();
-  renderUI();
-});
+function checkActiveSession() {
+  const savedUser = localStorage.getItem("gml_auth_code_user");
+  if (savedUser) { try { currentUser = JSON.parse(savedUser); setAccessState(true); } catch(e) { setAccessState(false); } } else { setAccessState(false); }
+}
 
-el("search").addEventListener("input", renderUI);
-el("vesselFilter").addEventListener("change", renderUI);
-el("gatewayFilter").addEventListener("change", renderUI);
-el("cfsFilter").addEventListener("change", renderUI);
+function setAccessState(isStaff) {
+  if(el("opsControls")) el("opsControls").style.display = isStaff ? "flex" : "none";
+  if(el("publicControls")) el("publicControls").style.display = isStaff ? "none" : "flex";
+  if(el("opsDashboardView")) el("opsDashboardView").style.display = isStaff ? "block" : "none";
+  if(el("publicLandingView")) el("publicLandingView").style.display = isStaff ? "none" : "block";
+  if (isStaff && currentUser) { 
+    if(el("userBadge")) el("userBadge").textContent = `${currentUser.id} (${currentUser.role})`; 
+    renderUI(); 
+  }
+}
 
-el("exportBtn").addEventListener("click", () => {
-  const wb = XLSX.utils.book_new();
-  const exportData = rows.map(r => {
-    const fees = calculateStandardFees(r);
-    return {
-      ...r,
-      "PORT DWELL (DAYS)": fees.portDwell,
-      "TERMINAL LFD": fees.terminalLFD,
-      "DEMURRAGE (USD)": fees.demCostUSD,
-      "TOTAL EQUIPMENT DWELL (DAYS)": fees.totalEquipmentDays,
-      "DETENTION LFD": fees.detentionLFD,
-      "DETENTION (USD)": fees.detCostUSD,
-      "TOTAL EXPOSURE (USD)": fees.totalCostUSD,
-      "TOTAL EXPOSURE (INR)": Math.round(fees.totalCostUSD * USD_TO_INR)
-    };
-  });
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), "Tracking & Surcharge");
-  XLSX.writeFile(wb, `Containers_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
-});
-
-el("excelInput").addEventListener("change", e => {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = evt => {
-    const data = new Uint8Array(evt.target.result);
-    const wb = XLSX.read(data, {type: 'array', cellDates: true});
-    let imported = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval: ""});
-    rows = imported.map(r => {
-      const out = {};
-      Object.keys(r).forEach(k => {
-        let val = r[k];
-        if (val instanceof Date) val = val.toISOString().split('T')[0];
-        out[k.trim()] = String(val ?? "").trim();
-      });
-      if (!out["LINER"] && out["MBL NO"]) out["LINER"] = detectLinerFromMBL(out["MBL NO"]);
-      return out;
-    });
-    logAuditEvent("BULK_EXCEL_IMPORT", "ALL", "SHEET_DATA", "N/A", `${rows.length} units imported`);
-    populateFilters();
-    saveAndRefresh();
-    toast(`Imported ${rows.length} records`);
-  };
-  reader.readAsArrayBuffer(file);
-});
-
+// Initial Boot Logic
 try {
   const saved = localStorage.getItem("containerRows");
   if (saved) {
     const parsed = JSON.parse(saved);
-    rows = parsed.map(item => ({
-      "PORT OUT": "",
-      "CONTAINER RETURN DATE": "",
-      "TRUCK NO.": "",
-      "DRIVER CONTACT": "",
-      ...item
-    }));
+    if(Array.isArray(parsed)) rows = parsed;
   }
 } catch(e){}
 
+document.documentElement.setAttribute("data-theme", "light");
+if(el("themeBtn")) el("themeBtn").textContent = "🌙"; 
+if(el("publicThemeBtn")) el("publicThemeBtn").textContent = "🌙";
 populateFilters();
 loadFromCloud();
-updateAuditBadge();
 checkActiveSession();
 
-const urlParams = new URLSearchParams(window.location.search);
-const scannedCntr = urlParams.get("cntr");
-if (scannedCntr) {
-  el("publicSearchInput").value = scannedCntr;
-  performPublicSearch();
-}
 </script>
 </body>
 </html>
