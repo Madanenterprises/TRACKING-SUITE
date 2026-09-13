@@ -195,18 +195,18 @@ body {
 ========================================================= */
 .public-hero-section {
   position: relative;
-  height: 540px;
+  height: 600px;
   display: flex;
   align-items: center;
-  background-image: url('https://images.unsplash.com/photo-1586528116311-ad8ed7c1590f?q=80&w=2070');
+  background-image: url('aa39b66e-bbb2-433e-bcef-581871855506.png');
   background-size: cover;
-  background-position: center 60%;
+  background-position: center;
   border-bottom: 4px solid var(--corporate-pink);
 }
 .public-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(0, 15, 40, 0.85) 0%, rgba(0, 15, 40, 0.2) 100%);
+  background: linear-gradient(90deg, rgba(0, 15, 40, 0.7) 0%, rgba(0, 15, 40, 0.1) 50%, transparent 100%);
   z-index: 1;
 }
 .public-hero-container {
@@ -222,21 +222,43 @@ body {
   align-items: center;
 }
 @media (max-width: 968px) {
-  .public-hero-container {
-    grid-template-columns: 1fr;
-    justify-content: center;
-    padding-top: 40px;
-  }
+  .public-hero-container { grid-template-columns: 1fr; justify-content: center; padding-top: 40px; }
 }
 
 .hero-text-content h1 {
-  font-size: 56px;
+  font-size: 64px;
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.1;
-  margin-bottom: 24px;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
+  line-height: 1.05;
+  margin-bottom: 16px;
+  text-shadow: 0 4px 16px rgba(0,0,0,0.6);
   letter-spacing: -0.02em;
+}
+.hero-text-content p {
+  font-size: 18px;
+  font-weight: 600;
+  color: #e2e8f0;
+  margin-bottom: 32px;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.8);
+}
+.hero-features {
+  display: flex;
+  gap: 32px;
+}
+.hero-feature-item {
+  text-align: center;
+  color: #ffffff;
+}
+.hero-feature-icon {
+  font-size: 24px;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+.hero-feature-text {
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
 }
 
 /* TRACKING WIDGET CARD */
@@ -263,7 +285,7 @@ body {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: -1px; /* Overlaps border */
+  margin-bottom: -1px;
 }
 .widget-tab-active svg {
   width: 16px; height: 16px; fill: currentColor;
@@ -464,7 +486,7 @@ body {
       <div class="brand-icon">⚓</div>
       <div>
         <div class="brand-title">Tracking Suite</div>
-        <div class="brand-sub">Chennai Port Operations</div>
+        <div class="brand-sub">LOGISTICS</div>
       </div>
     </div>
     
@@ -503,9 +525,9 @@ body {
         </div>
       </div>
 
-      <div id="publicControls" style="display:flex; align-items:center; gap:6px;">
-        <button class="btn btn-ghost" id="publicThemeBtn">☀️</button>
-        <button class="btn btn-primary" id="loginBtn">🔐 Staff Login</button>
+      <div id="publicControls" style="display:flex; align-items:center; gap:16px;">
+        <button class="btn btn-ghost" id="publicThemeBtn" style="font-size:16px; padding:4px;">🌙</button>
+        <button class="btn btn-primary" id="loginBtn" style="background:#0284c7; padding:10px 20px;">🔐 Staff Login</button>
       </div>
     </div>
   </div>
@@ -517,19 +539,35 @@ body {
     <div class="public-hero-container">
       
       <div class="hero-text-content">
-        <h1>Your Shipping Partner</h1>
+        <h1>Your<br>Chennai Port<br>Partner</h1>
+        <p>Track. Plan. Move Forward.<br>Together.</p>
+        
+        <div class="hero-features">
+          <div class="hero-feature-item">
+            <div class="hero-feature-icon">🚢</div>
+            <div class="hero-feature-text">Reliable<br>Updates</div>
+          </div>
+          <div class="hero-feature-item">
+            <div class="hero-feature-icon">🛡️</div>
+            <div class="hero-feature-text">Secure<br>Tracking</div>
+          </div>
+          <div class="hero-feature-item">
+            <div class="hero-feature-icon">🌐</div>
+            <div class="hero-feature-text">Global<br>Connectivity</div>
+          </div>
+        </div>
       </div>
       
       <div class="hero-widget-card">
         <div class="widget-tabs-header">
           <div class="widget-tab-active">
-            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <svg viewBox="0 0 24 24" style="color:#c80062;"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             Tracking
           </div>
         </div>
         
         <div class="widget-body">
-          <label>MBL & CONTAINER NO <span>*</span></label>
+          <label>MBL & CONTAINER NO <span style="color:#ef4444;">*</span></label>
           
           <div class="widget-input-wrapper">
             <input type="text" id="publicSearchInput" placeholder="E.g. SKHU9422886">
@@ -538,7 +576,7 @@ body {
           <div class="widget-helper-text">Enter your tracking numbers. Separate multiple entries with a space or comma.</div>
           
           <div class="widget-footer">
-            <button class="btn-track-action" id="publicSearchBtn">Track</button>
+            <button class="btn-track-action" id="publicSearchBtn" style="background:#c80062;">Track</button>
           </div>
         </div>
       </div>
@@ -559,7 +597,6 @@ body {
     <div class="kpi-card total-cost-kpi"><small>Total Financial Exposure</small><strong id="kTotalExposure" style="color:#ec4899">₹0</strong></div>
   </div>
 
-  <!-- STREAMLINED DOCKED CONTROL TRAY -->
   <div class="control-tray">
     <div class="control-tray-top">
       <div class="filter-inputs">
@@ -929,42 +966,6 @@ function parseLocalDate(str) {
   return isNaN(d) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
-/* =================================================================
-   AUTOMATIC VESSEL BERTH & ETA/DELAY ENGINE
-==================================================================== */
-function handleAutomaticVesselBerth(vesselName, berthDate) {
-  let updatedCount = 0;
-  rows.forEach((r, idx) => {
-    const vsl = (r["VESSEL & VOY"] || "").trim();
-    if (vsl.toLowerCase() === vesselName.toLowerCase() && !validDate(r["PORT IN"])) {
-      const oldVal = r["PORT IN"];
-      r["PORT IN"] = berthDate;
-      updatedCount++;
-      logAuditEvent("AUTO_BERTH_UPDATE", r["CONTAINER NO."], "PORT IN", oldVal, berthDate);
-    }
-  });
-  if (updatedCount > 0) {
-    saveAndRefresh();
-    toast(`Auto-updated ${updatedCount} containers to Port In based on vessel berth!`);
-  }
-}
-
-function getVesselDelayStatus(r) {
-  const eta = getField(r, ["ETA"]);
-  const portIn = getField(r, ["PORT IN"]);
-  if (!validDate(eta)) return { isDelayed: false, delayDays: 0 };
-  
-  const etaDate = parseLocalDate(eta);
-  const compDate = validDate(portIn) ? parseLocalDate(portIn) : new Date();
-  if (!etaDate) return { isDelayed: false, delayDays: 0 };
-  
-  const diffDays = Math.floor((compDate - etaDate) / (1000 * 60 * 60 * 24));
-  return { isDelayed: diffDays > 2 && !isFullyCompleted(r), delayDays: diffDays };
-}
-
-/* =================================================================
-   EXACT REFERENCE MODULES (TIMELINE BAR COMPLETELY REMOVED)
-==================================================================== */
 function generatePublicVoyageTimelineHtml(r) {
   const mblNo = esc(r["MBL NO"] || "—");
   const vesselName = esc(r["VESSEL & VOY"] || "—");
@@ -1059,9 +1060,6 @@ function generatePublicVoyageTimelineHtml(r) {
   `;
 }
 
-/* =================================================================
-   FEATURE: AUDIT TRAIL LOGGING
-==================================================================== */
 function logAuditEvent(action, containerNo, field, oldVal, newVal) {
   const operator = currentUser ? `${currentUser.id} (${currentUser.role})` : "System / Auto";
   const entry = {
@@ -1158,9 +1156,6 @@ el("clearAuditBtn").addEventListener("click", () => {
   }
 });
 
-/* =================================================================
-   FEATURE: ISO 6346 CONTAINER NUMBER VALIDATION ENGINE
-==================================================================== */
 function validateISO6346(cntr) {
   if (!cntr) return { isValid: false, message: "Empty code" };
   const clean = String(cntr).trim().toUpperCase();
@@ -1189,9 +1184,6 @@ function validateISO6346(cntr) {
   return { isValid, message: isValid ? "Valid ISO 6346" : `Checksum error (Expected ${checkDigit})` };
 }
 
-/* =================================================================
-   FEATURE: DUAL LAST FREE DAY (LFD) COUNTDOWN & FEE ENGINE
-==================================================================== */
 function calculateStandardFees(r) {
   const is20ft = (r["TYPE"] || "").includes("20");
   const demRatePerDay = is20ft ? 100 : 225;
@@ -1261,9 +1253,6 @@ function calculateStandardFees(r) {
   };
 }
 
-/* =================================================================
-   CLEAN MANIFEST TABLE REPORT GENERATOR (MATCHING SAMPLES)
-==================================================================== */
 function generateCleanManifestHtml(containersList) {
   const now = new Date();
   const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
@@ -1411,9 +1400,6 @@ function downloadMultipleStatusImage(containersList, titleRef = "Status_Report")
   });
 }
 
-/* =================================================================
-   FEATURE: TRUCK DRIVER GATE DISPATCH SLIP GENERATOR (INTERACTIVE)
-==================================================================== */
 function openTruckDispatchSlip(idx) {
   activeTruckSlipIndex = idx;
   const r = rows[idx];
@@ -1458,7 +1444,6 @@ function openTruckDispatchSlip(idx) {
         <span style="font-size:13px; font-weight:800; font-family:'JetBrains Mono'; color:#0f172a;">${esc(seal)}</span>
       </div>
 
-      <!-- EDITABLE DISPATCH ASSIGNMENT FIELDS -->
       <div style="border:2px solid #0284c7; border-radius:6px; padding:6px 10px; background:#eff6ff;">
         <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Assigned Vehicle / Trailer No. ✏️</label>
         <input type="text" id="slipTruckInput" class="input" style="width:100%; font-family:'JetBrains Mono'; font-weight:800; background:#ffffff; color:#0f172a; margin-top:2px;" 
@@ -1529,9 +1514,6 @@ el("sendDriverWhatsAppBtn").addEventListener("click", () => {
 el("truckSlipClose").addEventListener("click", () => el("truckSlipModalBg").classList.remove("open"));
 el("truckSlipCancel").addEventListener("click", () => el("truckSlipModalBg").classList.remove("open"));
 
-/* =================================================================
-   FEATURE: WHATSAPP DIRECT MESSAGE COMPOSER
-==================================================================== */
 function openWhatsAppComposer(idx = -1) {
   const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   let text = "";
@@ -1582,7 +1564,6 @@ el("loginBtn").addEventListener("click", () => el("loginModalBg").classList.add(
 el("loginClose").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
 el("loginCancel").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
 
-// Unique Access Code Login Verification (With Username Tracking Support)
 el("loginSubmit").addEventListener("click", async () => {
   const code = el("loginCodeInput").value.trim();
   if (!code) return alert("Please enter your Access Code.");
@@ -1614,7 +1595,6 @@ el("loginSubmit").addEventListener("click", async () => {
   }
 });
 
-// Secure Logout
 el("logoutBtn").addEventListener("click", () => {
   currentUser = null;
   localStorage.removeItem("gml_auth_code_user");
@@ -1622,7 +1602,6 @@ el("logoutBtn").addEventListener("click", () => {
   toast("Logged out");
 });
 
-// Check Local Storage Session on Load
 function checkActiveSession() {
   const savedUser = localStorage.getItem("gml_auth_code_user");
   if (savedUser) {
@@ -1851,7 +1830,6 @@ function performPublicSearch() {
   container.innerHTML = cardsHtml;
   container.style.display = "block";
   
-  // Smooth scroll to the result so the user isn't stuck on the hero section
   setTimeout(() => {
     container.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }, 100);
@@ -2028,6 +2006,19 @@ function getFilteredRows() {
   }
 
   return filtered;
+}
+
+function getVesselDelayStatus(r) {
+  const eta = getField(r, ["ETA"]);
+  const portIn = getField(r, ["PORT IN"]);
+  if (!validDate(eta)) return { isDelayed: false, delayDays: 0 };
+  
+  const etaDate = parseLocalDate(eta);
+  const compDate = validDate(portIn) ? parseLocalDate(portIn) : new Date();
+  if (!etaDate) return { isDelayed: false, delayDays: 0 };
+  
+  const diffDays = Math.floor((compDate - etaDate) / (1000 * 60 * 60 * 24));
+  return { isDelayed: diffDays > 2 && !isFullyCompleted(r), delayDays: diffDays };
 }
 
 function updateKPIs() {
