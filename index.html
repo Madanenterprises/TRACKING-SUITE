@@ -81,9 +81,6 @@ body {
   transition: background-color 0.2s ease, color 0.2s ease;
 }
 
-/* =========================================================
-   REFINED TOP NAVIGATION HEADER
-========================================================= */
 .nav-header {
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
@@ -195,18 +192,18 @@ body {
 ========================================================= */
 .public-hero-section {
   position: relative;
-  height: 600px;
+  height: 560px;
   display: flex;
   align-items: center;
-  background-image: url('aa39b66e-bbb2-433e-bcef-581871855506.png');
+  background-image: url('https://images.unsplash.com/photo-1586528116311-ad8ed7c1590f?q=80&w=2070');
   background-size: cover;
-  background-position: center;
+  background-position: center 60%;
   border-bottom: 4px solid var(--corporate-pink);
 }
 .public-hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, rgba(0, 15, 40, 0.7) 0%, rgba(0, 15, 40, 0.1) 50%, transparent 100%);
+  background: linear-gradient(90deg, rgba(0, 15, 40, 0.85) 0%, rgba(0, 15, 40, 0.3) 100%);
   z-index: 1;
 }
 .public-hero-container {
@@ -226,12 +223,12 @@ body {
 }
 
 .hero-text-content h1 {
-  font-size: 64px;
+  font-size: 56px;
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.05;
+  line-height: 1.1;
   margin-bottom: 16px;
-  text-shadow: 0 4px 16px rgba(0,0,0,0.6);
+  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
   letter-spacing: -0.02em;
 }
 .hero-text-content p {
@@ -372,7 +369,6 @@ body {
   text-align: left;
 }
 
-/* DATA MODULE SECTIONS */
 .ref-module-section { padding: 24px; }
 .ref-module-card {
   background: var(--bg-elevated);
@@ -389,7 +385,7 @@ body {
 .ref-data-box val { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-main); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
 /* =================================================================
-   DASHBOARD UI STYLES (Keep Intact for Staff view)
+   DASHBOARD UI STYLES
 ==================================================================== */
 .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
 .kpi-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
@@ -422,7 +418,6 @@ body {
 .chip.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
 .bulk-action-dock { display: flex; align-items: center; gap: 6px; background: var(--bg-elevated); padding: 3px 6px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
 
-/* CARDS LAYOUT */
 .cards-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(390px, 1fr)); gap: 12px; }
 .card-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); gap: 10px; transition: transform 0.15s, border-color 0.15s; }
 .card-box:hover { border-color: var(--border-focus); transform: translateY(-2px); }
@@ -674,7 +669,6 @@ body {
   <section id="kanbanView" class="kanban-layout" style="display:none;"></section>
 </main>
 
-<!-- TRUCK DISPATCH SLIP MODAL -->
 <div class="modal-bg" id="truckSlipModalBg">
   <div class="modal-dialog" style="width:720px; max-width:95vw;">
     <div class="modal-header">
@@ -692,7 +686,6 @@ body {
   </div>
 </div>
 
-<!-- CLIENT WHATSAPP COMPOSER MODAL -->
 <div class="modal-bg" id="whatsappComposerModalBg">
   <div class="modal-dialog" style="max-width:540px;">
     <div class="modal-header">
@@ -710,7 +703,6 @@ body {
   </div>
 </div>
 
-<!-- AUDIT TRAIL MODAL -->
 <div class="modal-bg" id="auditModalBg">
   <div class="modal-dialog" style="width:840px; max-width:95vw;">
     <div class="modal-header">
