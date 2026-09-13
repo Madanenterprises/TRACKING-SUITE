@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>Container Tracking Suite - Premium Portal</title>
+<title>Container Tracking Suite - Enterprise Hub</title>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
@@ -14,17 +14,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
 <style>
 :root[data-theme="dark"] {
-  --bg-app: #05070a;
-  --bg-surface: #0b101b;
-  --bg-elevated: #111827;
-  --bg-active: #1f293d;
-  --border: #1e293b;
+  --bg-app: #090d16;
+  --bg-surface: #111827;
+  --bg-elevated: #1e293b;
+  --bg-active: #334155;
+  --border: #1f2937;
   --border-focus: #38bdf8;
   --text-main: #f8fafc;
   --text-muted: #94a3b8;
   --text-dim: #64748b;
   --accent: #38bdf8;
-  --accent-glow: rgba(56, 189, 248, 0.18);
+  --accent-glow: rgba(56, 189, 248, 0.12);
   --primary: #0284c7;
   --primary-hover: #0369a1;
   --success: #10b981;
@@ -35,38 +35,40 @@
   --danger-bg: rgba(239, 68, 68, 0.12);
   --purple: #a855f7;
   --purple-bg: rgba(168, 85, 247, 0.12);
-  --shadow-sm: 0 4px 12px rgba(0,0,0,0.4);
-  --shadow-lg: 0 20px 50px -10px rgba(0,0,0,0.8);
-  --corporate-pink: #c80062;
-  --corporate-pink-hover: #a30050;
+  --shadow-sm: 0 4px 12px rgba(0,0,0,0.3);
+  --shadow-md: 0 10px 25px -5px rgba(0,0,0,0.4);
+  --shadow-lg: 0 24px 50px -12px rgba(0,0,0,0.7);
+  --corporate-pink: #ec4899;
+  --corporate-pink-hover: #db2777;
 }
 
 :root[data-theme="light"] {
-  --bg-app: #f4f6f9;
+  --bg-app: #f4f6fb;
   --bg-surface: #ffffff;
   --bg-elevated: #f8fafc;
   --bg-active: #e2e8f0;
-  --border: #cbd5e1;
+  --border: #e2e8f0;
   --border-focus: #0284c7;
   --text-main: #0f172a;
-  --text-muted: #475569;
+  --text-muted: #64748b;
   --text-dim: #94a3b8;
   --accent: #0284c7;
-  --accent-glow: rgba(2, 132, 199, 0.1);
+  --accent-glow: rgba(2, 132, 199, 0.08);
   --primary: #0284c7;
   --primary-hover: #0369a1;
   --success: #059669;
-  --success-bg: #d1fae5;
+  --success-bg: #ecfdf5;
   --warning: #d97706;
-  --warning-bg: #fef3c7;
+  --warning-bg: #fffbeb;
   --danger: #dc2626;
-  --danger-bg: #fee2e2;
+  --danger-bg: #fef2f2;
   --purple: #7c3aed;
-  --purple-bg: #ede9fe;
-  --shadow-sm: 0 4px 12px rgba(15,23,42,0.05);
-  --shadow-lg: 0 20px 40px -10px rgba(15,23,42,0.1);
-  --corporate-pink: #c80062;
-  --corporate-pink-hover: #a30050;
+  --purple-bg: #f5f3ff;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.03);
+  --shadow-md: 0 10px 25px -5px rgba(15,23,42,0.06), 0 8px 10px -6px rgba(15,23,42,0.04);
+  --shadow-lg: 0 20px 40px -10px rgba(15,23,42,0.08);
+  --corporate-pink: #db2777;
+  --corporate-pink-hover: #be185d;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -78,7 +80,7 @@ body {
   line-height: 1.5;
   min-height: 100vh;
   padding-bottom: 60px;
-  transition: background-color 0.2s ease, color 0.2s ease;
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 .nav-header {
@@ -87,35 +89,42 @@ body {
   position: sticky;
   top: 0;
   z-index: 100;
-  padding: 12px 30px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+  padding: 10px 24px;
+  backdrop-filter: blur(8px);
+  box-shadow: var(--shadow-sm);
 }
 .nav-container {
-  max-width: 1400px;
+  max-width: 1440px;
   margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
 }
-.brand-box { display: flex; align-items: center; gap: 12px; }
-.brand-icon {
-  width: 44px; height: 44px; border-radius: 8px;
-  background: linear-gradient(135deg, #0284c7, #2563eb);
-  display: grid; place-items: center; font-size: 22px;
-  color: #fff; font-weight: 900;
+.brand-box { display: flex; align-items: center; gap: 10px; }
+.brand-logo-icon {
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, var(--primary), var(--corporate-pink));
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+  font-weight: 900;
+  font-size: 15px;
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
 }
-.brand-title { font-size: 18px; font-weight: 900; color: var(--text-main); letter-spacing: -0.03em; margin-bottom: 2px; }
-.brand-sub { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+.brand-title { font-size: 17px; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; }
 
 .header-tools { display: flex; align-items: center; gap: 8px; }
 .header-segment {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
   background: var(--bg-elevated);
   padding: 3px 6px;
-  border-radius: 8px;
+  border-radius: 9px;
   border: 1px solid var(--border);
 }
 .header-divider {
@@ -129,8 +138,8 @@ body {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
   color: var(--text-main);
-  padding: 7px 14px;
-  border-radius: 6px;
+  padding: 7px 12px;
+  border-radius: 8px;
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
@@ -140,17 +149,19 @@ body {
   transition: all 0.15s ease;
   white-space: nowrap;
 }
-.btn:hover { border-color: var(--border-focus); background: var(--bg-active); }
+.btn:hover { border-color: var(--border-focus); background: var(--bg-active); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
 .btn-primary {
   background: var(--primary);
-  border: none;
-  color: #fff !important;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.3);
+  border: 1px solid transparent;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
 }
 .btn-primary:hover { background: var(--primary-hover); }
-.btn-emerald { background: var(--success-bg); border-color: rgba(16, 185, 129, 0.3); color: var(--success); }
-.btn-gold { background: var(--warning-bg); border-color: rgba(245, 158, 11, 0.3); color: var(--warning); }
-.btn-danger { background: var(--danger-bg); border-color: rgba(239, 68, 68, 0.3); color: var(--danger); }
+.btn-emerald { background: var(--success-bg); border-color: rgba(16, 185, 129, 0.25); color: var(--success); }
+.btn-gold { background: var(--warning-bg); border-color: rgba(245, 158, 11, 0.25); color: var(--warning); }
+.btn-danger { background: var(--danger-bg); border-color: rgba(239, 68, 68, 0.25); color: var(--danger); }
+.btn-purple { background: var(--purple-bg); border-color: rgba(168, 85, 247, 0.25); color: var(--purple); }
 .btn-ghost { background: transparent; border-color: transparent; color: var(--text-muted); }
 .btn-ghost:hover { background: var(--bg-active); color: var(--text-main); }
 
@@ -161,15 +172,15 @@ body {
   right: 0;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 8px;
+  border-radius: 12px;
   box-shadow: var(--shadow-lg);
   display: none;
   flex-direction: column;
-  min-width: 200px;
+  min-width: 220px;
   z-index: 100;
   padding: 6px;
 }
-.nav-dropdown-content.show { display: flex; }
+.nav-dropdown-content.show { display: flex; animation: dropFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
 .dropdown-item {
   padding: 8px 12px;
   font-size: 12px;
@@ -179,271 +190,674 @@ body {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   border: none;
   background: transparent;
   width: 100%;
   text-align: left;
+  transition: background 0.15s;
 }
 .dropdown-item:hover { background: var(--accent-glow); color: var(--accent); }
 
-/* ENTERPRISE HERO LANDING PAGE */
+@keyframes dropFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .public-hero-section {
   position: relative;
-  height: 540px;
+  min-height: calc(100vh - 65px);
   display: flex;
   align-items: center;
-  background-image: url('https://images.unsplash.com/photo-1586528116311-ad8ed7c1590f?q=80&w=2070');
+  background-image: linear-gradient(to right, rgba(9, 13, 22, 0.25) 0%, rgba(9, 13, 22, 0.6) 50%, rgba(9, 13, 22, 0.85) 100%), 
+                    url('c0c23c2b-49da-4968-8d66-a632733c57ea.png');
   background-size: cover;
-  background-position: center 60%;
-  border-bottom: 4px solid var(--corporate-pink);
-}
-.public-hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, rgba(0, 15, 40, 0.85) 0%, rgba(0, 15, 40, 0.2) 100%);
-  z-index: 1;
+  background-position: center left;
+  background-repeat: no-repeat;
+  border-bottom: 3px solid var(--corporate-pink);
+  padding: 60px 0;
 }
 .public-hero-container {
-  position: relative;
-  z-index: 2;
   width: 100%;
-  max-width: 1200px;
+  max-width: 1240px;
   margin: 0 auto;
-  padding: 0 30px;
-  display: grid;
-  grid-template-columns: 1fr 480px;
-  gap: 40px;
+  padding: 0 24px;
+  display: flex;
+  justify-content: flex-end;
   align-items: center;
 }
 @media (max-width: 968px) {
   .public-hero-container {
-    grid-template-columns: 1fr;
     justify-content: center;
-    padding-top: 40px;
   }
 }
 
-.hero-text-content h1 {
-  font-size: 56px;
-  font-weight: 900;
-  color: #ffffff;
-  line-height: 1.1;
-  margin-bottom: 24px;
-  text-shadow: 0 4px 20px rgba(0,0,0,0.5);
-  letter-spacing: -0.02em;
-}
-
-/* TRACKING WIDGET CARD */
 .hero-widget-card {
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 460px;
 }
 .widget-tabs-header {
   display: flex;
-  background: #f8fafc;
-  border-bottom: 1px solid #cbd5e1;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
   padding: 0 20px;
 }
 .widget-tab-active {
-  padding: 16px 20px;
-  font-size: 14px;
+  padding: 16px 8px;
+  font-size: 13.5px;
   font-weight: 800;
   color: var(--corporate-pink);
-  border-bottom: 3px solid var(--corporate-pink);
+  border-bottom: 2px solid var(--corporate-pink);
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: -1px;
 }
-.widget-tab-active svg {
-  width: 16px; height: 16px; fill: currentColor;
-}
-
 .widget-body {
-  padding: 32px 28px;
+  padding: 28px 24px;
 }
 .widget-body label {
   display: block;
-  font-size: 13px;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 12px;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
-.widget-body label span {
-  color: var(--corporate-pink);
-}
-
-.widget-input-wrapper {
-  margin-bottom: 10px;
-}
+.widget-body label span { color: var(--corporate-pink); }
+.widget-input-wrapper { margin-bottom: 8px; }
 .widget-input-wrapper input {
   width: 100%;
-  background: #ffffff;
-  border: 1px solid #94a3b8;
-  padding: 14px 16px;
-  border-radius: 4px;
-  font-size: 15px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 14px;
   font-family: 'JetBrains Mono', monospace;
-  font-weight: 600;
-  color: #0f172a;
+  font-weight: 700;
+  color: var(--text-main);
   outline: none;
   transition: all 0.2s ease;
 }
 .widget-input-wrapper input:focus {
   border-color: var(--corporate-pink);
-  box-shadow: 0 0 0 3px rgba(200, 0, 98, 0.15);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
 }
-.widget-input-wrapper input::placeholder {
-  color: #94a3b8;
-  font-weight: 500;
-}
-
 .widget-helper-text {
-  font-size: 12px;
-  color: #64748b;
-  margin-bottom: 28px;
-  line-height: 1.4;
-}
-
-.widget-footer {
-  display: flex;
-  justify-content: flex-end;
+  font-size: 11.5px;
+  color: var(--text-dim);
+  margin-bottom: 20px;
 }
 .btn-track-action {
-  background: var(--corporate-pink);
+  width: 100%;
+  background: linear-gradient(135deg, var(--corporate-pink), #be185d);
   color: #ffffff;
   border: none;
-  padding: 14px 42px;
-  font-size: 16px;
+  padding: 12px 24px;
+  font-size: 14px;
   font-weight: 800;
-  border-radius: 4px;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background 0.2s ease;
-  letter-spacing: 0.03em;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 14px rgba(219, 39, 119, 0.25);
 }
 .btn-track-action:hover {
-  background: var(--corporate-pink-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(219, 39, 119, 0.35);
 }
 
-/* PUBLIC SEARCH RESULT CARD */
 .public-result-card {
   max-width: 1100px;
-  margin: -30px auto 60px auto;
+  margin: -40px auto 60px auto;
   position: relative;
   z-index: 10;
   background: var(--bg-surface);
   border: 1px solid var(--border);
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden;
   box-shadow: var(--shadow-lg);
   display: none;
-  text-align: left;
+}
+
+.timeline-stepper {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  padding: 24px 30px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--border);
+}
+.timeline-stepper::before {
+  content: '';
+  position: absolute;
+  top: 38px;
+  left: 50px;
+  right: 50px;
+  height: 2px;
+  background: var(--border);
+  z-index: 1;
+}
+.step-node {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  text-align: center;
+}
+.step-dot {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg-surface);
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  color: var(--text-dim);
+  transition: all 0.2s ease;
+}
+.step-node.completed .step-dot {
+  background: var(--success);
+  border-color: var(--success);
+  color: #ffffff;
+}
+.step-node.active .step-dot {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+.step-label {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.step-date {
+  font-size: 9.5px;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-dim);
 }
 
 .ref-module-section { padding: 24px; }
 .ref-module-card {
   background: var(--bg-elevated);
   border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 18px;
+  border-radius: 12px;
+  padding: 16px;
   margin-bottom: 16px;
 }
-.ref-module-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-weight: 800; font-size: 12px; color: var(--accent); text-transform: uppercase; }
-.ref-data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.ref-module-title-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 800;
+  font-size: 11.5px;
+  color: var(--accent);
+  text-transform: uppercase;
+}
+.ref-data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
 @media(max-width: 768px) { .ref-data-grid { grid-template-columns: 1fr; } }
-.ref-data-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 6px; padding: 12px; }
-.ref-data-box label { display: block; font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
-.ref-data-box val { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-main); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ref-data-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.ref-data-box label {
+  display: block;
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 4px;
+}
+.ref-data-box val {
+  font-size: 13px;
+  font-weight: 800;
+  font-family: 'JetBrains Mono', monospace;
+  color: var(--text-main);
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-/* DASHBOARD UI STYLES */
-.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 16px; }
-.kpi-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
-.kpi-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--border); }
-.kpi-card.active-kpi::after { background: var(--accent); }
-.kpi-card.destuffed-kpi::after { background: var(--success); }
-.kpi-card.port-kpi::after { background: var(--warning); }
-.kpi-card.demurrage-kpi::after { background: #f97316; }
-.kpi-card.detention-kpi::after { background: var(--danger); }
-.kpi-card.total-cost-kpi::after { background: #ec4899; }
-.kpi-card small { font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.03em; }
-.kpi-card strong { font-size: 22px; font-weight: 800; font-family: 'JetBrains Mono', monospace; margin-top: 4px; }
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.kpi-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.kpi-card:hover { transform: translateY(-2px); border-color: var(--border-focus); }
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--border);
+}
+.kpi-card.active-kpi::before { background: var(--accent); }
+.kpi-card.destuffed-kpi::before { background: var(--success); }
+.kpi-card.port-kpi::before { background: var(--warning); }
+.kpi-card.total-cost-kpi::before { background: var(--corporate-pink); }
+.kpi-card small {
+  font-size: 10px;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.kpi-card strong {
+  font-size: 22px;
+  font-weight: 900;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 6px;
+}
 
-.main-wrapper { max-width: 1600px; margin: 0 auto; padding: 20px; }
-.control-tray { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-sm); }
-.control-tray-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.filter-inputs { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
+.main-wrapper { max-width: 1440px; margin: 0 auto; padding: 20px 24px; }
+.control-tray {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  box-shadow: var(--shadow-sm);
+}
+.control-tray-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.filter-inputs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  flex-wrap: wrap;
+}
 .search-input-wrapper { position: relative; min-width: 240px; flex: 1; max-width: 380px; }
-.search-input-wrapper input { width: 100%; padding-left: 30px; }
-.search-input-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 12px; color: var(--text-dim); pointer-events: none; }
-.input, .select { height: 34px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-main); padding: 0 10px; border-radius: 7px; font-size: 12px; font-weight: 600; outline: none; transition: all 0.15s ease; }
-.input:focus, .select:focus { border-color: var(--border-focus); background: var(--bg-surface); }
-.view-selector { display: flex; background: var(--bg-elevated); padding: 3px; border-radius: 7px; border: 1px solid var(--border); gap: 2px; height: 34px; box-sizing: border-box; }
-.view-btn { background: transparent; border: 0; color: var(--text-muted); padding: 0 12px; border-radius: 5px; font-size: 11.5px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; transition: all 0.15s ease; }
-.view-btn.active { background: var(--primary); color: #ffffff; box-shadow: 0 1px 4px rgba(37,99,235,0.25); }
-.control-tray-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--border); padding-top: 9px; }
-.quick-chips-wrapper { display: flex; align-items: center; gap: 6px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; flex: 1; }
-.chip { padding: 5px 11px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-muted); transition: all 0.15s ease; user-select: none; }
+.search-input-wrapper input { width: 100%; padding-left: 32px; }
+.search-input-icon {
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 13px;
+  color: var(--text-dim);
+  pointer-events: none;
+}
+.input, .select {
+  height: 36px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-main);
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  outline: none;
+  transition: all 0.15s ease;
+}
+.input:focus, .select:focus {
+  border-color: var(--border-focus);
+  background: var(--bg-surface);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+.view-selector {
+  display: flex;
+  background: var(--bg-elevated);
+  padding: 3px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  gap: 2px;
+}
+.view-btn {
+  background: transparent;
+  border: 0;
+  color: var(--text-muted);
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.view-btn.active {
+  background: var(--bg-surface);
+  color: var(--primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.control-tray-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 10px;
+}
+.quick-chips-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  white-space: nowrap;
+  scrollbar-width: none;
+  flex: 1;
+}
+.chip {
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: all 0.15s ease;
+  user-select: none;
+}
 .chip:hover { border-color: var(--accent); color: var(--text-main); }
 .chip.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
-.bulk-action-dock { display: flex; align-items: center; gap: 6px; background: var(--bg-elevated); padding: 3px 6px; border-radius: 8px; border: 1px solid var(--border); flex-shrink: 0; }
 
-.cards-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(390px, 1fr)); gap: 12px; }
-.card-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); gap: 10px; transition: transform 0.15s, border-color 0.15s; }
-.card-box:hover { border-color: var(--border-focus); transform: translateY(-2px); }
-.card-header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 6px; }
+.bulk-action-dock {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--bg-elevated);
+  padding: 3px 6px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.cards-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 14px; }
+.card-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  box-shadow: var(--shadow-sm);
+  gap: 12px;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card-box:hover {
+  border-color: var(--border-focus);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+.card-header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .card-title-group { display: flex; align-items: center; gap: 8px; }
-.card-cntr-code { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 800; color: var(--accent); }
+.card-cntr-code { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 900; color: var(--accent); }
 .card-vessel { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
 
-.status-pill { padding: 2px 7px; border-radius: 5px; font-size: 9px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; display: inline-flex; align-items: center; }
+.status-pill {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 9.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  display: inline-flex;
+  align-items: center;
+}
 .status-pill.completed { background: var(--success-bg); color: var(--success); }
 .status-pill.progress { background: var(--accent-glow); color: var(--accent); }
 
-.badge-row { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 4px; }
-.tag-badge { font-size: 9px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-muted); }
-.tag-badge.warning { background: var(--warning-bg); border-color: rgba(245, 158, 11, 0.3); color: var(--warning); }
-.tag-badge.danger { background: var(--danger-bg); border-color: rgba(239, 68, 68, 0.3); color: var(--danger); }
-.tag-badge.success { background: var(--success-bg); border-color: rgba(16, 185, 129, 0.3); color: var(--success); }
+.badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.tag-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+}
+.tag-badge.warning { background: var(--warning-bg); border-color: rgba(245, 158, 11, 0.25); color: var(--warning); }
+.tag-badge.danger { background: var(--danger-bg); border-color: rgba(239, 68, 68, 0.25); color: var(--danger); }
+.tag-badge.success { background: var(--success-bg); border-color: rgba(16, 185, 129, 0.25); color: var(--success); }
 
-.badge-links-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px; margin: 6px 0; }
-.link-pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10px; font-weight: 700; text-decoration: none; padding: 4px; border-radius: 5px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-muted); transition: all 0.15s; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-.link-pill:hover { border-color: var(--accent); color: var(--accent); }
+.badge-links-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0; }
+.link-pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  font-size: 10.5px;
+  font-weight: 700;
+  text-decoration: none;
+  padding: 5px;
+  border-radius: 6px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  transition: all 0.15s;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.link-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
 
-.card-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 10px; background: var(--bg-elevated); padding: 8px 10px; border-radius: 7px; border: 1px solid var(--border); }
-.detail-item label { display: block; font-size: 8.5px; text-transform: uppercase; font-weight: 800; color: var(--text-dim); margin-bottom: 1px; }
-.detail-item val { font-size: 10.5px; font-weight: 700; font-family: 'JetBrains Mono', monospace; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-details-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 10px;
+  background: var(--bg-elevated);
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+.detail-item label {
+  display: block;
+  font-size: 8.5px;
+  text-transform: uppercase;
+  font-weight: 800;
+  color: var(--text-dim);
+  margin-bottom: 1px;
+}
+.detail-item val {
+  font-size: 11px;
+  font-weight: 700;
+  font-family: 'JetBrains Mono', monospace;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 
-.fee-breakdown-box { background: rgba(239, 68, 68, 0.06); border: 1px dashed rgba(239, 68, 68, 0.35); border-radius: 7px; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
-.card-footer-btns { display: flex; justify-content: flex-end; gap: 4px; padding-top: 6px; border-top: 1px solid var(--border); flex-wrap: wrap; }
+.fee-breakdown-box {
+  background: var(--danger-bg);
+  border: 1px dashed rgba(239, 68, 68, 0.3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+.card-footer-btns {
+  display: flex;
+  justify-content: flex-end;
+  gap: 5px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  flex-wrap: wrap;
+}
 
-.sheet-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; overflow-x: auto; box-shadow: var(--shadow-sm); }
+.sheet-box {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-x: auto;
+  box-shadow: var(--shadow-sm);
+}
 .sheet-table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 11.5px; }
-.sheet-table th { background: var(--bg-elevated); padding: 8px 10px; text-align: left; font-weight: 800; color: var(--text-muted); text-transform: uppercase; font-size: 9.5px; letter-spacing: 0.03em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; }
-.sheet-table td { padding: 5px 8px; border-bottom: 1px solid var(--border); }
+.sheet-table th {
+  background: var(--bg-elevated);
+  padding: 10px 12px;
+  text-align: left;
+  font-weight: 800;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-size: 9.5px;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+  user-select: none;
+}
+.sheet-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
 .sheet-table tr:hover td { background: var(--accent-glow); }
-.cell-input, .cell-select { background: transparent; border: 1px solid transparent; color: var(--text-main); font-family: inherit; font-size: 11.5px; padding: 2px 4px; border-radius: 4px; width: 100%; }
-.cell-input:focus, .cell-select:focus { background: var(--bg-elevated); border-color: var(--border-focus); outline: none; }
+.cell-input, .cell-select {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-main);
+  font-family: inherit;
+  font-size: 11.5px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  width: 100%;
+}
+.cell-input:focus, .cell-select:focus {
+  background: var(--bg-elevated);
+  border-color: var(--border-focus);
+  outline: none;
+}
 
-.kanban-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; align-items: start; }
-.kanban-column { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 10px; display: flex; flex-direction: column; max-height: 80vh; }
-.kanban-header-strip { padding: 10px 12px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 11px; text-transform: uppercase; }
-.kanban-body-list { padding: 8px; display: flex; flex-direction: column; gap: 6px; overflow-y: auto; }
+.kanban-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; align-items: start; }
+.kanban-column {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+  box-shadow: var(--shadow-sm);
+}
+.kanban-header-strip {
+  padding: 12px 14px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+  font-size: 11px;
+  text-transform: uppercase;
+}
+.kanban-body-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
 
-.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
-.modal-bg.open { display: flex; }
-.modal-dialog { background: var(--bg-surface); border: 1px solid var(--border); width: 620px; max-width: 100%; border-radius: 12px; overflow: hidden; box-shadow: var(--shadow-lg); }
-.modal-header { padding: 12px 16px; border-bottom: 1px solid var(--border); font-weight: 800; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-.modal-body { padding: 16px; display: flex; flex-direction: column; gap: 10px; max-height: 75vh; overflow-y: auto; }
-.modal-footer { padding: 10px 16px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 6px; background: var(--bg-elevated); }
+.modal-bg {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  backdrop-filter: blur(4px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+.modal-bg.open { display: flex; animation: modalFade 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes modalFade { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+.modal-dialog {
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  width: 620px;
+  max-width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.modal-header {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  font-weight: 800;
+  font-size: 13.5px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-elevated);
+}
+.modal-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; max-height: 75vh; overflow-y: auto; }
+.modal-footer {
+  padding: 12px 18px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  background: var(--bg-elevated);
+}
 
-.truck-pass-sheet { background: #ffffff; color: #0f172a; padding: 24px; border-radius: 8px; border: 2px solid #0b1e36; font-family: 'Plus Jakarta Sans', sans-serif; }
-.barcode-visual { font-family: 'Libre Barcode 39 Text', cursive; font-size: 38px; text-align: center; line-height: 1; }
-.toast-popup { position: fixed; bottom: 20px; right: 20px; background: var(--primary); color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 700; z-index: 200; opacity: 0; transform: translateY(10px); transition: all 0.2s; pointer-events: none; box-shadow: var(--shadow-lg); }
+.truck-pass-sheet {
+  background: #ffffff;
+  color: #0f172a;
+  padding: 24px;
+  border-radius: 12px;
+  border: 2px solid #0f172a;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.barcode-visual {
+  font-family: 'Courier New', Courier, monospace;
+  letter-spacing: 4px;
+  font-size: 28px;
+  font-weight: 900;
+  text-align: center;
+  padding: 8px 0;
+  border-top: 1px dashed #cbd5e1;
+  border-bottom: 1px dashed #cbd5e1;
+}
+.toast-popup {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--primary);
+  color: #ffffff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  z-index: 200;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  pointer-events: none;
+  box-shadow: var(--shadow-lg);
+}
 .toast-popup.show { opacity: 1; transform: translateY(0); }
 </style>
 </head>
@@ -452,11 +866,8 @@ body {
 <header class="nav-header">
   <div class="nav-container">
     <div class="brand-box">
-      <div class="brand-icon">⚓</div>
-      <div>
-        <div class="brand-title">Tracking Suite</div>
-        <div class="brand-sub">Chennai Port Operations</div>
-      </div>
+      <div class="brand-logo-icon">⚓</div>
+      <div class="brand-title">Container Tracking Suite</div>
     </div>
     
     <div class="header-tools">
@@ -464,7 +875,7 @@ body {
         <div class="header-segment">
           <button class="btn btn-primary action-editor-only" id="addBtn">+ Container</button>
           <button class="btn btn-purple action-editor-only" id="bulkDestuffBtn">✅ Destuff</button>
-          <button class="btn btn-emerald" id="whatsappQuickBtn">💬 Quick WhatsApp</button>
+          <button class="btn btn-emerald" id="whatsappQuickBtn">💬 WhatsApp</button>
         </div>
 
         <div class="nav-dropdown">
@@ -494,9 +905,9 @@ body {
         </div>
       </div>
 
-      <div id="publicControls" style="display:flex; align-items:center; gap:6px;">
-        <button class="btn btn-ghost" id="publicThemeBtn">☀️</button>
-        <button class="btn btn-primary" id="loginBtn">🔐 Staff Login</button>
+      <div id="publicControls" style="display:flex; align-items:center; gap:8px;">
+        <button class="btn btn-ghost" id="publicThemeBtn" style="padding:6px 10px;">☀️</button>
+        <button class="btn btn-primary" id="loginBtn">🔐 Staff Portal Login</button>
       </div>
     </div>
   </div>
@@ -504,36 +915,24 @@ body {
 
 <section id="publicLandingView">
   <div class="public-hero-section">
-    <div class="public-hero-overlay"></div>
     <div class="public-hero-container">
-      
-      <div class="hero-text-content">
-        <h1>Your Shipping Partner</h1>
-      </div>
-      
       <div class="hero-widget-card">
         <div class="widget-tabs-header">
           <div class="widget-tab-active">
-            <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
-            Tracking
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            Live Shipment Tracking
           </div>
         </div>
         
         <div class="widget-body">
-          <label>MBL & CONTAINER NO <span>*</span></label>
-          
+          <label>MBL or Container Number <span>*</span></label>
           <div class="widget-input-wrapper">
             <input type="text" id="publicSearchInput" placeholder="E.g. SKHU9422886">
           </div>
-          
-          <div class="widget-helper-text">Enter your tracking numbers. Separate multiple entries with a space or comma.</div>
-          
-          <div class="widget-footer">
-            <button class="btn-track-action" id="publicSearchBtn">Track</button>
-          </div>
+          <div class="widget-helper-text">Enter tracking numbers. Separate multiple identifiers with a comma or space.</div>
+          <button class="btn-track-action" id="publicSearchBtn">Track Shipment Now</button>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -545,9 +944,9 @@ body {
     <div class="kpi-card active-kpi"><small>Active Shipments</small><strong id="kActive">0</strong></div>
     <div class="kpi-card destuffed-kpi"><small>Returned (Done)</small><strong id="kCompleted" style="color:var(--success)">0</strong></div>
     <div class="kpi-card port-kpi"><small>Port In Awaiting</small><strong id="kPortInPending" style="color:var(--warning)">0</strong></div>
-    <div class="kpi-card demurrage-kpi"><small>Demurrage (Inside Port)</small><strong id="kDemurrageAlert" style="color:#f97316">0</strong></div>
-    <div class="kpi-card detention-kpi"><small>Detention (Outside Port)</small><strong id="kDetentionAlert" style="color:var(--danger)">0</strong></div>
-    <div class="kpi-card total-cost-kpi"><small>Total Financial Exposure</small><strong id="kTotalExposure" style="color:#ec4899">₹0</strong></div>
+    <div class="kpi-card" style="border-top-color: #f97316;"><small>Port Out Pending</small><strong id="kPortOutPending" style="color:#f97316">0</strong></div>
+    <div class="kpi-card" style="border-top-color: var(--danger);"><small>Destuffing Pending</small><strong id="kDestuffingPending" style="color:var(--danger)">0</strong></div>
+    <div class="kpi-card total-cost-kpi"><small>Total Financial Exposure</small><strong id="kTotalExposure" style="color:var(--corporate-pink)">₹0</strong></div>
   </div>
 
   <div class="control-tray">
@@ -589,8 +988,8 @@ body {
 
       <div class="bulk-action-dock">
         <span id="selectionNotice" style="font-size:11px; font-weight:700; color:var(--text-muted); padding:0 4px;">0 selected</span>
-        <button class="btn btn-emerald" id="bulkPhotoBtn" style="padding:4px 9px;">📷 Photo (<span id="btnSelectCount">0</span>)</button>
-        <button class="btn btn-purple" id="bulkWhatsAppBtn" style="padding:4px 9px;">💬 WhatsApp</button>
+        <button class="btn btn-emerald" id="bulkPhotoBtn" style="padding:4px 8px;">📷 Photo (<span id="btnSelectCount">0</span>)</button>
+        <button class="btn btn-purple" id="bulkWhatsAppBtn" style="padding:4px 8px;">💬 WhatsApp</button>
       </div>
     </div>
   </div>
@@ -615,9 +1014,9 @@ body {
           <th onclick="sortSheet('CONTAINER RETURN DATE')">Empty Return ↕</th>
           <th>Terminal LFD</th>
           <th>Detention LFD</th>
-          <th>Total Exposure</th>
+          <th>Exposure</th>
           <th>Remarks</th>
-          <th width="100">Actions</th>
+          <th width="80">Actions</th>
         </tr>
       </thead>
       <tbody id="sheetTableBody"></tbody>
@@ -627,13 +1026,17 @@ body {
   <section id="kanbanView" class="kanban-layout" style="display:none;"></section>
 </main>
 
+<footer style="text-align: center; padding: 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 40px;">
+  © ME2026 . All Rights Reserved.
+</footer>
+
 <div class="modal-bg" id="truckSlipModalBg">
-  <div class="modal-dialog" style="width:720px; max-width:95vw;">
+  <div class="modal-dialog" style="width:680px; max-width:95vw;">
     <div class="modal-header">
-      <span>🚚 Transporter & Driver Gate Dispatch Slip</span>
-      <button class="btn" id="truckSlipClose">✕</button>
+      <span>🚚 Yard Gate Dispatch Slip</span>
+      <button class="btn btn-ghost" id="truckSlipClose">✕</button>
     </div>
-    <div class="modal-body" style="padding:16px; background:#e2e8f0;">
+    <div class="modal-body" style="padding:16px; background:var(--bg-elevated);">
       <div id="truckSlipArea" class="truck-pass-sheet"></div>
     </div>
     <div class="modal-footer">
@@ -647,12 +1050,12 @@ body {
 <div class="modal-bg" id="whatsappComposerModalBg">
   <div class="modal-dialog" style="max-width:540px;">
     <div class="modal-header">
-      <span>💬 WhatsApp Client Message Composer</span>
-      <button class="btn" id="whatsappComposerClose">✕</button>
+      <span>💬 WhatsApp Message Composer</span>
+      <button class="btn btn-ghost" id="whatsappComposerClose">✕</button>
     </div>
     <div class="modal-body">
-      <div style="font-size:11px; color:var(--text-muted); margin-bottom:4px;">Direct text format ready to paste into client WhatsApp threads:</div>
-      <textarea id="whatsappComposerText" class="input" style="width:100%; height:230px; font-family:'JetBrains Mono'; font-size:11.5px; line-height:1.6; resize:vertical;"></textarea>
+      <div style="font-size:11px; color:var(--text-muted);">Formatted text ready for WhatsApp threads:</div>
+      <textarea id="whatsappComposerText" class="input" style="width:100%; height:220px; font-family:'JetBrains Mono'; font-size:11.5px; line-height:1.5; resize:vertical; padding:10px;"></textarea>
     </div>
     <div class="modal-footer">
       <button class="btn" id="copyComposerTextBtn">📋 Copy Message</button>
@@ -664,25 +1067,25 @@ body {
 <div class="modal-bg" id="auditModalBg">
   <div class="modal-dialog" style="width:840px; max-width:95vw;">
     <div class="modal-header">
-      <span>📜 Operational Activity & Change Audit Trail</span>
-      <button class="btn" id="auditClose">✕</button>
+      <span>📜 Activity & Change Audit Trail</span>
+      <button class="btn btn-ghost" id="auditClose">✕</button>
     </div>
-    <div class="modal-body" style="padding:14px; background:var(--bg-elevated);">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; gap:8px;">
-        <input type="text" id="auditSearchInput" class="input" placeholder="Search by Container, Operator, Action, or Field..." style="flex:1;">
+    <div class="modal-body" style="padding:16px; background:var(--bg-elevated);">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px;">
+        <input type="text" id="auditSearchInput" class="input" placeholder="Filter audit logs..." style="flex:1;">
         <button class="btn btn-ghost" id="exportAuditBtn">📤 Export CSV</button>
         <button class="btn btn-danger" id="clearAuditBtn" style="display:none;">Clear Logs</button>
       </div>
-      <div style="max-height:420px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; background:var(--bg-surface);">
+      <div style="max-height:400px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; background:var(--bg-surface);">
         <table style="width:100%; border-collapse:collapse; font-size:11px;">
           <thead style="position:sticky; top:0; background:var(--bg-elevated); border-bottom:1px solid var(--border); z-index:5;">
             <tr style="text-align:left; color:var(--text-muted); font-size:9.5px; text-transform:uppercase;">
               <th style="padding:8px 10px;">Timestamp</th>
               <th style="padding:8px 10px;">Operator</th>
               <th style="padding:8px 10px;">Action</th>
-              <th style="padding:8px 10px;">Container / Unit</th>
-              <th style="padding:8px 10px;">Field Modified</th>
-              <th style="padding:8px 10px;">Change (Old ➔ New)</th>
+              <th style="padding:8px 10px;">Unit</th>
+              <th style="padding:8px 10px;">Field</th>
+              <th style="padding:8px 10px;">Change</th>
             </tr>
           </thead>
           <tbody id="auditTableBody"></tbody>
@@ -696,29 +1099,30 @@ body {
   <div class="modal-dialog" style="width:840px; max-width:95vw;">
     <div class="modal-header">
       <span id="mapModalTitle">Voyage Tracker</span>
-      <button class="btn" id="mapCloseBtn">✕</button>
+      <button class="btn btn-ghost" id="mapCloseBtn">✕</button>
     </div>
     <div class="modal-body" style="padding:0; background:#0b1329;">
       <div id="leafletMap" style="width:100%; height:380px; background:#0b1329;"></div>
       <div style="padding:10px 16px; font-size:11px; display:flex; justify-content:space-between; align-items:center; background:var(--bg-elevated);">
         <div><strong id="mapVesselText">Vessel Route</strong></div>
-        <a id="vesselFinderExternalBtn" href="https://www.vesselfinder.com/" target="_blank" class="btn btn-primary" style="padding:4px 8px; font-size:11px;">Open Live AIS on VesselFinder ↗</a>
+        <a id="vesselFinderExternalBtn" href="https://www.vesselfinder.com/" target="_blank" class="btn btn-primary" style="padding:4px 10px; font-size:11px;">Open Live AIS ↗</a>
       </div>
     </div>
   </div>
 </div>
 
 <div class="modal-bg" id="loginModalBg">
-  <div class="modal-dialog" style="max-width:340px;">
+  <div class="modal-dialog" style="max-width:360px;">
     <div class="modal-header">
-      <span>Operational Login</span>
-      <button class="btn" id="loginClose">✕</button>
+      <span>🔐 Staff Portal Login</span>
+      <button class="btn btn-ghost" id="loginClose">✕</button>
     </div>
-    <div class="modal-body">
+    <div class="modal-body" style="padding:20px;">
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Unique Access Code</label>
-        <input type="text" id="loginCodeInput" class="input" style="width:100%; margin-top:4px; font-family:'JetBrains Mono'; font-weight:800;" placeholder="Enter Access Code">
+        <label style="font-size:10.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Access Code</label>
+        <input type="password" id="loginCodeInput" class="input" style="width:100%; margin-top:6px; font-family:'JetBrains Mono'; font-weight:800; font-size:15px; letter-spacing:0.1em; text-align:center; height:40px;" placeholder="••••••••">
       </div>
+      <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:8px;">Enter assigned credentials to access operations desk tools.</div>
     </div>
     <div class="modal-footer">
       <button class="btn" id="loginCancel">Cancel</button>
@@ -731,7 +1135,7 @@ body {
   <div class="modal-dialog">
     <div class="modal-header">
       <span id="modalTitle">Container Details</span>
-      <button class="btn" id="modalClose">✕</button>
+      <button class="btn btn-ghost" id="modalClose">✕</button>
     </div>
     <div class="modal-body" id="modalForm" style="display:grid; grid-template-columns:1fr 1fr; gap:10px;"></div>
     <div class="modal-footer">
@@ -745,15 +1149,15 @@ body {
   <div class="modal-dialog" style="max-width:420px;">
     <div class="modal-header">
       <span>Bulk Update Vessel Schedule</span>
-      <button class="btn" id="vesselModalClose">✕</button>
+      <button class="btn btn-ghost" id="vesselModalClose">✕</button>
     </div>
     <div class="modal-body">
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted);">Select Vessel</label>
+        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Select Vessel</label>
         <select id="targetVesselSelect" class="select" style="width:100%; margin-top:4px;"></select>
       </div>
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted);">Field</label>
+        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Field</label>
         <select id="targetFieldSelect" class="select" style="width:100%; margin-top:4px;">
           <option value="GATEWAY PORT">Port</option>
           <option value="POL">POL</option>
@@ -770,7 +1174,7 @@ body {
         </select>
       </div>
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted);">New Date or Value</label>
+        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">New Date or Value</label>
         <input type="text" id="targetNewValue" class="input" style="width:100%; margin-top:4px;" placeholder="YYYY-MM-DD or Text">
       </div>
     </div>
@@ -785,20 +1189,20 @@ body {
   <div class="modal-dialog" style="width:540px;">
     <div class="modal-header">
       <span>✉️ Automated Client Notification</span>
-      <button class="btn" id="emailModalClose">✕</button>
+      <button class="btn btn-ghost" id="emailModalClose">✕</button>
     </div>
     <div class="modal-body">
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted);">Recipient Email</label>
+        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Recipient Email</label>
         <input type="email" id="emailRecipient" class="input" style="width:100%; margin-top:4px;" placeholder="client@company.com">
       </div>
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted);">Subject</label>
+        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Subject</label>
         <input type="text" id="emailSubject" class="input" style="width:100%; margin-top:4px;">
       </div>
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted);">Body Text</label>
-        <textarea id="emailBody" class="input" style="width:100%; height:130px; margin-top:4px; font-family:'JetBrains Mono'; font-size:11px; resize:vertical;"></textarea>
+        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Body Text</label>
+        <textarea id="emailBody" class="input" style="width:100%; height:130px; margin-top:4px; font-family:'JetBrains Mono'; font-size:11px; resize:vertical; padding:8px;"></textarea>
       </div>
     </div>
     <div class="modal-footer">
@@ -809,10 +1213,10 @@ body {
 </div>
 
 <div class="modal-bg" id="analyticsModalBg">
-  <div class="modal-dialog" style="width:560px;">
+  <div class="modal-dialog" style="width:520px;">
     <div class="modal-header">
       <span>Turnaround & Terminal Statistics</span>
-      <button class="btn" id="analyticsModalClose">✕</button>
+      <button class="btn btn-ghost" id="analyticsModalClose">✕</button>
     </div>
     <div class="modal-body" id="analyticsBody"></div>
   </div>
@@ -856,7 +1260,7 @@ let rows = [
 let currentUser = null;
 let selectedIndices = new Set();
 let currentView = 'cards';
-let activeQuickFilter = 'active';
+let activeQuickFilter = 'all'; 
 let editingIndex = -1;
 let sortField = null;
 let sortAsc = true;
@@ -902,7 +1306,7 @@ function toast(msg) {
   const t = el("toast");
   t.textContent = msg;
   t.classList.add("show");
-  setTimeout(() => t.classList.remove("show"), 2000);
+  setTimeout(() => t.classList.remove("show"), 2200);
 }
 
 function parseLocalDate(str) {
@@ -924,20 +1328,31 @@ function generatePublicVoyageTimelineHtml(r) {
   const pol = esc(r["POL"] || "—");
   const eta = formatDate(r["ETA"]) || 'Pending';
 
-  const igmSplit = formatDate(r["SPLIT DATE"]) || 'Pending';
-  const berthedPort = formatDate(r["PORT IN"]) || 'Pending';
-  const portOut = formatDate(r["PORT OUT"]) || 'Pending';
-  const cfsIn = formatDate(r["CFS IN"]) || 'Pending';
-  const destuffed = formatDate(r["DESTUFFING DATE"]) || 'Pending';
-  const containerReturned = formatDate(r["CONTAINER RETURN DATE"]) || 'Pending';
+  const igmSplit = formatDate(r["SPLIT DATE"]);
+  const berthedPort = formatDate(r["PORT IN"]);
+  const portOut = formatDate(r["PORT OUT"]);
+  const cfsIn = formatDate(r["CFS IN"]);
+  const destuffed = formatDate(r["DESTUFFING DATE"]);
+  const containerReturned = formatDate(r["CONTAINER RETURN DATE"]);
+
+  const steps = [
+    { label: "Vessel Berthed", date: berthedPort, done: !!berthedPort },
+    { label: "Port Discharged", date: portOut, done: !!portOut },
+    { label: "CFS In-Gate", date: cfsIn, done: !!cfsIn },
+    { label: "Destuffed", date: destuffed, done: !!destuffed },
+    { label: "Empty Returned", date: containerReturned, done: !!containerReturned }
+  ];
 
   return `
     <div>
-      <div style="background:var(--bg-elevated); padding:20px 28px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-        <div>
-          <div style="font-size:10px; font-weight:800; color:var(--text-dim); text-transform:uppercase;">Container Number</div>
-          <div style="font-size:24px; font-weight:900; font-family:'JetBrains Mono'; color:var(--accent);">${esc(r["CONTAINER NO."])}</div>
-        </div>
+      <div class="timeline-stepper">
+        ${steps.map((s, idx) => `
+          <div class="step-node ${s.done ? 'completed' : (idx === 0 || steps[idx-1].done ? 'active' : '')}">
+            <div class="step-dot">${s.done ? '✓' : idx + 1}</div>
+            <div class="step-label">${s.label}</div>
+            <div class="step-date">${s.date || 'Pending'}</div>
+          </div>
+        `).join("")}
       </div>
 
       <div class="ref-module-section">
@@ -947,27 +1362,27 @@ function generatePublicVoyageTimelineHtml(r) {
             <span style="font-size:10px; color:var(--text-muted);">Line: ${liner}</span>
           </div>
           <div class="ref-data-grid">
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Master Bill of Lading (MBL)</label>
               <val>${mblNo}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Vessel & Voyage</label>
               <val>${vesselName}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Estimated Arrival (ETA)</label>
               <val>${eta}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Port of Loading (POL)</label>
               <val>${pol}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Designated CFS Depot</label>
               <val>${cfsName}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Container Size</label>
               <val>${esc(r["TYPE"] || "40' DC")}</val>
             </div>
@@ -976,32 +1391,32 @@ function generatePublicVoyageTimelineHtml(r) {
 
         <div class="ref-module-card" style="margin-bottom:0;">
           <div class="ref-module-title-bar">
-            <span>2. Port Discharge & Terminal Status</span>
+            <span>2. Terminal & Gate Milestones</span>
           </div>
           <div class="ref-data-grid">
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>IGM Split</label>
-              <val>${igmSplit}</val>
+              <val>${igmSplit || 'Pending'}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Berthed Into Port</label>
-              <val>${berthedPort}</val>
+              <val>${berthedPort || 'Pending'}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Port Out</label>
-              <val>${portOut}</val>
+              <val>${portOut || 'Pending'}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>CFS In</label>
-              <val>${cfsIn}</val>
+              <val>${cfsIn || 'Pending'}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Destuffing Completed</label>
-              <val>${destuffed}</val>
+              <val>${destuffed || 'Pending'}</val>
             </div>
-            <div class="ref-data-box normal-box">
+            <div class="ref-data-box">
               <label>Container Returned</label>
-              <val>${containerReturned}</val>
+              <val>${containerReturned || 'Pending'}</val>
             </div>
           </div>
         </div>
@@ -1042,18 +1457,18 @@ function updateAuditBadge() {
 function renderAuditTable(filteredList = auditLogs) {
   const tbody = el("auditTableBody");
   if (!filteredList.length) {
-    tbody.innerHTML = `<tr><td colspan="6" style="padding:24px; text-align:center; color:var(--text-muted);">No activity recorded yet.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:var(--text-muted);">No activity recorded yet.</td></tr>`;
     return;
   }
 
   tbody.innerHTML = filteredList.map(log => {
     const d = new Date(log.timestamp);
     const dateFormatted = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
-    const timeFormatted = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    const timeFormatted = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
 
-    let actionBadge = `<span style="background:var(--accent-glow); color:var(--accent); padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${esc(log.action)}</span>`;
-    if (log.action.includes("DELETE")) actionBadge = `<span style="background:var(--danger-bg); color:var(--danger); padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${esc(log.action)}</span>`;
-    if (log.action.includes("DESTUFF") || log.action.includes("RETURN")) actionBadge = `<span style="background:var(--success-bg); color:var(--success); padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${esc(log.action)}</span>`;
+    let actionBadge = `<span class="tag-badge" style="background:var(--accent-glow); color:var(--accent); font-weight:800;">${esc(log.action)}</span>`;
+    if (log.action.includes("DELETE")) actionBadge = `<span class="tag-badge danger">${esc(log.action)}</span>`;
+    if (log.action.includes("DESTUFF") || log.action.includes("RETURN")) actionBadge = `<span class="tag-badge success">${esc(log.action)}</span>`;
 
     return `
       <tr style="border-bottom:1px solid var(--border);">
@@ -1063,7 +1478,7 @@ function renderAuditTable(filteredList = auditLogs) {
         <td style="padding:6px 10px; font-family:'JetBrains Mono'; font-weight:800; color:var(--accent);">${esc(log.containerNo)}</td>
         <td style="padding:6px 10px; font-weight:600;">${esc(log.field)}</td>
         <td style="padding:6px 10px; font-family:'JetBrains Mono'; font-size:10.5px;">
-          <span style="color:var(--text-muted); text-decoration:line-through;">${esc(log.oldVal)}</span>
+          <span style="color:var(--text-dim); text-decoration:line-through;">${esc(log.oldVal)}</span>
           <span style="color:var(--text-muted); margin:0 4px;">➔</span>
           <span style="color:var(--success); font-weight:700;">${esc(log.newVal)}</span>
         </td>
@@ -1139,8 +1554,8 @@ function calculateStandardFees(r) {
   const demRatePerDay = is20ft ? 100 : 225;
   const detRatePerDay = is20ft ? 75 : 150;
 
-  const portInDate = parseLocalDate(getField(r, ["PORT IN"]));
-  const portOutDate = parseLocalDate(getField(r, ["PORT OUT"])) || parseLocalDate(getField(r, ["CFS IN"]));
+  const portInDate = parseLocalDate(getField(r, ["PORT IN", "INWARD DATE"]));
+  const portOutDate = parseLocalDate(getField(r, ["PORT OUT", "CFS IN"]));
   const returnDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
   
   const today = new Date();
@@ -1223,92 +1638,68 @@ function generateCleanManifestHtml(containersList) {
     let pillStyle = "background:#e0f2fe; color:#0284c7;";
     if (st.text.includes("DE-STUFF") || st.text.includes("RETURNED")) {
       pillStyle = "background:#dcfce7; color:#15803d;";
-    } else if (st.text.includes("PORT IN") || st.text.includes("CFS IN")) {
-      pillStyle = "background:#e0f2fe; color:#0369a1;";
     }
-
-    const isSpecialRemark = remarks !== "—" && !remarks.toLowerCase().includes("standard");
-    const remarkColor = isSpecialRemark ? "#b91c1c" : "#475569";
 
     return `
       <tr style="border-bottom:1px solid #e2e8f0; font-size:11px;">
-        <td style="padding:12px 10px; font-weight:800; font-family:'JetBrains Mono', monospace; color:#0284c7;">
+        <td style="padding:10px 8px; font-weight:800; font-family:'JetBrains Mono', monospace; color:#0284c7;">
           ${esc(r["CONTAINER NO."])}
-          <div style="font-size:9.5px; font-weight:700; color:#64748b; margin-top:2px;">${esc(r["TYPE"] || "40' DC")}</div>
+          <div style="font-size:9px; font-weight:700; color:#64748b;">${esc(r["TYPE"] || "40' DC")}</div>
         </td>
-        <td style="padding:12px 10px; color:#0f172a; font-weight:600;">
+        <td style="padding:10px 8px; color:#0f172a; font-weight:600;">
           <div style="font-family:'JetBrains Mono', monospace; font-weight:700;">${esc(r["MBL NO"] || "—")}</div>
-          <div style="font-size:9.5px; color:#64748b; margin-top:2px; text-transform:uppercase;">${esc(liner)}</div>
+          <div style="font-size:9px; color:#64748b; text-transform:uppercase;">${esc(liner)}</div>
         </td>
-        <td style="padding:12px 10px; font-weight:700; color:#0f172a;">
-          ${esc(vsl)}
-        </td>
-        <td style="padding:12px 10px; font-weight:800; color:#b45309;">
-          ${esc(port)}
-        </td>
-        <td style="padding:12px 10px; color:#0f172a; font-weight:600;">
+        <td style="padding:10px 8px; font-weight:700; color:#0f172a;">${esc(vsl)}</td>
+        <td style="padding:10px 8px; font-weight:800; color:#b45309;">${esc(port)}</td>
+        <td style="padding:10px 8px; color:#0f172a; font-weight:600;">
           <div>${esc(pol)}</div>
-          <div style="font-size:9px; color:#64748b; margin-top:2px;">${etd ? 'ETD: ' + etd : ''}</div>
+          <div style="font-size:8.5px; color:#64748b;">${etd ? 'ETD: ' + etd : ''}</div>
         </td>
-        <td style="padding:12px 10px; font-weight:800; color:#0284c7;">
-          ${esc(cfs)}
-        </td>
-        <td style="padding:12px 10px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:600;">
+        <td style="padding:10px 8px; font-weight:800; color:#0284c7;">${esc(cfs)}</td>
+        <td style="padding:10px 8px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:600;">
           ${eta || '—'} / <br><span style="color:#0284c7;">${portIn || '—'}</span>
         </td>
-        <td style="padding:12px 10px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:700;">
-          ${destuff}
-        </td>
-        <td style="padding:12px 8px; text-align:center;">
-          <span style="display:inline-block; padding:4px 8px; border-radius:4px; font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.02em; ${pillStyle}">
+        <td style="padding:10px 8px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:700;">${destuff}</td>
+        <td style="padding:10px 8px; text-align:center;">
+          <span style="display:inline-block; padding:3px 6px; border-radius:4px; font-size:9px; font-weight:800; text-transform:uppercase; ${pillStyle}">
             ${st.text}
           </span>
         </td>
-        <td style="padding:12px 10px; font-weight:800; font-size:10px; text-transform:uppercase; color:${remarkColor};">
-          ${esc(remarks)}
-        </td>
+        <td style="padding:10px 8px; font-weight:700; font-size:9.5px; color:#475569;">${esc(remarks)}</td>
       </tr>
     `;
   }).join("");
 
   return `
-    <div id="manifestCaptureContainer" style="width:1160px; background:#ffffff; padding:32px 36px; border:1px solid #cbd5e1; border-radius:12px; font-family:'Plus Jakarta Sans', sans-serif; color:#0f172a; box-sizing:border-box;">
-      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:18px;">
+    <div id="manifestCaptureContainer" style="width:1100px; background:#ffffff; padding:28px; border:1px solid #cbd5e1; border-radius:10px; font-family:'Plus Jakarta Sans', sans-serif; color:#0f172a;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
         <div>
-          <h1 style="font-size:20px; font-weight:900; color:#091e42; margin:0; letter-spacing:-0.02em;">GREENWICH MERIDIAN LOGISTICS (INDIA) PVT. LTD.</h1>
-          <div style="font-size:12px; font-weight:700; color:#64748b; margin-top:4px;">Live Status Report • Chennai Operations Desk</div>
+          <h1 style="font-size:18px; font-weight:900; color:#091e42; margin:0;">GREENWICH MERIDIAN LOGISTICS (INDIA) PVT. LTD.</h1>
+          <div style="font-size:11px; font-weight:700; color:#64748b;">Live Status Report • Chennai Operations Desk</div>
         </div>
         <div style="text-align:right;">
-          <div style="font-size:13px; font-weight:800; color:#0265dc; font-family:'JetBrains Mono', monospace;">${dateStr}</div>
+          <div style="font-size:12px; font-weight:800; color:#0284c7; font-family:'JetBrains Mono', monospace;">${dateStr}</div>
         </div>
       </div>
-
-      <div style="height:2px; background:#0b1e36; margin-bottom:18px;"></div>
-
+      <div style="height:2px; background:#0f172a; margin-bottom:14px;"></div>
       <table style="width:100%; border-collapse:collapse; text-align:left;">
         <thead>
-          <tr style="background:#0b1e36; color:#ffffff; font-size:9.5px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">
-            <th style="padding:10px; width:135px;">CONTAINER NO / TYPE</th>
-            <th style="padding:10px; width:130px;">MBL NO / LINE</th>
-            <th style="padding:10px; width:160px;">VESSEL & VOYAGE</th>
-            <th style="padding:10px; width:65px;">PORT</th>
-            <th style="padding:10px; width:95px;">POL / ETD</th>
-            <th style="padding:10px; width:75px;">CFS DEPOT</th>
-            <th style="padding:10px; width:95px;">ETA / PORT IN</th>
-            <th style="padding:10px; width:80px;">DESTUFF DATE</th>
-            <th style="padding:10px; width:120px; text-align:center;">STATUS</th>
-            <th style="padding:10px; width:140px;">REMARKS / NOTES</th>
+          <tr style="background:#0f172a; color:#ffffff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">
+            <th style="padding:8px;">CONTAINER NO</th>
+            <th style="padding:8px;">MBL / LINE</th>
+            <th style="padding:8px;">VESSEL</th>
+            <th style="padding:8px;">PORT</th>
+            <th style="padding:8px;">POL</th>
+            <th style="padding:8px;">CFS</th>
+            <th style="padding:8px;">ETA / PORT IN</th>
+            <th style="padding:8px;">DESTUFF</th>
+            <th style="padding:8px; text-align:center;">STATUS</th>
+            <th style="padding:8px;">REMARKS</th>
           </tr>
         </thead>
-        <tbody>
-          ${rowsHtml}
-        </tbody>
+        <tbody>${rowsHtml}</tbody>
       </table>
-
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:24px; padding-top:14px; border-top:1px solid #e2e8f0; font-size:10px; color:#64748b; font-weight:600;">
-        <div>Greenwich Meridian Logistics (India) Pvt. Ltd. — Chennai</div>
-        <div>Inquiries: madhan@gmlindia.net</div>
-      </div>
     </div>
   `;
 }
@@ -1332,19 +1723,15 @@ function downloadMultipleStatusImage(containersList, titleRef = "Status_Report")
 
   const target = document.getElementById("manifestCaptureContainer");
 
-  html2canvas(target, {
-    scale: 2.5,
-    useCORS: true,
-    backgroundColor: "#ffffff"
-  }).then(canvas => {
+  html2canvas(target, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
     document.body.removeChild(tempWrapper);
     const link = document.createElement("a");
     link.download = `Report_${titleRef}_${Date.now()}.png`;
     link.href = canvas.toDataURL("image/png");
     link.click();
-    toast("Status report photo downloaded!");
+    toast("Report photo downloaded!");
   }).catch(err => {
-    console.error("Capture failed:", err);
+    console.error(err);
     if (tempWrapper.parentNode) document.body.removeChild(tempWrapper);
     toast("Failed to render photo.");
   });
@@ -1361,58 +1748,55 @@ function openTruckDispatchSlip(idx) {
   const passNo = `GML-DSP-${Math.floor(100000 + Math.random() * 900000)}`;
 
   el("truckSlipArea").innerHTML = `
-    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f172a; padding-bottom:12px; margin-bottom:14px;">
+    <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid #0f172a; padding-bottom:10px; margin-bottom:12px;">
       <div>
-        <div style="font-size:18px; font-weight:900; color:#0f172a;">CONTAINER YARD TRUCK DISPATCH SLIP</div>
-        <div style="font-size:10.5px; font-weight:700; color:#475569; text-transform:uppercase;">Greenwich Meridian Logistics (India) Pvt. Ltd.</div>
+        <div style="font-size:16px; font-weight:900; color:#0f172a;">CONTAINER YARD TRUCK DISPATCH SLIP</div>
+        <div style="font-size:10px; font-weight:700; color:#475569; text-transform:uppercase;">Greenwich Meridian Logistics (India) Pvt. Ltd.</div>
       </div>
       <div style="text-align:right;">
-        <div style="font-size:12px; font-weight:800; font-family:'JetBrains Mono'; color:#0265dc;">${passNo}</div>
-        <div style="font-size:10px; color:#64748b;">${new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric', hour:'2-digit', minute:'2-digit' })}</div>
+        <div style="font-size:11.5px; font-weight:800; font-family:'JetBrains Mono'; color:#0284c7;">${passNo}</div>
+        <div style="font-size:9.5px; color:#64748b;">${new Date().toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' })}</div>
       </div>
     </div>
 
-    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:10px; margin-bottom:14px;">
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Container Number</label>
-        <span style="font-size:15px; font-weight:900; font-family:'JetBrains Mono'; color:#0265dc;">${esc(cntr)}</span>
+    <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:8px; margin-bottom:12px;">
+      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; background:#f8fafc;">
+        <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Container Number</label>
+        <span style="font-size:14px; font-weight:900; font-family:'JetBrains Mono'; color:#0284c7;">${esc(cntr)}</span>
       </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Equipment / Line</label>
-        <span style="font-size:13px; font-weight:800; color:#0f172a;">${esc(r["TYPE"] || "40' DC")} • ${esc(liner)}</span>
+      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; background:#f8fafc;">
+        <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Equipment / Line</label>
+        <span style="font-size:12px; font-weight:800; color:#0f172a;">${esc(r["TYPE"] || "40' DC")} • ${esc(liner)}</span>
       </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Origin Terminal</label>
-        <span style="font-size:13px; font-weight:800; color:#d97706;">${esc(port)}</span>
+      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; background:#f8fafc;">
+        <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Origin Terminal</label>
+        <span style="font-size:12px; font-weight:800; color:#d97706;">${esc(port)}</span>
       </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Destination CFS Depot</label>
-        <span style="font-size:13px; font-weight:800; color:#059669;">${esc(cfs)}</span>
+      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; background:#f8fafc;">
+        <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Destination CFS</label>
+        <span style="font-size:12px; font-weight:800; color:#059669;">${esc(cfs)}</span>
       </div>
-      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 10px; background:#f8fafc;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">High-Security Seal No.</label>
-        <span style="font-size:13px; font-weight:800; font-family:'JetBrains Mono'; color:#0f172a;">${esc(seal)}</span>
+      <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; background:#f8fafc;">
+        <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Seal No.</label>
+        <span style="font-size:12px; font-weight:800; font-family:'JetBrains Mono'; color:#0f172a;">${esc(seal)}</span>
       </div>
-
-      <div style="border:2px solid #0284c7; border-radius:6px; padding:6px 10px; background:#eff6ff;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Assigned Vehicle / Trailer No. ✏️</label>
-        <input type="text" id="slipTruckInput" class="input" style="width:100%; font-family:'JetBrains Mono'; font-weight:800; background:#ffffff; color:#0f172a; margin-top:2px;" 
-               placeholder="e.g. TN-04-AR-8821" value="${esc(r["TRUCK NO."] || '')}" onchange="updateTruckInSlip(this.value)">
+      <div style="border:1px solid #0284c7; border-radius:6px; padding:6px 8px; background:#eff6ff;">
+        <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Truck No. ✏️</label>
+        <input type="text" id="slipTruckInput" class="input" style="width:100%; height:28px; font-family:'JetBrains Mono'; font-weight:800; background:#ffffff; color:#0f172a; margin-top:2px;" 
+               placeholder="TN-04-AR-8821" value="${esc(r["TRUCK NO."] || '')}" onchange="updateTruckInSlip(this.value)">
       </div>
-
-      <div style="grid-column: span 2; border:2px solid #0284c7; border-radius:6px; padding:6px 10px; background:#eff6ff;">
-        <label style="font-size:8.5px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Driver Name & Mobile Contact ✏️</label>
-        <input type="text" id="slipDriverInput" class="input" style="width:100%; font-weight:700; background:#ffffff; color:#0f172a; margin-top:2px;" 
-               placeholder="e.g. Ravi Kumar (+91 98401 23456)" value="${esc(r["DRIVER CONTACT"] || '')}" onchange="updateDriverInSlip(this.value)">
+      <div style="grid-column: span 2; border:1px solid #0284c7; border-radius:6px; padding:6px 8px; background:#eff6ff;">
+        <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Driver Contact ✏️</label>
+        <input type="text" id="slipDriverInput" class="input" style="width:100%; height:28px; font-weight:700; background:#ffffff; color:#0f172a; margin-top:2px;" 
+               placeholder="Driver Name (Contact)" value="${esc(r["DRIVER CONTACT"] || '')}" onchange="updateDriverInSlip(this.value)">
       </div>
     </div>
 
-    <div class="barcode-visual">*${cntr}*</div>
+    <div class="barcode-visual">||| | |||| || ||| | |||</div>
 
-    <div style="display:flex; justify-content:space-between; margin-top:16px; padding-top:12px; border-top:1px dashed #cbd5e1; font-size:11px; font-weight:700;">
+    <div style="display:flex; justify-content:space-between; margin-top:12px; padding-top:10px; font-size:10px; font-weight:700; color:#475569;">
       <div>Authorized Ops Signature: ______________</div>
       <div>CFS Gate In Stamp: ______________</div>
-      <div>Driver Acceptance: ______________</div>
     </div>
   `;
   el("truckSlipModalBg").classList.add("open");
@@ -1425,7 +1809,7 @@ function updateTruckInSlip(val) {
   rows[activeTruckSlipIndex]["TRUCK NO."] = newVal;
   logAuditEvent("TRUCK_ASSIGN", rows[activeTruckSlipIndex]["CONTAINER NO."], "TRUCK NO.", oldVal, newVal);
   saveAndRefresh();
-  toast("Truck number updated!");
+  toast("Truck updated");
 }
 
 function updateDriverInSlip(val) {
@@ -1435,7 +1819,7 @@ function updateDriverInSlip(val) {
   rows[activeTruckSlipIndex]["DRIVER CONTACT"] = newVal;
   logAuditEvent("DRIVER_ASSIGN", rows[activeTruckSlipIndex]["CONTAINER NO."], "DRIVER CONTACT", oldVal, newVal);
   saveAndRefresh();
-  toast("Driver details updated!");
+  toast("Driver updated");
 }
 
 el("sendDriverWhatsAppBtn").addEventListener("click", () => {
@@ -1447,16 +1831,12 @@ el("sendDriverWhatsAppBtn").addEventListener("click", () => {
   const seal = getField(r, ["SEAL NO."]) || "—";
   const truck = r["TRUCK NO."] || "Pending Assignment";
   
-  const text = `🚚 *CONTAINER MOVEMENT DISPATCH ORDER*\n` +
-               `━━━━━━━━━━━━━━━━━━━━━━\n` +
+  const text = `🚚 *CONTAINER MOVEMENT ORDER*\n` +
                `*Container:* ${cntr} (${r["TYPE"] || "40' DC"})\n` +
                `*Assigned Truck:* ${truck}\n` +
-               `*Pickup Terminal:* ${port}\n` +
-               `*Delivery CFS:* ${cfs}\n` +
-               `*Seal No:* ${seal}\n` +
-               `*Vessel:* ${r["VESSEL & VOY"] || '—'}\n` +
-               `━━━━━━━━━━━━━━━━━━━━━━\n` +
-               `Please report to gate officer upon arrival. Contact: madhan@gmlindia.net`;
+               `*Pickup:* ${port} ➔ *Delivery:* ${cfs}\n` +
+               `*Seal:* ${seal}\n` +
+               `Report to gate upon arrival.`;
 
   window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
 });
@@ -1465,7 +1845,7 @@ el("truckSlipClose").addEventListener("click", () => el("truckSlipModalBg").clas
 el("truckSlipCancel").addEventListener("click", () => el("truckSlipModalBg").classList.remove("open"));
 
 function openWhatsAppComposer(idx = -1) {
-  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   let text = "";
 
   if (idx !== -1) {
@@ -1476,23 +1856,20 @@ function openWhatsAppComposer(idx = -1) {
            `*Container:* ${r["CONTAINER NO."]} (${r["TYPE"] || "40' DC"})\n` +
            `*Line / MBL:* ${r["LINER"] || '-'} | ${r["MBL NO"] || '-'}\n` +
            `*Vessel:* ${r["VESSEL & VOY"] || '-'}\n` +
-           `*Port In:* ${formatDate(r["PORT IN"]) || 'Pending'}\n` +
-           `*Port Out:* ${formatDate(r["PORT OUT"]) || 'Pending'}\n` +
+           `*Port In:* ${formatDate(r["PORT IN"]) || 'Pending'} | *Port Out:* ${formatDate(r["PORT OUT"]) || 'Pending'}\n` +
            `*CFS Depot:* ${r["CFS NAME"] || '-'}\n` +
            (r["TRUCK NO."] ? `*Truck No:* ${r["TRUCK NO."]}\n` : '') +
            `*Status:* ${getStatus(r).text}\n` +
-           `*Free Time Left:* Terminal (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'}) | Detention (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})\n` +
+           `*Free Days:* Terminal (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'}) | Detention (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})\n` +
            (r["REMARKS"] ? `*Remark:* ${r["REMARKS"]}\n` : '') +
-           `━━━━━━━━━━━━━━━━━━━━━━\n` +
-           `Operations Support: madhan@gmlindia.net`;
+           `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
   } else {
     const active = rows.filter(r => !isFullyCompleted(r));
-    text = `🚢 *GREENWICH MERIDIAN LOGISTICS (CHENNAI)*\n` +
+    text = `🚢 *GREENWICH MERIDIAN LOGISTICS*\n` +
            `📋 *DAILY SHIPMENT DISPATCH BRIEF* • ${dateStr}\n` +
            `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
     active.forEach((r, i) => {
       text += `${i + 1}. *${r["CONTAINER NO."]}* (${r["TYPE"] || "40' DC"})\n` +
-              `   • Vessel: ${r["VESSEL & VOY"] || '-'}\n` +
               `   • Status: ${getStatus(r).text} | CFS: ${r["CFS NAME"] || '-'}\n` +
               `   • Port In: ${formatDate(r["PORT IN"]) || 'Pending'} | Port Out: ${formatDate(r["PORT OUT"]) || 'Pending'}\n\n`;
     });
@@ -1510,9 +1887,17 @@ el("copyComposerTextBtn").addEventListener("click", () => {
   toast("Message copied to clipboard!");
 });
 
-el("loginBtn").addEventListener("click", () => el("loginModalBg").classList.add("open"));
+el("loginBtn").addEventListener("click", () => {
+  el("loginCodeInput").value = "";
+  el("loginModalBg").classList.add("open");
+  setTimeout(() => el("loginCodeInput").focus(), 100);
+});
 el("loginClose").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
 el("loginCancel").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
+
+el("loginCodeInput").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") el("loginSubmit").click();
+});
 
 el("loginSubmit").addEventListener("click", async () => {
   const code = el("loginCodeInput").value.trim();
@@ -1531,12 +1916,7 @@ el("loginSubmit").addEventListener("click", async () => {
     alert("Invalid Access Code.");
     el("loginSubmit").textContent = originalBtnText;
   } else {
-    currentUser = { 
-      id: data.username || code, 
-      role: data.role, 
-      uid: data.user_id 
-    };
-    
+    currentUser = { id: data.username || code, role: data.role, uid: data.user_id };
     localStorage.setItem("gml_auth_code_user", JSON.stringify(currentUser));
     el("loginModalBg").classList.remove("open");
     el("loginSubmit").textContent = originalBtnText;
@@ -1575,11 +1955,9 @@ function setAccessState(isStaff) {
   if (isStaff && currentUser) {
     el("userBadge").textContent = `${currentUser.id} (${currentUser.role})`;
     const isViewer = currentUser.role === "Viewer";
-
     document.querySelectorAll(".action-editor-only").forEach(elem => {
       elem.style.display = isViewer ? "none" : "inline-flex";
     });
-
     renderUI();
   }
 }
@@ -1628,7 +2006,7 @@ function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
     }
 
     routeMapInstance.invalidateSize();
-    const seaPath = L.polyline(waypoints, { color: '#38bdf8', weight: 3, dashArray: '4, 6', opacity: 0.8 }).addTo(routeMapInstance);
+    const seaPath = L.polyline(waypoints, { color: '#38bdf8', weight: 2.5, dashArray: '4, 6', opacity: 0.85 }).addTo(routeMapInstance);
 
     L.marker(origin.coord, { icon: L.divIcon({ html: `<div style="background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${origin.name}</div>` }) }).addTo(routeMapInstance);
     L.marker(dest.coord, { icon: L.divIcon({ html: `<div style="background:#10b981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">⚓ ${dest.name}</div>` }) }).addTo(routeMapInstance);
@@ -1639,7 +2017,7 @@ function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
     else if (progressPercent >= 50) vesselPos = waypoints[3];
     else if (progressPercent >= 25) vesselPos = waypoints[1];
 
-    L.marker(vesselPos, { icon: L.divIcon({ html: `<div style="background:#2563eb; color:#fff; padding:3px 6px; border-radius:6px; font-weight:800; font-size:10px;">🚢 ${esc(cleanVessel || 'Vessel')}</div>` }) }).addTo(routeMapInstance);
+    L.marker(vesselPos, { icon: L.divIcon({ html: `<div style="background:#2563eb; color:#fff; padding:2px 6px; border-radius:6px; font-weight:800; font-size:9.5px;">🚢 ${esc(cleanVessel || 'Vessel')}</div>` }) }).addTo(routeMapInstance);
 
     routeMapInstance.fitBounds(seaPath.getBounds(), { padding: [30, 30] });
   }, 120);
@@ -1654,23 +2032,12 @@ function openEmailModal(idx) {
   const gwPort = getGatewayPortInfo(r).name;
   const cfs = getField(r, ["CFS NAME"]) || "Designated CFS";
   const st = getStatus(r).text;
-  const destuff = formatDate(getField(r, ["DESTUFFING DATE"]));
-  const emptyRet = formatDate(getField(r, ["CONTAINER RETURN DATE"]));
 
   el("emailSubject").value = `Status Update: ${cntr} - ${st}`;
-  
-  const body = `Dear Customer,\n\n` +
-    `Current status for Container ${cntr} (${r["TYPE"] || "40' HC"}):\n` +
-    `• Line: ${liner}\n` +
-    `• MBL: ${r["MBL NO"] || 'N/A'}\n` +
-    `• Vessel: ${r["VESSEL & VOY"] || 'N/A'}\n` +
+  const body = `Dear Customer,\n\nStatus for Container ${cntr} (${r["TYPE"] || "40' HC"}):\n` +
+    `• Line: ${liner}\n• MBL: ${r["MBL NO"] || 'N/A'}\n• Vessel: ${r["VESSEL & VOY"] || 'N/A'}\n` +
     `• Port: ${gwPort} (In: ${formatDate(r["PORT IN"]) || 'Pending'} | Out: ${formatDate(r["PORT OUT"]) || 'Pending'})\n` +
-    `• CFS Depot: ${cfs} (In: ${formatDate(r["CFS IN"]) || 'Pending'})\n` +
-    `• Truck No: ${r["TRUCK NO."] || 'Pending Assignment'}\n` +
-    `• Destuffing: ${destuff || 'In Process'}\n` +
-    `• Empty Return: ${emptyRet || 'Pending'}\n` +
-    `• Status: ${st}\n\n` +
-    `Operations Support: madhan@gmlindia.net`;
+    `• CFS: ${cfs}\n• Truck: ${r["TRUCK NO."] || 'Pending Assignment'}\n• Status: ${st}\n\nSupport: madhan@gmlindia.net`;
 
   el("emailBody").value = body;
   el("sendMailtoBtn").href = `mailto:?subject=${encodeURIComponent(el("emailSubject").value)}&body=${encodeURIComponent(body)}`;
@@ -1679,7 +2046,7 @@ function openEmailModal(idx) {
 el("emailModalClose").addEventListener("click", () => el("emailModalBg").classList.remove("open"));
 el("copyEmailBtn").addEventListener("click", () => {
   navigator.clipboard.writeText(el("emailBody").value);
-  toast("Email text copied");
+  toast("Email copied");
 });
 
 el("openAnalyticsBtn").addEventListener("click", () => {
@@ -1703,20 +2070,20 @@ el("openAnalyticsBtn").addEventListener("click", () => {
   });
 
   el("analyticsBody").innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:14px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
       <div class="kpi-card">
-        <small>Average Total Turnaround</small>
+        <small>Average Turnaround</small>
         <strong>${avgTransit} Days</strong>
       </div>
       <div class="kpi-card">
-        <small>Completed & Returned</small>
+        <small>Completed Units</small>
         <strong style="color:var(--success);">${completed.length}</strong>
       </div>
     </div>
     <div style="background:var(--bg-elevated); padding:12px; border-radius:8px; border:1px solid var(--border);">
-      <div style="font-size:11px; font-weight:800; text-transform:uppercase; margin-bottom:8px;">Terminal Distribution</div>
+      <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; margin-bottom:8px;">Terminal Distribution</div>
       ${Object.entries(terminalBreakdown).map(([term, num]) => `
-        <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11px; font-weight:600;">
+        <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11.5px; font-weight:600;">
           <span>${esc(term)}</span>
           <span>${num} units</span>
         </div>
@@ -1727,8 +2094,6 @@ el("openAnalyticsBtn").addEventListener("click", () => {
 });
 el("analyticsModalClose").addEventListener("click", () => el("analyticsModalBg").classList.remove("open"));
 
-let publicSearchResults = [];
-
 function performPublicSearch() {
   const rawInput = el("publicSearchInput").value.trim().toLowerCase();
   const container = el("publicResultContainer");
@@ -1736,7 +2101,7 @@ function performPublicSearch() {
 
   const queries = rawInput.split(/[\s,]+/).filter(Boolean);
 
-  publicSearchResults = rows.filter(r => {
+  const publicSearchResults = rows.filter(r => {
     const cntr = (getField(r, ["CONTAINER NO."]) || "").toLowerCase();
     const mbl = (getField(r, ["MBL NO"]) || "").toLowerCase();
     return queries.some(q => cntr === q || mbl === q || cntr.includes(q) || mbl.includes(q));
@@ -1744,9 +2109,9 @@ function performPublicSearch() {
 
   if (!publicSearchResults.length) {
     container.innerHTML = `
-      <div style="text-align:center; padding:40px; color:var(--danger);">
-        <strong style="font-size:16px;">No matching shipments found.</strong>
-        <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">Please verify your MBL or Container Number.</div>
+      <div style="text-align:center; padding:36px; color:var(--danger);">
+        <strong style="font-size:15px;">No matching shipments found.</strong>
+        <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">Please verify your MBL or Container Number.</div>
       </div>
     `;
     container.style.display = "block";
@@ -1754,7 +2119,7 @@ function performPublicSearch() {
     return;
   }
 
-  const cardsHtml = publicSearchResults.map((r, mIdx) => {
+  container.innerHTML = publicSearchResults.map((r) => {
     const st = getStatus(r);
     const originPort = getField(r, ["POL"]) || "SHEKOU";
     const gwPort = getGatewayPortInfo(r).name;
@@ -1762,27 +2127,24 @@ function performPublicSearch() {
     const publicTimelineHtml = generatePublicVoyageTimelineHtml(r);
 
     return `
-      <div style="padding:12px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+      <div>
+        <div style="background:var(--bg-elevated); padding:16px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
-            <span style="font-size:12px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Shipment Status Result</span>
+            <div style="font-size:9.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase;">Container Number</div>
+            <div style="font-size:20px; font-weight:900; font-family:'JetBrains Mono'; color:var(--accent);">${esc(r["CONTAINER NO."])}</div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <button class="btn" style="border-radius:20px; font-size:11px; padding:6px 14px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(r["VESSEL & VOY"])}', 50)">🗺️ Route Map</button>
-            <span class="status-pill ${st.class}" style="font-size:11px; padding:6px 14px; border-radius:20px;">${st.text}</span>
+            <button class="btn" style="border-radius:20px; font-size:11px; padding:5px 12px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(r["VESSEL & VOY"])}', 50)">🗺️ Route Map</button>
+            <span class="status-pill ${st.class}" style="font-size:11px; padding:5px 12px; border-radius:20px;">${st.text}</span>
           </div>
         </div>
         ${publicTimelineHtml}
       </div>
     `;
-  }).join("<hr style='border:0; border-top:1px dashed var(--border); margin:24px 0;'>");
+  }).join("<hr style='border:0; border-top:1px solid var(--border);'>");
 
-  container.innerHTML = cardsHtml;
   container.style.display = "block";
-  
-  setTimeout(() => {
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }, 100);
+  setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
 
 el("publicSearchBtn").addEventListener("click", performPublicSearch);
@@ -1910,7 +2272,7 @@ el("bulkDestuffBtn").addEventListener("click", () => {
 });
 
 el("bulkPhotoBtn").addEventListener("click", () => {
-  if (!selectedIndices.size) return alert("Select at least one container to generate clean table photo!");
+  if (!selectedIndices.size) return alert("Select at least one container!");
   const selectedRows = Array.from(selectedIndices).map(idx => rows[idx]);
   downloadMultipleStatusImage(selectedRows, "Selection");
 });
@@ -1923,18 +2285,17 @@ function getFilteredRows() {
   const todayStr = new Date().toISOString().slice(0, 10);
 
   let filtered = rows.map((r, i) => ({r, i})).filter(({r}) => {
-    const cntr = (getField(r, ["CONTAINER NO."]) || "").toLowerCase();
-    const vsl = (getField(r, ["VESSEL & VOY"]) || "").toLowerCase();
-    const mbl = (getField(r, ["MBL NO"]) || "").toLowerCase();
-    const truck = (getField(r, ["TRUCK NO."]) || "").toLowerCase();
+    const cntr = (getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "").toLowerCase();
+    const vsl = (getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "").toLowerCase();
+    const mbl = (getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "").toLowerCase();
+    const truck = (getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "").toLowerCase();
     const completed = isFullyCompleted(r);
     const fees = calculateStandardFees(r);
-    const delay = getVesselDelayStatus(r);
 
     if (q && !cntr.includes(q) && !vsl.includes(q) && !mbl.includes(q) && !truck.includes(q)) return false;
-    if (vf && getField(r, ["VESSEL & VOY"]) !== vf) return false;
-    if (gw && !(getField(r, ["GATEWAY PORT"]) || "").toLowerCase().includes(gw.toLowerCase())) return false;
-    if (cf && getField(r, ["CFS NAME"]) !== cf) return false;
+    if (vf && getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) !== vf) return false;
+    if (gw && !(getField(r, ["GATEWAY PORT", "PORT"]) || "").toLowerCase().includes(gw.toLowerCase())) return false;
+    if (cf && getField(r, ["CFS NAME", "CFS"]) !== cf) return false;
 
     if (activeQuickFilter === "active" && completed) return false;
     if (activeQuickFilter === "completed" && !completed) return false;
@@ -1942,7 +2303,6 @@ function getFilteredRows() {
     if (activeQuickFilter === "demurrage" && (completed || !fees.demOverdue)) return false;
     if (activeQuickFilter === "detention" && (completed || !fees.detOverdue)) return false;
     if (activeQuickFilter === "critical_lfd" && (completed || ((fees.terminalDaysLeft > 2 || fees.terminalDaysLeft === null) && (fees.detentionDaysLeft > 2 || fees.detentionDaysLeft === null)))) return false;
-    if (activeQuickFilter === "delayed" && !delay.isDelayed) return false;
 
     return true;
   });
@@ -1951,42 +2311,36 @@ function getFilteredRows() {
     filtered.sort((a, b) => {
       const vA = (a.r[sortField] || "").toLowerCase();
       const vB = (b.r[sortField] || "").toLowerCase();
-      return sortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+      return sortAsc ? vA.localeCompare(vB) : vB.localeCompare(a.r[sortField] || "");
     });
   }
 
   return filtered;
 }
 
-function getVesselDelayStatus(r) {
-  const eta = getField(r, ["ETA"]);
-  const portIn = getField(r, ["PORT IN"]);
-  if (!validDate(eta)) return { isDelayed: false, delayDays: 0 };
-  
-  const etaDate = parseLocalDate(eta);
-  const compDate = validDate(portIn) ? parseLocalDate(portIn) : new Date();
-  if (!etaDate) return { isDelayed: false, delayDays: 0 };
-  
-  const diffDays = Math.floor((compDate - etaDate) / (1000 * 60 * 60 * 24));
-  return { isDelayed: diffDays > 2 && !isFullyCompleted(r), delayDays: diffDays };
-}
-
 function updateKPIs() {
   const active = rows.filter(r => !isFullyCompleted(r));
-  let demAlerts = 0, detAlerts = 0, totalExposureUSD = 0;
+  let portOutPending = 0;
+  let destuffingPending = 0;
+  let totalExposureUSD = 0;
 
   active.forEach(r => {
     const fees = calculateStandardFees(r);
-    if (fees.demOverdue) demAlerts++;
-    if (fees.detOverdue) detAlerts++;
     totalExposureUSD += fees.totalCostUSD;
+
+    const hasPortIn = validDate(getField(r, ["PORT IN"]));
+    const hasPortOut = validDate(getField(r, ["PORT OUT"]));
+    const hasDestuff = validDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]));
+
+    if (hasPortIn && !hasPortOut) portOutPending++;
+    if (hasPortOut && !hasDestuff) destuffingPending++;
   });
 
   el("kActive").textContent = active.length;
   el("kCompleted").textContent = rows.filter(r => isFullyCompleted(r)).length;
   el("kPortInPending").textContent = active.filter(r => !validDate(getField(r, ["PORT IN"]))).length;
-  el("kDemurrageAlert").textContent = demAlerts;
-  el("kDetentionAlert").textContent = detAlerts;
+  el("kPortOutPending").textContent = portOutPending;
+  el("kDestuffingPending").textContent = destuffingPending;
   el("kTotalExposure").textContent = formatCurrency(totalExposureUSD);
 }
 
@@ -2008,12 +2362,15 @@ function renderCards(items) {
   el("cardsView").innerHTML = items.map(({r, i}) => {
     const st = getStatus(r);
     const isChecked = selectedIndices.has(i) ? "checked" : "";
-    const liner = getField(r, ["LINER"]) || detectLinerFromMBL(getField(r, ["MBL NO"])) || "Line";
+    const cntrNo = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "UNKNOWN";
+    const vesselVoy = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
+    const containerType = getField(r, ["TYPE", "SIZE", "CONTAINER TYPE"]) || "40' HC";
+    const liner = getField(r, ["LINER", "LINE"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "Line";
     const trackUrl = getCarrierTrackingUrl(r);
     const fees = calculateStandardFees(r);
-    const delay = getVesselDelayStatus(r);
     const gwPort = getGatewayPortInfo(r);
-    const cfsDepot = getCfsDepotInfo(r["CFS NAME"]);
+    const cfsDepot = getCfsDepotInfo(getField(r, ["CFS NAME", "CFS"]));
+    const truckNo = getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]);
 
     const isTerminalCritical = fees.terminalDaysLeft !== null && fees.terminalDaysLeft <= 2 && !validDate(r["PORT OUT"]);
     const isDetentionCritical = fees.detentionDaysLeft !== null && fees.detentionDaysLeft <= 2 && !fees.isCompleted;
@@ -2025,23 +2382,19 @@ function renderCards(items) {
             <div>
               <div class="card-title-group">
                 <input type="checkbox" class="chk-item photo-exclude" value="${i}" ${isChecked}>
-                <span class="card-cntr-code">${esc(getField(r, ["CONTAINER NO."]))}</span>
+                <span class="card-cntr-code">${esc(cntrNo)}</span>
               </div>
-              <div class="card-vessel">${esc(getField(r, ["VESSEL & VOY"]) || "—")} (${esc(r["TYPE"] || "40' HC")})</div>
+              <div class="card-vessel">${esc(vesselVoy)} (${esc(containerType)})</div>
             </div>
-
-            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
-              <span class="status-pill ${st.class}">${st.text}</span>
-            </div>
+            <span class="status-pill ${st.class}">${st.text}</span>
           </div>
 
           <div class="badge-row">
             ${fees.demOverdue ? `<span class="tag-badge danger">Port Dem: +${fees.demDays}d (${formatCurrency(fees.demCostUSD)})</span>` : ''}
             ${fees.detOverdue ? `<span class="tag-badge danger">Detention: +${fees.detDays}d (${formatCurrency(fees.detCostUSD)})</span>` : ''}
-            ${isTerminalCritical && !fees.demOverdue ? `<span class="tag-badge danger alert-pulse">Terminal LFD: ${fees.terminalDaysLeft}d Left</span>` : ''}
-            ${isDetentionCritical && !fees.demOverdue ? `<span class="tag-badge danger alert-pulse">Carrier LFD: ${fees.detentionDaysLeft}d Left</span>` : ''}
+            ${isTerminalCritical && !fees.demOverdue ? `<span class="tag-badge danger">Terminal LFD: ${fees.terminalDaysLeft}d Left</span>` : ''}
+            ${isDetentionCritical && !fees.demOverdue ? `<span class="tag-badge danger">Carrier LFD: ${fees.detentionDaysLeft}d Left</span>` : ''}
             ${!fees.demOverdue && !fees.detOverdue && !isTerminalCritical && !isDetentionCritical ? `<span class="tag-badge success">Free Time Clear</span>` : ''}
-            ${delay.isDelayed ? `<span class="tag-badge warning">+${delay.delayDays}d Delayed</span>` : ''}
           </div>
 
           <div class="badge-links-group">
@@ -2062,36 +2415,35 @@ function renderCards(items) {
           </div>
           <div class="detail-item">
             <label>CFS Depot / Truck</label>
-            <val style="color:var(--accent);">${esc(r["CFS NAME"] || "—")} / <span style="color:#f8fafc;">${esc(r["TRUCK NO."] || "No Truck")}</span></val>
+            <val style="color:var(--accent);">${esc(getField(r, ["CFS NAME", "CFS"]) || "—")} / <span style="color:var(--text-main);">${esc(truckNo || "No Truck")}</span></val>
           </div>
           <div class="detail-item">
             <label>Detention LFD / Dwell</label>
-            <val style="${fees.detOverdue ? 'color:var(--danger)' : ''}">${fees.detentionLFD} (${fees.totalEquipmentDays}d / Free ${esc(r["FREE DAYS"] || "14")}d)</val>
+            <val style="${fees.detOverdue ? 'color:var(--danger)' : ''}">${fees.detentionLFD} (${fees.totalEquipmentDays}d / Free ${esc(getField(r, ["FREE DAYS"]) || "14")}d)</val>
           </div>
         </div>
 
         ${fees.totalCostUSD > 0 ? `
           <div class="fee-breakdown-box">
-            <span style="font-weight:700; color:var(--danger)">⚠️ Total D&D Exposure</span>
-            <strong style="font-family:'JetBrains Mono'; color:var(--danger); font-size:12.5px;">${formatCurrency(fees.totalCostUSD)}</strong>
+            <span style="font-weight:700; color:var(--danger)">⚠️ Total Surcharges</span>
+            <strong style="font-family:'JetBrains Mono'; color:var(--danger); font-size:12px;">${formatCurrency(fees.totalCostUSD)}</strong>
           </div>
         ` : ''}
 
         <div>
-          <input type="text" class="input" style="width:100%; margin-bottom:8px;" value="${esc(r["REMARKS"] || "")}" placeholder="Remark..." onchange="updateRemark(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
-
+          <input type="text" class="input" style="width:100%; margin-bottom:6px; height:32px;" value="${esc(r["REMARKS"] || "")}" placeholder="Remark..." onchange="updateRemark(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
           <div class="card-footer-btns photo-exclude">
-            <button class="btn btn-emerald" style="padding:3px 7px;" onclick="downloadCardAsImage(${i}, '${esc(r["CONTAINER NO."])}')">📷 Photo</button>
-            <button class="btn" style="padding:3px 7px;" onclick="openTruckDispatchSlip(${i})">🚚 Truck Slip</button>
-            <button class="btn" style="padding:3px 7px;" onclick="openWhatsAppComposer(${i})">💬 WhatsApp</button>
-            <button class="btn" style="padding:3px 7px;" onclick="openEmailModal(${i})">✉️ Email</button>
-            ${!isViewer ? `<button class="btn" style="padding:3px 7px;" onclick="openModal(${i})">✏️ Edit</button>` : ''}
-            ${currentUser && currentUser.role === 'Admin' ? `<button class="btn btn-danger" style="padding:3px 7px;" onclick="deleteRow(${i})">🗑️</button>` : ''}
+            <button class="btn btn-emerald" style="padding:4px 8px;" onclick="downloadCardAsImage(${i}, '${esc(cntrNo)}')">📷 Photo</button>
+            <button class="btn" style="padding:4px 8px;" onclick="openTruckDispatchSlip(${i})">🚚 Truck Slip</button>
+            <button class="btn" style="padding:4px 8px;" onclick="openWhatsAppComposer(${i})">💬 WhatsApp</button>
+            <button class="btn" style="padding:4px 8px;" onclick="openEmailModal(${i})">✉️ Email</button>
+            ${!isViewer ? `<button class="btn" style="padding:4px 8px;" onclick="openModal(${i})">✏️ Edit</button>` : ''}
+            ${currentUser && currentUser.role === 'Admin' ? `<button class="btn btn-danger" style="padding:4px 8px;" onclick="deleteRow(${i})">🗑️</button>` : ''}
           </div>
         </div>
       </div>
     `;
-  }).join("") || `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No records found matching filters.</div>`;
+  }).join("") || `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No records found matching current filters.</div>`;
   bindCheckboxes();
 }
 
@@ -2102,40 +2454,40 @@ function renderSheet(items) {
     const isChecked = selectedIndices.has(i) ? "checked" : "";
     const gwPort = getGatewayPortInfo(r);
     const fees = calculateStandardFees(r);
-    const isoStatus = validateISO6346(r["CONTAINER NO."]);
-    const isoClass = isoStatus.isValid ? "valid-iso" : "invalid-iso";
+    const cntrNo = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "";
+    const isoStatus = validateISO6346(cntrNo);
 
     return `
       <tr>
         <td><input type="checkbox" class="chk-item" value="${i}" ${isChecked}></td>
         <td>
-          <input class="cell-input ${isoClass}" style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" value="${esc(r["CONTAINER NO."] || "")}" title="${isoStatus.message}" onchange="inlineEditContainerNo(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
+          <input class="cell-input" style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" value="${esc(cntrNo)}" title="${isoStatus.message}" onchange="inlineEditContainerNo(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
         </td>
-        <td><input class="cell-input" style="width:50px;" value="${esc(r["TYPE"] || "40' DC")}" onchange="inlineEdit(${i}, 'TYPE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:90px;" value="${esc(r["MBL NO"] || "")}" onchange="inlineEditMBL(${i}, this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:80px;" value="${esc(r["LINER"] || "")}" onchange="inlineEdit(${i}, 'LINER', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" style="width:45px;" value="${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}" onchange="inlineEdit(${i}, 'TYPE', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" style="width:85px;" value="${esc(getField(r, ["MBL NO", "MBL"]) || "")}" onchange="inlineEditMBL(${i}, this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" style="width:75px;" value="${esc(getField(r, ["LINER", "LINE"]) || "")}" onchange="inlineEdit(${i}, 'LINER', this.value)" ${isViewer ? 'readonly' : ''}></td>
         <td>
-          <select class="cell-select" style="width:85px;" onchange="setGatewayPort(${i}, this.value)" ${isViewer ? 'disabled' : ''}>
+          <select class="cell-select" style="width:80px;" onchange="setGatewayPort(${i}, this.value)" ${isViewer ? 'disabled' : ''}>
             <option value="CITPL" ${gwPort.key === 'CITPL' ? 'selected' : ''}>CITPL</option>
             <option value="CCTL" ${gwPort.key === 'CCTL' ? 'selected' : ''}>CCTL</option>
             <option value="Kattupalli" ${gwPort.key === 'Kattupalli' ? 'selected' : ''}>Kattupalli</option>
             <option value="Ennore" ${gwPort.key === 'Ennore' ? 'selected' : ''}>Ennore</option>
           </select>
         </td>
-        <td><input class="cell-input" type="date" value="${r["PORT IN"] || ""}" onchange="inlineEdit(${i}, 'PORT IN', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${r["PORT OUT"] || ""}" onchange="inlineEdit(${i}, 'PORT OUT', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:85px;" value="${esc(r["CFS NAME"] || "")}" onchange="inlineEdit(${i}, 'CFS NAME', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:95px; font-family:'JetBrains Mono';" value="${esc(r["TRUCK NO."] || "")}" placeholder="Vehicle No" onchange="inlineEdit(${i}, 'TRUCK NO.', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${r["DESTUFFING DATE"] || ""}" onchange="inlineEdit(${i}, 'DESTUFFING DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${r["CONTAINER RETURN DATE"] || ""}" onchange="inlineEdit(${i}, 'CONTAINER RETURN DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td style="font-weight:700; color:${fees.demOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.terminalLFD} (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'})</td>
-        <td style="font-weight:700; color:${fees.detOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.detentionLFD} (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})</td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["PORT IN"]) || ""}" onchange="inlineEdit(${i}, 'PORT IN', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["PORT OUT"]) || ""}" onchange="inlineEdit(${i}, 'PORT OUT', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" style="width:80px;" value="${esc(getField(r, ["CFS NAME", "CFS"]) || "")}" onchange="inlineEdit(${i}, 'CFS NAME', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" style="width:90px; font-family:'JetBrains Mono';" value="${esc(getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "")}" placeholder="Vehicle" onchange="inlineEdit(${i}, 'TRUCK NO.', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]) || ""}" onchange="inlineEdit(${i}, 'DESTUFFING DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]) || ""}" onchange="inlineEdit(${i}, 'CONTAINER RETURN DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td style="font-weight:700; color:${fees.demOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.terminalLFD}</td>
+        <td style="font-weight:700; color:${fees.detOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.detentionLFD}</td>
         <td style="font-weight:800; font-family:'JetBrains Mono'; color:${fees.totalCostUSD > 0 ? 'var(--danger)' : 'var(--success)'};">${formatCurrency(fees.totalCostUSD)}</td>
         <td><input class="cell-input" value="${esc(r["REMARKS"] || "")}" onchange="inlineEdit(${i}, 'REMARKS', this.value)" ${isViewer ? 'readonly' : ''}></td>
         <td>
           <div style="display:flex; gap:3px;">
-            <button class="btn" style="padding:2px 5px;" title="Truck Dispatch Slip" onclick="openTruckDispatchSlip(${i})">🚚</button>
-            ${!isViewer ? `<button class="btn" style="padding:2px 5px; color:var(--accent)" title="Mark Returned Today" onclick="markSingleReturned(${i})">🔄</button>` : ''}
+            <button class="btn" style="padding:2px 5px;" title="Truck Slip" onclick="openTruckDispatchSlip(${i})">🚚</button>
+            ${!isViewer ? `<button class="btn" style="padding:2px 5px; color:var(--accent)" title="Mark Returned" onclick="markSingleReturned(${i})">🔄</button>` : ''}
             ${currentUser && currentUser.role === 'Admin' ? `<button class="btn btn-danger" style="padding:2px 5px;" onclick="deleteRow(${i})">🗑️</button>` : ''}
           </div>
         </td>
@@ -2169,10 +2521,14 @@ function renderKanban(items) {
   const lanes = { "Terminal In": [], "Port Out / CFS": [], "Destuffed": [], "Completed Return": [] };
   items.forEach(({r, i}) => {
     const st = getStatus(r);
-    if (st.text === "EMPTY RETURNED") lanes["Completed Return"].push({r, i});
-    else if (st.text.includes("DE-STUFF")) lanes["Destuffed"].push({r, i});
-    else if (st.text === "CFS IN" || st.text === "PORT OUT") lanes["Port Out / CFS"].push({r, i});
-    else lanes["Terminal In"].push({r, i});
+    const cntrNo = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "";
+    const vesselVoy = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
+    const cfsName = getField(r, ["CFS NAME", "CFS"]) || "—";
+
+    if (st.text === "EMPTY RETURNED") lanes["Completed Return"].push({r, i, cntrNo, vesselVoy, cfsName});
+    else if (st.text.includes("DE-STUFF")) lanes["Destuffed"].push({r, i, cntrNo, vesselVoy, cfsName});
+    else if (st.text === "CFS IN" || st.text === "PORT OUT") lanes["Port Out / CFS"].push({r, i, cntrNo, vesselVoy, cfsName});
+    else lanes["Terminal In"].push({r, i, cntrNo, vesselVoy, cfsName});
   });
 
   el("kanbanView").innerHTML = Object.entries(lanes).map(([title, list]) => `
@@ -2182,13 +2538,13 @@ function renderKanban(items) {
         <span class="status-pill progress">${list.length}</span>
       </div>
       <div class="kanban-body-list">
-        ${list.map(({r, i}) => `
-          <div class="card-box" style="padding:8px;">
+        ${list.map(({i, cntrNo, vesselVoy, cfsName}) => `
+          <div class="card-box" style="padding:10px;">
             <div style="display:flex; justify-content:space-between;">
-              <span class="card-cntr-code" style="font-size:12.5px;">${esc(r["CONTAINER NO."])}</span>
+              <span class="card-cntr-code" style="font-size:12.5px;">${esc(cntrNo)}</span>
             </div>
-            <div class="card-vessel" style="font-size:10px;">${esc(r["VESSEL & VOY"] || "—")}</div>
-            <div style="font-size:10px; color:var(--accent); margin-top:2px;">${esc(r["CFS NAME"] || "—")}</div>
+            <div class="card-vessel" style="font-size:10px;">${esc(vesselVoy)}</div>
+            <div style="font-size:10px; color:var(--accent); margin-top:2px;">${esc(cfsName)}</div>
           </div>
         `).join("")}
       </div>
@@ -2218,9 +2574,7 @@ function inlineEdit(idx, field, val) {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   const oldVal = rows[idx][field];
   const newVal = val.trim();
-  if (oldVal !== newVal) {
-    logAuditEvent("INLINE_EDIT", rows[idx]["CONTAINER NO."], field, oldVal, newVal);
-  }
+  if (oldVal !== newVal) logAuditEvent("INLINE_EDIT", rows[idx]["CONTAINER NO."], field, oldVal, newVal);
   rows[idx][field] = newVal;
   saveAndRefresh();
 }
@@ -2292,8 +2646,10 @@ async function loadFromCloud() {
 function populateFilters() {
   const vSet = new Set(), cSet = new Set();
   rows.forEach(r => {
-    if (r["VESSEL & VOY"]) vSet.add(r["VESSEL & VOY"].trim());
-    if (r["CFS NAME"]) cSet.add(r["CFS NAME"].trim());
+    const vsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
+    const cfs = getField(r, ["CFS NAME", "CFS"]);
+    if (vsl) vSet.add(vsl.trim());
+    if (cfs) cSet.add(cfs.trim());
   });
   el("vesselFilter").innerHTML = `<option value="">All Vessels</option>` + [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
   el("cfsFilter").innerHTML = `<option value="">All CFS</option>` + [...cSet].sort().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
@@ -2321,7 +2677,7 @@ function openModal(idx = -1) {
       return `
         <div>
           <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Gateway Port</label>
-          <select id="modal_GATEWAY_PORT" class="select" style="width:100%; margin-top:3px;" data-field="${c}">
+          <select id="modal_GATEWAY_PORT" class="select" style="width:100%; margin-top:4px;" data-field="${c}">
             <option value="CCTL" ${cur === 'CCTL' ? 'selected' : ''}>CCTL (DP World)</option>
             <option value="CITPL" ${cur === 'CITPL' ? 'selected' : ''}>CITPL (PSA)</option>
             <option value="Kattupalli" ${cur === 'Kattupalli' ? 'selected' : ''}>Kattupalli Port</option>
@@ -2335,7 +2691,7 @@ function openModal(idx = -1) {
         <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">${c}</label>
         <input type="${DATE_COLS.has(c) ? 'date' : 'text'}" 
                id="modal_${c.replace(/[^a-zA-Z0-9]/g, '_')}"
-               class="input" style="width:100%; margin-top:3px;" 
+               class="input" style="width:100%; margin-top:4px;" 
                data-field="${c}" 
                value="${esc(r[c] || '')}">
       </div>
@@ -2395,7 +2751,7 @@ el("dailyDispatchBtn").addEventListener("click", () => {
 
   let summary = `📋 *DAILY DISPATCH BRIEF*\nTotal: *${activeToday.length}*\n━━━━━━━━━━━━━━\n`;
   activeToday.forEach((r, idx) => {
-    summary += `${idx + 1}. *${r["CONTAINER NO."]}* | ${r["CFS NAME"] || '-'} | ${getStatus(r).text}\n`;
+    summary += `${idx + 1}. *${getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"])}* | ${getField(r, ["CFS NAME", "CFS"]) || '-'} | ${getStatus(r).text}\n`;
   });
   window.open("https://wa.me/?text=" + encodeURIComponent(summary), "_blank");
 });
@@ -2403,7 +2759,10 @@ el("dailyDispatchBtn").addEventListener("click", () => {
 el("vesselEditBtn").addEventListener("click", () => {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   const vSet = new Set();
-  rows.forEach(r => { if(r["VESSEL & VOY"]) vSet.add(r["VESSEL & VOY"].trim()); });
+  rows.forEach(r => { 
+    const vsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
+    if(vsl) vSet.add(vsl.trim()); 
+  });
   el("targetVesselSelect").innerHTML = [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
   el("vesselModalBg").classList.add("open");
 });
@@ -2415,8 +2774,9 @@ el("vesselModalSave").addEventListener("click", () => {
   const fld = el("targetFieldSelect").value;
   const val = el("targetNewValue").value.trim();
   rows.forEach(r => { 
-    if (r["VESSEL & VOY"] === vsl) {
-      logAuditEvent("BULK_VESSEL_UPDATE", r["CONTAINER NO."], `${vsl}:${fld}`, r[fld], val);
+    const currentVsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
+    if (currentVsl === vsl) {
+      logAuditEvent("BULK_VESSEL_UPDATE", getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), `${vsl}:${fld}`, r[fld], val);
       r[fld] = val; 
     }
   });
@@ -2465,20 +2825,42 @@ el("excelInput").addEventListener("change", e => {
     const data = new Uint8Array(evt.target.result);
     const wb = XLSX.read(data, {type: 'array', cellDates: true});
     let imported = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval: ""});
+    
     rows = imported.map(r => {
       const out = {};
       Object.keys(r).forEach(k => {
         let val = r[k];
         if (val instanceof Date) val = val.toISOString().split('T')[0];
-        out[k.trim()] = String(val ?? "").trim();
+        const cleanKey = k.trim().toUpperCase();
+        out[cleanKey] = String(val ?? "").trim();
       });
+
+      if (!out["CONTAINER NO."] && (out["CONTAINER"] || out["CONTAINER NO"] || out["CNTR NO"])) {
+        out["CONTAINER NO."] = out["CONTAINER"] || out["CONTAINER NO"] || out["CNTR NO"];
+      }
+      if (!out["MBL NO"] && (out["MBL"] || out["MASTER BL"])) {
+        out["MBL NO"] = out["MBL"] || out["MASTER BL"];
+      }
+      if (!out["LINER"] && out["LINE"]) {
+        out["LINER"] = out["LINE"];
+      }
+      if (!out["VESSEL & VOY"] && (out["VESSEL"] || out["VESSEL NAME"])) {
+        out["VESSEL & VOY"] = out["VESSEL"] || out["VESSEL NAME"];
+      }
+      if (!out["CFS NAME"] && out["CFS"]) {
+        out["CFS NAME"] = out["CFS"];
+      }
+      if (!out["TRUCK NO."] && (out["TRUCK NO"] || out["VEHICLE NO"])) {
+        out["TRUCK NO."] = out["TRUCK NO"] || out["VEHICLE NO"];
+      }
       if (!out["LINER"] && out["MBL NO"]) out["LINER"] = detectLinerFromMBL(out["MBL NO"]);
       return out;
     });
+
     logAuditEvent("BULK_EXCEL_IMPORT", "ALL", "SHEET_DATA", "N/A", `${rows.length} units imported`);
     populateFilters();
     saveAndRefresh();
-    toast(`Imported ${rows.length} records`);
+    toast(`Imported ${rows.length} records!`);
   };
   reader.readAsArrayBuffer(file);
 });
@@ -2501,6 +2883,12 @@ populateFilters();
 loadFromCloud();
 updateAuditBadge();
 checkActiveSession();
+
+activeQuickFilter = 'all';
+document.querySelectorAll(".chip").forEach(c => {
+  c.classList.toggle("active", c.dataset.filter === 'all');
+});
+renderUI();
 
 const urlParams = new URLSearchParams(window.location.search);
 const scannedCntr = urlParams.get("cntr");
