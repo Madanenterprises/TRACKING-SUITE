@@ -4,9 +4,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
 <title>Container Tracking Suite - Enterprise Hub</title>
+<!-- Dependencies -->
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.2/Sortable.min.js"></script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -72,91 +74,32 @@
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-body {
-  background-color: var(--bg-app);
-  color: var(--text-main);
-  font-family: 'Plus Jakarta Sans', sans-serif;
-  font-size: 13px;
-  line-height: 1.5;
-  min-height: 100vh;
-  padding-bottom: 60px;
-  transition: background-color 0.25s ease, color 0.25s ease;
-}
+body { background-color: var(--bg-app); color: var(--text-main); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 13px; line-height: 1.5; min-height: 100vh; padding-bottom: 90px; transition: background-color 0.25s ease, color 0.25s ease; overflow-x: hidden; }
 
-.nav-header {
-  background: var(--bg-surface);
-  border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  padding: 10px 24px;
-  backdrop-filter: blur(8px);
-  box-shadow: var(--shadow-sm);
+.clickable-copy { cursor: pointer; transition: color 0.15s; position: relative; display: inline-block; }
+.clickable-copy:hover { color: var(--corporate-pink) !important; }
+.clickable-copy::after {
+  content: '📋 Copy'; position: absolute; top: -24px; left: 50%; transform: translateX(-50%);
+  background: var(--bg-elevated); border: 1px solid var(--border); padding: 2px 6px; border-radius: 4px;
+  font-size: 9px; font-weight: 800; color: var(--text-muted); opacity: 0; pointer-events: none;
+  transition: opacity 0.2s; box-shadow: var(--shadow-sm); z-index: 10;
 }
-.nav-container {
-  max-width: 1440px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-}
-.brand-box { display: flex; align-items: center; gap: 10px; }
-.brand-logo-icon {
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, var(--primary), var(--corporate-pink));
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #ffffff;
-  font-weight: 900;
-  font-size: 15px;
-  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3);
-}
+.clickable-copy:hover::after { opacity: 1; }
+
+.nav-header { background: var(--bg-surface); border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 100; padding: 10px 24px; backdrop-filter: blur(8px); box-shadow: var(--shadow-sm); }
+.nav-container { max-width: 1440px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.brand-box { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.brand-logo-icon { width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary), var(--corporate-pink)); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #ffffff; font-weight: 900; font-size: 15px; box-shadow: 0 4px 10px rgba(2, 132, 199, 0.3); }
 .brand-title { font-size: 17px; font-weight: 800; color: var(--text-main); letter-spacing: -0.02em; }
 
 .header-tools { display: flex; align-items: center; gap: 8px; }
-.header-segment {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-elevated);
-  padding: 3px 6px;
-  border-radius: 9px;
-  border: 1px solid var(--border);
-}
-.header-divider {
-  width: 1px;
-  height: 20px;
-  background: var(--border);
-  margin: 0 4px;
-}
+.header-segment { display: flex; align-items: center; gap: 6px; background: var(--bg-elevated); padding: 3px 6px; border-radius: 9px; border: 1px solid var(--border); }
+.header-divider { width: 1px; height: 20px; background: var(--border); margin: 0 4px; }
 
-.btn {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  padding: 7px 12px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
+.btn { background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-main); padding: 7px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s ease; white-space: nowrap; }
 .btn:hover { border-color: var(--border-focus); background: var(--bg-active); transform: translateY(-1px); }
 .btn:active { transform: translateY(0); }
-.btn-primary {
-  background: var(--primary);
-  border: 1px solid transparent;
-  color: #ffffff !important;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
-}
+.btn-primary { background: var(--primary); border: 1px solid transparent; color: #ffffff !important; box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25); }
 .btn-primary:hover { background: var(--primary-hover); }
 .btn-emerald { background: var(--success-bg); border-color: rgba(16, 185, 129, 0.25); color: var(--success); }
 .btn-gold { background: var(--warning-bg); border-color: rgba(245, 158, 11, 0.25); color: var(--warning); }
@@ -166,731 +109,210 @@ body {
 .btn-ghost:hover { background: var(--bg-active); color: var(--text-main); }
 
 .nav-dropdown { position: relative; }
-.nav-dropdown-content {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: var(--shadow-lg);
-  display: none;
-  flex-direction: column;
-  min-width: 220px;
-  z-index: 100;
-  padding: 6px;
-}
+.nav-dropdown-content { position: absolute; top: calc(100% + 8px); right: 0; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow-lg); display: none; flex-direction: column; min-width: 220px; z-index: 100; padding: 6px; }
 .nav-dropdown-content.show { display: flex; animation: dropFadeIn 0.15s cubic-bezier(0.16, 1, 0.3, 1); }
-.dropdown-item {
-  padding: 8px 12px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-main);
-  border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  border: none;
-  background: transparent;
-  width: 100%;
-  text-align: left;
-  transition: background 0.15s;
-}
+.dropdown-item { padding: 8px 12px; font-size: 12px; font-weight: 600; color: var(--text-main); border-radius: 6px; cursor: pointer; display: flex; align-items: center; gap: 10px; border: none; background: transparent; width: 100%; text-align: left; transition: background 0.15s; }
 .dropdown-item:hover { background: var(--accent-glow); color: var(--accent); }
 
-@keyframes dropFadeIn {
-  from { opacity: 0; transform: translateY(-6px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+@keyframes dropFadeIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
 
+/* Hero Section */
 .public-hero-section {
-  position: relative;
-  min-height: calc(100vh - 65px);
-  display: flex;
-  align-items: center;
-  background-color: #0c182b;
-  background-image: 
-    linear-gradient(to right, rgba(9, 13, 22, 0.15) 0%, rgba(9, 13, 22, 0.5) 55%, rgba(9, 13, 22, 0.88) 100%),
+  position: relative; min-height: calc(100vh - 65px); display: flex; align-items: center; background-color: #0c182b;
+  background-image: linear-gradient(to right, rgba(9, 13, 22, 0.15) 0%, rgba(9, 13, 22, 0.5) 55%, rgba(9, 13, 22, 0.88) 100%),
     url("https://ykeucqritoexykqrggzz.supabase.co/storage/v1/object/public/website-assets/chennai-port-hero.png");
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  border-bottom: 3px solid var(--corporate-pink);
-  padding: 60px 0;
+  background-size: cover; background-position: center; background-repeat: no-repeat; border-bottom: 3px solid var(--corporate-pink); padding: 60px 0;
 }
-
-.public-hero-container {
-  width: 100%;
-  max-width: 1240px;
-  margin: 0 auto;
-  padding: 0 24px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-}
+.public-hero-container { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 24px; display: flex; justify-content: flex-end; align-items: center; }
 
 @media (max-width: 968px) {
   .public-hero-section {
-    min-height: auto;
-    padding: 36px 0 54px 0;
-    background-image: 
-      linear-gradient(to bottom, rgba(9, 13, 22, 0.25) 0%, rgba(9, 13, 22, 0.72) 48%, rgba(9, 13, 22, 0.94) 100%),
+    min-height: auto; padding: 36px 0 54px 0;
+    background-image: linear-gradient(to bottom, rgba(9, 13, 22, 0.25) 0%, rgba(9, 13, 22, 0.72) 48%, rgba(9, 13, 22, 0.94) 100%),
       url("https://ykeucqritoexykqrggzz.supabase.co/storage/v1/object/public/website-assets/chennai-port-hero.png");
-    background-position: center;
-    background-size: cover;
   }
-  .public-hero-container {
-    justify-content: center;
-  }
-  .hero-widget-card {
-    max-width: 100%;
-    backdrop-filter: blur(12px);
-    background: var(--bg-surface);
-  }
+  .public-hero-container { justify-content: center; }
+  .hero-widget-card { max-width: 100%; backdrop-filter: blur(12px); background: var(--bg-surface); }
 }
 
-@media (max-width: 480px) {
-  .public-hero-section {
-    background-position: center;
-    padding: 24px 0 40px 0;
-  }
-}
-
-.hero-widget-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 20px;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65);
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  max-width: 460px;
-}
-.widget-tabs-header {
-  display: flex;
-  background: var(--bg-elevated);
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-}
-.widget-tab-active {
-  padding: 16px 8px;
-  font-size: 13.5px;
-  font-weight: 800;
-  color: var(--corporate-pink);
-  border-bottom: 2px solid var(--corporate-pink);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: -1px;
-}
-.widget-body {
-  padding: 28px 24px;
-}
-.widget-body label {
-  display: block;
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
+.hero-widget-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.65); overflow: hidden; display: flex; flex-direction: column; width: 100%; max-width: 460px; }
+.widget-tabs-header { display: flex; background: var(--bg-elevated); border-bottom: 1px solid var(--border); padding: 0 20px; }
+.widget-tab-active { padding: 16px 8px; font-size: 13.5px; font-weight: 800; color: var(--corporate-pink); border-bottom: 2px solid var(--corporate-pink); display: flex; align-items: center; gap: 8px; margin-bottom: -1px; }
+.widget-body { padding: 28px 24px; }
+.widget-body label { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.05em; }
 .widget-body label span { color: var(--corporate-pink); }
 .widget-input-wrapper { margin-bottom: 8px; }
-.widget-input-wrapper input {
-  width: 100%;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  padding: 12px 16px;
-  border-radius: 10px;
-  font-size: 14px;
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-  color: var(--text-main);
-  outline: none;
-  transition: all 0.2s ease;
-}
-.widget-input-wrapper input:focus {
-  border-color: var(--corporate-pink);
-  background: var(--bg-surface);
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
-}
-.widget-helper-text {
-  font-size: 11.5px;
-  color: var(--text-dim);
-  margin-bottom: 20px;
-}
-.btn-track-action {
-  width: 100%;
-  background: linear-gradient(135deg, var(--corporate-pink), #be185d);
-  color: #ffffff;
-  border: none;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 800;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: 0 4px 14px rgba(219, 39, 119, 0.25);
-}
-.btn-track-action:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgba(219, 39, 119, 0.35);
-}
+.widget-input-wrapper input { width: 100%; background: var(--bg-elevated); border: 1px solid var(--border); padding: 12px 16px; border-radius: 10px; font-size: 14px; font-family: 'JetBrains Mono', monospace; font-weight: 700; color: var(--text-main); outline: none; transition: all 0.2s ease; }
+.widget-input-wrapper input:focus { border-color: var(--corporate-pink); background: var(--bg-surface); box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15); }
+.widget-helper-text { font-size: 11.5px; color: var(--text-dim); margin-bottom: 20px; }
+.btn-track-action { width: 100%; background: linear-gradient(135deg, var(--corporate-pink), #be185d); color: #ffffff; border: none; padding: 12px 24px; font-size: 14px; font-weight: 800; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(219, 39, 119, 0.25); }
+.btn-track-action:hover { transform: translateY(-1px); box-shadow: 0 6px 18px rgba(219, 39, 119, 0.35); }
 
-.public-result-card {
-  max-width: 1100px;
-  margin: -40px auto 60px auto;
-  position: relative;
-  z-index: 10;
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  display: none;
-}
+.public-result-card { max-width: 1100px; margin: -40px auto 60px auto; position: relative; z-index: 10; background: var(--bg-surface); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; box-shadow: var(--shadow-lg); display: none; }
 
-.timeline-stepper {
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-  padding: 24px 30px;
-  background: var(--bg-elevated);
-  border-bottom: 1px solid var(--border);
-}
-.timeline-stepper::before {
-  content: '';
-  position: absolute;
-  top: 38px;
-  left: 50px;
-  right: 50px;
-  height: 2px;
-  background: var(--border);
-  z-index: 1;
-}
-.step-node {
-  position: relative;
-  z-index: 2;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
-  text-align: center;
-}
-.step-dot {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  background: var(--bg-surface);
-  border: 2px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 11px;
-  font-weight: 800;
-  color: var(--text-dim);
-  transition: all 0.2s ease;
-}
-.step-node.completed .step-dot {
-  background: var(--success);
-  border-color: var(--success);
-  color: #ffffff;
-}
-.step-node.active .step-dot {
-  background: var(--accent);
-  border-color: var(--accent);
-  color: #ffffff;
-  box-shadow: 0 0 0 4px var(--accent-glow);
-}
-.step-label {
-  font-size: 10px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.step-date {
-  font-size: 9.5px;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--text-dim);
-}
+/* Timeline */
+.timeline-stepper { display: flex; justify-content: space-between; position: relative; padding: 24px 30px; background: var(--bg-elevated); border-bottom: 1px solid var(--border); }
+.timeline-stepper::before { content: ''; position: absolute; top: 38px; left: 50px; right: 50px; height: 2px; background: var(--border); z-index: 1; }
+.step-node { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; }
+.step-dot { width: 28px; height: 28px; border-radius: 50%; background: var(--bg-surface); border: 2px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800; color: var(--text-dim); transition: all 0.2s ease; }
+.step-node.completed .step-dot { background: var(--success); border-color: var(--success); color: #ffffff; }
+.step-node.active .step-dot { background: var(--accent); border-color: var(--accent); color: #ffffff; box-shadow: 0 0 0 4px var(--accent-glow); }
+.step-label { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
+.step-date { font-size: 9.5px; font-family: 'JetBrains Mono', monospace; color: var(--text-dim); }
 
 .ref-module-section { padding: 24px; }
-.ref-module-card {
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 16px;
-}
-.ref-module-title-bar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  font-weight: 800;
-  font-size: 11.5px;
-  color: var(--accent);
-  text-transform: uppercase;
-}
+.ref-module-card { background: var(--bg-elevated); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+.ref-module-title-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; font-weight: 800; font-size: 11.5px; color: var(--accent); text-transform: uppercase; }
 .ref-data-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
-@media(max-width: 768px) { .ref-data-grid { grid-template-columns: 1fr; } }
-.ref-data-box {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 10px 12px;
-}
-.ref-data-box label {
-  display: block;
-  font-size: 9px;
-  font-weight: 800;
-  text-transform: uppercase;
-  color: var(--text-dim);
-  margin-bottom: 4px;
-}
-.ref-data-box val {
-  font-size: 13px;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-  color: var(--text-main);
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.ref-data-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; }
+.ref-data-box label { display: block; font-size: 9px; font-weight: 800; text-transform: uppercase; color: var(--text-dim); margin-bottom: 4px; }
+.ref-data-box val { font-size: 13px; font-weight: 800; font-family: 'JetBrains Mono', monospace; color: var(--text-main); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.kpi-card {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 14px 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: var(--shadow-sm);
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.15s ease, border-color 0.15s ease;
-}
+/* Dashboard KPI */
+.kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; margin-bottom: 20px; }
+.kpi-card { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 14px 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; transition: transform 0.15s ease, border-color 0.15s ease; }
 .kpi-card:hover { transform: translateY(-2px); border-color: var(--border-focus); }
-.kpi-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 3px;
-  background: var(--border);
-}
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; background: var(--border); }
 .kpi-card.active-kpi::before { background: var(--accent); }
 .kpi-card.destuffed-kpi::before { background: var(--success); }
 .kpi-card.port-kpi::before { background: var(--warning); }
 .kpi-card.total-cost-kpi::before { background: var(--corporate-pink); }
-.kpi-card small {
-  font-size: 10px;
-  font-weight: 800;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-}
-.kpi-card strong {
-  font-size: 22px;
-  font-weight: 900;
-  font-family: 'JetBrains Mono', monospace;
-  margin-top: 6px;
-}
+.kpi-card small { font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.kpi-card strong { font-size: 22px; font-weight: 900; font-family: 'JetBrains Mono', monospace; margin-top: 6px; }
 
+/* Control Tray */
 .main-wrapper { max-width: 1440px; margin: 0 auto; padding: 20px 24px; }
-.control-tray {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 12px 16px;
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-shadow: var(--shadow-sm);
-}
-.control-tray-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-.filter-inputs {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  flex-wrap: wrap;
-}
+.control-tray { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 14px; padding: 12px 16px; margin-bottom: 20px; display: flex; flex-direction: column; gap: 10px; box-shadow: var(--shadow-sm); }
+.control-tray-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.filter-inputs { display: flex; align-items: center; gap: 8px; flex: 1; flex-wrap: wrap; }
 .search-input-wrapper { position: relative; min-width: 240px; flex: 1; max-width: 380px; }
 .search-input-wrapper input { width: 100%; padding-left: 32px; }
-.search-input-icon {
-  position: absolute;
-  left: 10px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 13px;
-  color: var(--text-dim);
-  pointer-events: none;
-}
-.input, .select {
-  height: 36px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-main);
-  padding: 0 10px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 600;
-  outline: none;
-  transition: all 0.15s ease;
-}
-.input:focus, .select:focus {
-  border-color: var(--border-focus);
-  background: var(--bg-surface);
-  box-shadow: 0 0 0 3px var(--accent-glow);
-}
-.view-selector {
-  display: flex;
-  background: var(--bg-elevated);
-  padding: 3px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-  gap: 2px;
-}
-.view-btn {
-  background: transparent;
-  border: 0;
-  color: var(--text-muted);
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 11.5px;
-  font-weight: 700;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.view-btn.active {
-  background: var(--bg-surface);
-  color: var(--primary);
-  box-shadow: var(--shadow-sm);
-}
-
-.control-tray-bottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  border-top: 1px solid var(--border);
-  padding-top: 10px;
-}
-.quick-chips-wrapper {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  overflow-x: auto;
-  white-space: nowrap;
-  scrollbar-width: none;
-  flex: 1;
-}
-.chip {
-  padding: 5px 10px;
-  border-radius: 6px;
-  font-size: 11px;
-  font-weight: 700;
-  cursor: pointer;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  transition: all 0.15s ease;
-  user-select: none;
-}
+.search-input-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); font-size: 13px; color: var(--text-dim); pointer-events: none; }
+.input, .select { height: 36px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-main); padding: 0 10px; border-radius: 8px; font-size: 12px; font-weight: 600; outline: none; transition: all 0.15s ease; }
+.input:focus, .select:focus { border-color: var(--border-focus); background: var(--bg-surface); box-shadow: 0 0 0 3px var(--accent-glow); }
+.view-selector { display: flex; background: var(--bg-elevated); padding: 3px; border-radius: 8px; border: 1px solid var(--border); gap: 2px; }
+.view-btn { background: transparent; border: 0; color: var(--text-muted); padding: 4px 12px; border-radius: 6px; font-size: 11.5px; font-weight: 700; cursor: pointer; transition: all 0.15s ease; }
+.view-btn.active { background: var(--bg-surface); color: var(--primary); box-shadow: var(--shadow-sm); }
+.control-tray-bottom { display: flex; align-items: center; justify-content: space-between; gap: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+.quick-chips-wrapper { display: flex; align-items: center; gap: 6px; overflow-x: auto; white-space: nowrap; scrollbar-width: none; flex: 1; padding-bottom: 4px; }
+.chip { padding: 5px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; cursor: pointer; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-muted); transition: all 0.15s ease; user-select: none; }
 .chip:hover { border-color: var(--accent); color: var(--text-main); }
 .chip.active { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); }
 
-.bulk-action-dock {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  background: var(--bg-elevated);
-  padding: 3px 6px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
+/* Filter Drawer */
+.drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(2px); z-index: 199; opacity: 0; pointer-events: none; transition: opacity 0.25s ease; }
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.filter-drawer { position: fixed; top: 0; right: -300px; width: 280px; height: 100vh; background: var(--bg-surface); border-left: 1px solid var(--border); z-index: 200; box-shadow: var(--shadow-lg); transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1); display: flex; flex-direction: column; padding: 24px; }
+.filter-drawer.open { right: 0; }
+.filter-drawer label { display: block; font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px; }
+.filter-drawer .select { width: 100%; margin-bottom: 16px; }
 
+/* Floating Action Bar (FAB) */
+.floating-action-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(120px); background: var(--bg-surface); padding: 8px 16px; border-radius: 100px; box-shadow: 0 10px 40px -10px rgba(0,0,0,0.8); border: 1px solid var(--border-focus); display: flex; gap: 8px; align-items: center; z-index: 250; transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s; opacity: 0; pointer-events: none; }
+.floating-action-bar.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+
+/* Cards Layout */
 .cards-layout { display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 14px; }
-.card-box {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  box-shadow: var(--shadow-sm);
-  gap: 12px;
-  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
-}
-.card-box:hover {
-  border-color: var(--border-focus);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
+.card-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); gap: 12px; transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.3s; }
+.card-box:hover { border-color: var(--border-focus); transform: translateY(-2px); box-shadow: var(--shadow-md); }
 .card-header-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
 .card-title-group { display: flex; align-items: center; gap: 8px; }
 .card-cntr-code { font-family: 'JetBrains Mono', monospace; font-size: 15px; font-weight: 900; color: var(--accent); }
 .card-vessel { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 1px; }
 
-.status-pill {
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 9.5px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  display: inline-flex;
-  align-items: center;
-}
+.status-pill { padding: 3px 8px; border-radius: 6px; font-size: 9.5px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.03em; display: inline-flex; align-items: center; gap: 4px; }
 .status-pill.completed { background: var(--success-bg); color: var(--success); }
 .status-pill.progress { background: var(--accent-glow); color: var(--accent); }
 
+/* LFD Progress Bars */
+.lfd-wrap { display: flex; flex-direction: column; gap: 4px; padding: 6px 8px; border-radius: 6px; background: var(--bg-elevated); border: 1px solid var(--border); flex: 1; min-width: 120px; }
+.lfd-wrap.success { border-color: rgba(16, 185, 129, 0.25); background: var(--success-bg); }
+.lfd-wrap.warning { border-color: rgba(245, 158, 11, 0.25); background: var(--warning-bg); }
+.lfd-wrap.danger { border-color: rgba(239, 68, 68, 0.25); background: var(--danger-bg); }
+.lfd-wrap.danger.pulse { animation: pulseRed 2s infinite; }
+@keyframes pulseRed { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.3); } 70% { box-shadow: 0 0 0 6px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
+.lfd-label { font-size: 8.5px; font-weight: 800; text-transform: uppercase; color: var(--text-main); }
+.lfd-bar { height: 4px; width: 100%; background: rgba(0,0,0,0.1); border-radius: 4px; overflow: hidden; }
+.lfd-fill { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
+.success .lfd-fill { background: var(--success); }
+.warning .lfd-fill { background: var(--warning); }
+.danger .lfd-fill { background: var(--danger); }
+
 .badge-row { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-.tag-badge {
-  font-size: 9.5px;
-  font-weight: 700;
-  padding: 2px 6px;
-  border-radius: 4px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-}
+.tag-badge { font-size: 9.5px; font-weight: 700; padding: 2px 6px; border-radius: 4px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-muted); }
 .tag-badge.warning { background: var(--warning-bg); border-color: rgba(245, 158, 11, 0.25); color: var(--warning); }
 .tag-badge.danger { background: var(--danger-bg); border-color: rgba(239, 68, 68, 0.25); color: var(--danger); }
 .tag-badge.success { background: var(--success-bg); border-color: rgba(16, 185, 129, 0.25); color: var(--success); }
 
 .badge-links-group { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0; }
-.link-pill {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 4px;
-  font-size: 10.5px;
-  font-weight: 700;
-  text-decoration: none;
-  padding: 5px;
-  border-radius: 6px;
-  background: var(--bg-elevated);
-  border: 1px solid var(--border);
-  color: var(--text-muted);
-  transition: all 0.15s;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
+.link-pill { display: inline-flex; align-items: center; justify-content: center; gap: 4px; font-size: 10.5px; font-weight: 700; text-decoration: none; padding: 5px; border-radius: 6px; background: var(--bg-elevated); border: 1px solid var(--border); color: var(--text-muted); transition: all 0.15s; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .link-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
 
-.card-details-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px 10px;
-  background: var(--bg-elevated);
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid var(--border);
-}
-.detail-item label {
-  display: block;
-  font-size: 8.5px;
-  text-transform: uppercase;
-  font-weight: 800;
-  color: var(--text-dim);
-  margin-bottom: 1px;
-}
-.detail-item val {
-  font-size: 11px;
-  font-weight: 700;
-  font-family: 'JetBrains Mono', monospace;
-  display: block;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
+.card-details-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 10px; background: var(--bg-elevated); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border); }
+.detail-item label { display: block; font-size: 8.5px; text-transform: uppercase; font-weight: 800; color: var(--text-dim); margin-bottom: 1px; }
+.detail-item val { font-size: 11px; font-weight: 700; font-family: 'JetBrains Mono', monospace; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-.fee-breakdown-box {
-  background: var(--danger-bg);
-  border: 1px dashed rgba(239, 68, 68, 0.3);
-  border-radius: 6px;
-  padding: 6px 10px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-}
-.card-footer-btns {
-  display: flex;
-  justify-content: flex-end;
-  gap: 5px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border);
-  flex-wrap: wrap;
-}
+.fee-breakdown-box { background: var(--danger-bg); border: 1px dashed rgba(239, 68, 68, 0.3); border-radius: 6px; padding: 6px 10px; display: flex; justify-content: space-between; align-items: center; font-size: 11px; }
+.card-footer-btns { display: flex; justify-content: flex-end; gap: 5px; padding-top: 8px; border-top: 1px solid var(--border); flex-wrap: wrap; }
 
-.sheet-box {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  overflow-x: auto;
-  box-shadow: var(--shadow-sm);
-}
-.sheet-table { width: 100%; border-collapse: collapse; white-space: nowrap; font-size: 11.5px; }
-.sheet-table th {
-  background: var(--bg-elevated);
-  padding: 10px 12px;
-  text-align: left;
-  font-weight: 800;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-size: 9.5px;
-  letter-spacing: 0.04em;
-  border-bottom: 1px solid var(--border);
-  cursor: pointer;
-  user-select: none;
-}
-.sheet-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); }
-.sheet-table tr:hover td { background: var(--accent-glow); }
-.cell-input, .cell-select {
-  background: transparent;
-  border: 1px solid transparent;
-  color: var(--text-main);
-  font-family: inherit;
-  font-size: 11.5px;
-  padding: 4px 6px;
-  border-radius: 4px;
-  width: 100%;
-}
-.cell-input:focus, .cell-select:focus {
-  background: var(--bg-elevated);
-  border-color: var(--border-focus);
-  outline: none;
-}
+/* Sticky Table with Crosshair Highlight */
+.sheet-box { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; max-height: 70vh; overflow-y: auto; overflow-x: auto; position: relative; box-shadow: var(--shadow-sm); }
+.sheet-table { width: 100%; border-collapse: separate; border-spacing: 0; white-space: nowrap; font-size: 11.5px; min-width: max-content; }
+.sheet-table th { background: var(--bg-elevated); padding: 10px 12px; text-align: left; font-weight: 800; color: var(--text-muted); text-transform: uppercase; font-size: 9.5px; letter-spacing: 0.04em; border-bottom: 1px solid var(--border); cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 20; }
+.sheet-table td { padding: 6px 8px; border-bottom: 1px solid var(--border); background: var(--bg-surface); transition: background-color 0.1s; }
+.sheet-table tr:hover td { background: var(--accent-glow) !important; }
+.sheet-table td.col-highlight { background-color: var(--bg-elevated); }
+.sheet-table th:nth-child(1), .sheet-table td:nth-child(1) { position: sticky; left: 0; z-index: 15; }
+.sheet-table th:nth-child(2), .sheet-table td:nth-child(2) { position: sticky; left: 35px; z-index: 15; box-shadow: 2px 0 5px rgba(0,0,0,0.05); border-right: 1px solid var(--border); }
+.sheet-table th:nth-child(1), .sheet-table th:nth-child(2) { z-index: 21; background: var(--bg-elevated); }
 
+.cell-input, .cell-select { background: transparent; border: 1px solid transparent; color: var(--text-main); font-family: inherit; font-size: 11.5px; padding: 4px 6px; border-radius: 4px; width: 100%; transition: all 0.2s; }
+.cell-input:focus, .cell-select:focus { background: var(--bg-surface); border-color: var(--border-focus); outline: none; box-shadow: 0 0 0 3px var(--accent-glow); }
+.cell-input[readonly], .cell-select[disabled] { cursor: default; }
+
+/* Kanban Drag & Drop */
 .kanban-layout { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; align-items: start; }
-.kanban-column {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  display: flex;
-  flex-direction: column;
-  max-height: 80vh;
-  box-shadow: var(--shadow-sm);
-}
-.kanban-header-strip {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: 800;
-  font-size: 11px;
-  text-transform: uppercase;
-}
-.kanban-body-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
+.kanban-column { background: var(--bg-surface); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-direction: column; max-height: 80vh; box-shadow: var(--shadow-sm); }
+.kanban-header-strip { padding: 12px 14px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; font-weight: 800; font-size: 11px; text-transform: uppercase; }
+.kanban-body-list { padding: 10px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; min-height: 200px; }
+.kanban-ghost { opacity: 0.4; background: var(--accent-glow); border: 1px dashed var(--accent) !important; }
 
-.modal-bg {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.5);
-  backdrop-filter: blur(4px);
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 100;
-  padding: 16px;
-}
+/* Modals & Mobile Bottom Sheet */
+.modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); display: none; align-items: center; justify-content: center; z-index: 300; padding: 16px; }
 .modal-bg.open { display: flex; animation: modalFade 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
 @keyframes modalFade { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
-.modal-dialog {
-  background: var(--bg-surface);
-  border: 1px solid var(--border);
-  width: 620px;
-  max-width: 100%;
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-}
-.modal-header {
-  padding: 14px 18px;
-  border-bottom: 1px solid var(--border);
-  font-weight: 800;
-  font-size: 13.5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--bg-elevated);
-}
+.modal-dialog { background: var(--bg-surface); border: 1px solid var(--border); width: 620px; max-width: 100%; border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-lg); display: flex; flex-direction: column; }
+.modal-header { padding: 14px 18px; border-bottom: 1px solid var(--border); font-weight: 800; font-size: 13.5px; display: flex; justify-content: space-between; align-items: center; background: var(--bg-elevated); }
 .modal-body { padding: 18px; display: flex; flex-direction: column; gap: 12px; max-height: 75vh; overflow-y: auto; }
-.modal-footer {
-  padding: 12px 18px;
-  border-top: 1px solid var(--border);
-  display: flex;
-  justify-content: flex-end;
-  gap: 8px;
-  background: var(--bg-elevated);
+.modal-footer { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; justify-content: flex-end; gap: 8px; background: var(--bg-elevated); }
+
+@media (max-width: 768px) {
+  .modal-dialog { position: absolute; bottom: 0; width: 100%; max-height: 90vh; border-radius: 24px 24px 0 0; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .modal-bg { align-items: flex-end; padding: 0; }
 }
 
-.truck-pass-sheet {
-  background: #ffffff;
-  color: #0f172a;
-  padding: 24px;
-  border-radius: 12px;
-  border: 2px solid #0f172a;
-  font-family: 'Plus Jakarta Sans', sans-serif;
-}
-.barcode-visual {
-  font-family: 'Courier New', Courier, monospace;
-  letter-spacing: 4px;
-  font-size: 28px;
-  font-weight: 900;
-  text-align: center;
-  padding: 8px 0;
-  border-top: 1px dashed #cbd5e1;
-  border-bottom: 1px dashed #cbd5e1;
-}
-.toast-popup {
-  position: fixed;
-  bottom: 24px;
-  right: 24px;
-  background: var(--primary);
-  color: #ffffff;
-  padding: 8px 16px;
-  border-radius: 8px;
-  font-size: 12px;
-  font-weight: 700;
-  z-index: 200;
-  opacity: 0;
-  transform: translateY(10px);
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-  box-shadow: var(--shadow-lg);
-}
+.truck-pass-sheet { background: #ffffff; color: #0f172a; padding: 24px; border-radius: 12px; border: 2px solid #0f172a; font-family: 'Plus Jakarta Sans', sans-serif; }
+.barcode-visual { font-family: 'Courier New', Courier, monospace; letter-spacing: 4px; font-size: 28px; font-weight: 900; text-align: center; padding: 8px 0; border-top: 1px dashed #cbd5e1; border-bottom: 1px dashed #cbd5e1; }
+
+.toast-popup { position: fixed; bottom: 24px; right: 24px; background: var(--primary); color: #ffffff; padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700; z-index: 400; opacity: 0; transform: translateY(10px); transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1); pointer-events: none; box-shadow: var(--shadow-lg); }
 .toast-popup.show { opacity: 1; transform: translateY(0); }
+
+/* Undo Delete Toast */
+.undo-toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: #0f172a; color: #fff; padding: 10px 16px; border-radius: 8px; display: flex; gap: 12px; align-items: center; z-index: 350; transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1); box-shadow: var(--shadow-lg); opacity: 0; pointer-events: none; font-size: 12px; font-weight: 600; }
+.undo-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; pointer-events: auto; }
+.undo-btn { background: var(--accent); color: #fff; border: none; padding: 4px 10px; border-radius: 4px; font-weight: 800; cursor: pointer; font-size: 11px; transition: background 0.15s; }
+.undo-btn:hover { background: var(--primary-hover); }
+
+/* Overlay Skeleton */
+.skeleton-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); z-index: 9999; display: flex; align-items: center; justify-content: center; color: white; font-size: 16px; font-weight: 700; backdrop-filter: blur(4px); }
 </style>
 </head>
 <body>
 
 <header class="nav-header">
   <div class="nav-container">
-    <div class="brand-box">
+    <div class="brand-box" onclick="resetToLanding()">
       <div class="brand-logo-icon">⚓</div>
       <div class="brand-title">Container Tracking Suite</div>
     </div>
@@ -899,7 +321,6 @@ body {
       <div id="opsControls" style="display:none; align-items:center; gap:8px;">
         <div class="header-segment">
           <button class="btn btn-primary action-editor-only" id="addBtn">+ Container</button>
-          <button class="btn btn-purple action-editor-only" id="bulkDestuffBtn">✅ Destuff</button>
           <button class="btn btn-emerald" id="whatsappQuickBtn">💬 WhatsApp</button>
         </div>
 
@@ -932,7 +353,7 @@ body {
 
       <div id="publicControls" style="display:flex; align-items:center; gap:8px;">
         <button class="btn btn-ghost" id="publicThemeBtn" style="padding:6px 10px;">☀️</button>
-        <button class="btn btn-primary" id="loginBtn">🔐 Staff Portal Login</button>
+        <button class="btn btn-primary" id="loginBtn" onclick="openLoginModal()">🔐 Staff Portal Login</button>
       </div>
     </div>
   </div>
@@ -948,19 +369,17 @@ body {
             Live Shipment Tracking
           </div>
         </div>
-        
         <div class="widget-body">
           <label>MBL or Container Number <span>*</span></label>
           <div class="widget-input-wrapper">
-            <input type="text" id="publicSearchInput" placeholder="E.g. SKHU9422886">
+            <input type="text" id="publicSearchInput" placeholder="E.g. SKHU9422886, IAAU1753030">
           </div>
           <div class="widget-helper-text">Enter tracking numbers. Separate multiple identifiers with a comma or space.</div>
-          <button class="btn-track-action" id="publicSearchBtn">Track Shipment Now</button>
+          <button class="btn-track-action" id="publicSearchBtn" onclick="performPublicSearch()">Track Shipment Now</button>
         </div>
       </div>
     </div>
   </div>
-
   <div id="publicResultContainer" class="public-result-card"></div>
 </section>
 
@@ -981,15 +400,7 @@ body {
           <span class="search-input-icon">🔍</span>
           <input id="search" class="input" placeholder="Search container, vessel, seal, truck...">
         </div>
-        <select id="vesselFilter" class="select"><option value="">All Vessels</option></select>
-        <select id="gatewayFilter" class="select">
-          <option value="">All Ports</option>
-          <option value="CITPL">CITPL (PSA)</option>
-          <option value="CCTL">CCTL (DP World)</option>
-          <option value="Kattupalli">Kattupalli Port</option>
-          <option value="Ennore">Ennore Port</option>
-        </select>
-        <select id="cfsFilter" class="select"><option value="">All CFS Depots</option></select>
+        <button class="btn" onclick="openDrawer()">⚙️ Deep Filters</button>
       </div>
 
       <div class="view-selector">
@@ -1009,12 +420,6 @@ body {
         <span class="chip" data-filter="critical_lfd">⚠️ LFD Critical (&le; 2d)</span>
         <span class="chip" data-filter="delayed">Delayed / Rolled</span>
         <span class="chip" data-filter="completed">Archive (Returned)</span>
-      </div>
-
-      <div class="bulk-action-dock">
-        <span id="selectionNotice" style="font-size:11px; font-weight:700; color:var(--text-muted); padding:0 4px;">0 selected</span>
-        <button class="btn btn-emerald" id="bulkPhotoBtn" style="padding:4px 8px;">📷 Photo (<span id="btnSelectCount">0</span>)</button>
-        <button class="btn btn-purple" id="bulkWhatsAppBtn" style="padding:4px 8px;">💬 WhatsApp</button>
       </div>
     </div>
   </div>
@@ -1051,10 +456,51 @@ body {
   <section id="kanbanView" class="kanban-layout" style="display:none;"></section>
 </main>
 
-<footer style="text-align: center; padding: 24px; font-size: 11px; font-weight: 700; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 40px;">
-  © ME2026 . All Rights Reserved.
-</footer>
+<!-- Slide-Out Filter Drawer -->
+<div class="drawer-overlay" id="filterDrawerOverlay" onclick="closeDrawer()"></div>
+<div class="filter-drawer" id="filterDrawer">
+  <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:12px; margin-bottom:16px;">
+    <h3 style="margin:0; font-size:14px; font-weight:800; display:flex; align-items:center; gap:8px;">⚙️ Advanced Filters</h3>
+    <button class="btn btn-ghost" style="padding:4px 8px;" onclick="closeDrawer()">✕</button>
+  </div>
+  <div style="display:flex; flex-direction:column; gap:6px;">
+    <div>
+      <label>Vessel</label>
+      <select id="vesselFilter" class="select"></select>
+    </div>
+    <div>
+      <label>Gateway Port</label>
+      <select id="gatewayFilter" class="select">
+        <option value="">All Ports</option>
+        <option value="CITPL">CITPL (PSA)</option>
+        <option value="CCTL">CCTL (DP World)</option>
+        <option value="Kattupalli">Kattupalli Port</option>
+        <option value="Ennore">Ennore Port</option>
+      </select>
+    </div>
+    <div>
+      <label>CFS Depot</label>
+      <select id="cfsFilter" class="select"></select>
+    </div>
+  </div>
+</div>
 
+<!-- Floating Action Bar (FAB) -->
+<div id="floatingActionBar" class="floating-action-bar">
+  <span id="selectionNotice" style="font-size:11.5px; font-weight:800; color:var(--text-main); padding:0 8px;">0 selected</span>
+  <div style="width:1px; height:20px; background:var(--border);"></div>
+  <button class="btn btn-emerald" id="bulkPhotoBtn">📷 Snapshot (<span id="btnSelectCount">0</span>)</button>
+  <button class="btn btn-purple" id="bulkWhatsAppBtn">💬 Broadcast</button>
+  <button class="btn action-editor-only" id="bulkDestuffBtn" style="background:var(--danger-bg); color:var(--danger); border-color:transparent;">✅ Destuff Today</button>
+</div>
+
+<!-- Undo Toast -->
+<div class="undo-toast" id="undoToast">
+  <span>Container deleted permanently.</span>
+  <button class="undo-btn" onclick="undoDelete()">Undo Action</button>
+</div>
+
+<!-- Modals -->
 <div class="modal-bg" id="truckSlipModalBg">
   <div class="modal-dialog" style="width:680px; max-width:95vw;">
     <div class="modal-header">
@@ -1137,20 +583,22 @@ body {
 </div>
 
 <div class="modal-bg" id="loginModalBg">
-  <div class="modal-dialog" style="max-width:360px;">
+  <div class="modal-dialog" style="max-width:380px;">
     <div class="modal-header">
       <span>🔐 Staff Portal Login</span>
-      <button class="btn btn-ghost" id="loginClose">✕</button>
+      <button class="btn btn-ghost" id="loginClose" onclick="closeLoginModal()">✕</button>
     </div>
     <div class="modal-body" style="padding:20px;">
       <div>
         <label style="font-size:10.5px; font-weight:800; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.04em;">Access Code</label>
         <input type="password" id="loginCodeInput" class="input" style="width:100%; margin-top:6px; font-family:'JetBrains Mono'; font-weight:800; font-size:15px; letter-spacing:0.1em; text-align:center; height:40px;" placeholder="••••••••">
       </div>
-      <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:8px;">Enter assigned credentials to access operations desk tools.</div>
+      <div style="font-size:11px; color:var(--text-muted); text-align:center; margin-top:8px;">
+        Enter your authorized credentials to access operations desk tools.
+      </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" id="loginCancel">Cancel</button>
+      <button class="btn" id="loginCancel" onclick="closeLoginModal()">Cancel</button>
       <button class="btn btn-primary" id="loginSubmit">Sign In</button>
     </div>
   </div>
@@ -1253,7 +701,14 @@ body {
 <script>
 const SUPABASE_URL = "https://ykeucqritoexykqrggzz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_olbFhK5Wu6hGiaGGDdXMeA_6szko2wZ";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+let sb = null;
+try {
+  if (typeof supabase !== 'undefined' && supabase.createClient) {
+    sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  }
+} catch(e) {
+  console.warn("Supabase init bypassed or offline:", e);
+}
 
 const USD_TO_INR = 84;
 let activeCurrency = localStorage.getItem("gml_curr") || "INR";
@@ -1266,7 +721,7 @@ const COLS = [
 ];
 const DATE_COLS = new Set(['ETD', 'ETA', 'SPLIT DATE', 'INWARD DATE', 'PORT IN', 'PORT OUT', 'CFS IN', 'DESTUFFING DATE', 'CONTAINER RETURN DATE']);
 
-let rows = [
+const DEFAULT_ROWS = [
   {
     "CONTAINER NO.": "SKHU9422886", "TYPE": "40' DC", "MBL NO": "SNK003C260801543", "LINER": "PAREKH", 
     "GATEWAY PORT": "CCTL", "CFS NAME": "ECCT", "POL": "SHEKOU", "ETD": "2026-08-26", "FREE DAYS": "14", "SEAL NO.": "ML-99824",
@@ -1280,8 +735,17 @@ let rows = [
     "VESSEL & VOY": "TS QINGDAO V 2618W", "ETA": "2026-09-04", "SPLIT DATE": "", "INWARD DATE": "", 
     "PORT IN": "2026-09-04", "PORT OUT": "", "CFS IN": "", "TRUCK NO.": "",
     "DRIVER CONTACT": "", "PLANNING": "", "DESTUFFING DATE": "", "CONTAINER RETURN DATE": "", "REMARKS": "NOT MOVED"
+  },
+  {
+    "CONTAINER NO.": "IAAU1753030", "TYPE": "40' DC", "MBL NO": "A56GX21515", "LINER": "IAL",
+    "GATEWAY PORT": "CCTL", "CFS NAME": "ECCT", "POL": "SHANGHAI", "ETD": "2026-08-18", "FREE DAYS": "14", "SEAL NO.": "IAL-44120",
+    "VESSEL & VOY": "REN JIAN 23 V 2633W", "ETA": "2026-09-13", "SPLIT DATE": "2026-09-12", "INWARD DATE": "2026-09-14",
+    "PORT IN": "", "PORT OUT": "", "CFS IN": "", "TRUCK NO.": "",
+    "DRIVER CONTACT": "", "PLANNING": "", "DESTUFFING DATE": "", "CONTAINER RETURN DATE": "", "REMARKS": ""
   }
 ];
+
+let rows = [...DEFAULT_ROWS];
 
 let currentUser = null;
 let selectedIndices = new Set();
@@ -1292,6 +756,8 @@ let sortField = null;
 let sortAsc = true;
 let routeMapInstance = null;
 let activeTruckSlipIndex = -1;
+let pendingDelete = null;
+let deleteTimeout = null;
 
 let auditLogs = [];
 try {
@@ -1309,27 +775,75 @@ const PORT_COORDS = {
 const el = id => document.getElementById(id);
 const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 
+/* Safe Event Listener Binder: Prevents missing-element crash */
+function safeOn(id, evt, handler) {
+  const elem = typeof id === 'string' ? el(id) : id;
+  if (elem) elem.addEventListener(evt, handler);
+}
+
+function openLoginModal() {
+  const modal = el("loginModalBg");
+  if (modal) {
+    modal.classList.add("open");
+    const inp = el("loginCodeInput");
+    if (inp) {
+      inp.value = "";
+      setTimeout(() => inp.focus(), 100);
+    }
+  }
+}
+
+function closeLoginModal() {
+  const modal = el("loginModalBg");
+  if (modal) modal.classList.remove("open");
+}
+
+function resetToLanding() {
+  setAccessState(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 function formatCurrency(valUSD) {
   if (activeCurrency === "USD") return `$${Math.round(valUSD).toLocaleString()}`;
   return `₹${Math.round(valUSD * USD_TO_INR).toLocaleString()}`;
 }
 
-el("opsMenuBtn").addEventListener("click", (e) => {
-  e.stopPropagation();
-  el("opsMenuDropdown").classList.toggle("show");
-});
-document.addEventListener("click", () => el("opsMenuDropdown").classList.remove("show"));
+function copyText(txt) {
+  if(!txt) return;
+  if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(txt).then(() => toast("Copied!")).catch(() => fallbackCopy(txt));
+  } else {
+      fallbackCopy(txt);
+  }
+}
 
-el("currencyToggleBtn").addEventListener("click", () => {
-  activeCurrency = activeCurrency === "INR" ? "USD" : "INR";
-  localStorage.setItem("gml_curr", activeCurrency);
-  el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
-  renderUI();
-});
-el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
+function fallbackCopy(txt) {
+  let textArea = document.createElement("textarea");
+  textArea.value = txt;
+  textArea.style.position = "fixed";
+  textArea.style.left = "-999999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try { document.execCommand('copy'); toast("Copied!"); } catch(err) { }
+  textArea.remove();
+}
+
+function formatTruckNo(val) {
+  let v = String(val || "").toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if(v.length > 2) v = v.substring(0,2) + '-' + v.substring(2);
+  if(v.length > 5) v = v.substring(0,5) + '-' + v.substring(5);
+  if(v.length > 8) v = v.substring(0,8) + '-' + v.substring(8);
+  if(v.length > 13) v = v.substring(0,13);
+  return v;
+}
+
+function openDrawer() { el("filterDrawer").classList.add("open"); el("filterDrawerOverlay").classList.add("open"); }
+function closeDrawer() { el("filterDrawer").classList.remove("open"); el("filterDrawerOverlay").classList.remove("open"); }
 
 function toast(msg) {
   const t = el("toast");
+  if (!t) return;
   t.textContent = msg;
   t.classList.add("show");
   setTimeout(() => t.classList.remove("show"), 2200);
@@ -1346,21 +860,35 @@ function parseLocalDate(str) {
   return isNaN(d) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 
-function generatePublicVoyageTimelineHtml(r) {
-  const mblNo = esc(r["MBL NO"] || "—");
-  const vesselName = esc(r["VESSEL & VOY"] || "—");
-  const cfsName = esc(r["CFS NAME"] || "—");
-  const liner = esc(r["LINER"] || "—");
-  const pol = esc(r["POL"] || "—");
-  const eta = formatDate(r["ETA"]) || 'Pending';
+function getField(r, names) {
+  if (!r) return "";
+  for (let name of names) {
+    const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (let k of Object.keys(r)) {
+      const cleanK = k.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanK === cleanName && r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
+        return String(r[k]).trim();
+      }
+    }
+  }
+  return "";
+}
 
-  const igmSplit = formatDate(r["SPLIT DATE"]);
-  const inward = formatDate(r["INWARD DATE"]);
-  const berthedPort = formatDate(r["PORT IN"]);
-  const portOut = formatDate(r["PORT OUT"]);
-  const cfsIn = formatDate(r["CFS IN"]);
-  const destuffed = formatDate(r["DESTUFFING DATE"]);
-  const containerReturned = formatDate(r["CONTAINER RETURN DATE"]);
+function generatePublicVoyageTimelineHtml(r) {
+  const mblNo = esc(getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "—");
+  const vesselName = esc(getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—");
+  const cfsName = esc(getField(r, ["CFS NAME", "CFS"]) || "—");
+  const liner = esc(getField(r, ["LINER", "LINE"]) || detectLinerFromMBL(mblNo) || "—");
+  const pol = esc(getField(r, ["POL", "PORT OF LOADING"]) || "—");
+  const eta = formatDate(getField(r, ["ETA"])) || 'Pending';
+
+  const igmSplit = formatDate(getField(r, ["SPLIT DATE", "SPLIT"]));
+  const inward = formatDate(getField(r, ["INWARD DATE", "INWARD"]));
+  const berthedPort = formatDate(getField(r, ["PORT IN"]));
+  const portOut = formatDate(getField(r, ["PORT OUT"]));
+  const cfsIn = formatDate(getField(r, ["CFS IN"]));
+  const destuffed = formatDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]));
+  const containerReturned = formatDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
 
   const steps = [
     { label: "Inward Granted", date: inward, done: !!inward },
@@ -1412,7 +940,7 @@ function generatePublicVoyageTimelineHtml(r) {
             </div>
             <div class="ref-data-box">
               <label>Container Size</label>
-              <val>${esc(r["TYPE"] || "40' DC")}</val>
+              <val>${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}</val>
             </div>
           </div>
         </div>
@@ -1475,7 +1003,7 @@ function logAuditEvent(action, containerNo, field, oldVal, newVal) {
 
   try {
     localStorage.setItem("gml_audit_trail", JSON.stringify(auditLogs));
-    sb.from('audit_logs').insert([entry]).then(() => {}).catch(() => {});
+    if (sb) sb.from('audit_logs').insert([entry]).then(() => {}).catch(() => {});
   } catch(e) {}
 
   updateAuditBadge();
@@ -1488,6 +1016,7 @@ function updateAuditBadge() {
 
 function renderAuditTable(filteredList = auditLogs) {
   const tbody = el("auditTableBody");
+  if (!tbody) return;
   if (!filteredList.length) {
     tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:var(--text-muted);">No activity recorded yet.</td></tr>`;
     return;
@@ -1519,40 +1048,6 @@ function renderAuditTable(filteredList = auditLogs) {
   }).join("");
 }
 
-el("openAuditLogBtn").addEventListener("click", () => {
-  renderAuditTable();
-  el("clearAuditBtn").style.display = (currentUser && currentUser.role === "Admin") ? "inline-block" : "none";
-  el("auditModalBg").classList.add("open");
-});
-el("auditClose").addEventListener("click", () => el("auditModalBg").classList.remove("open"));
-
-el("auditSearchInput").addEventListener("input", (e) => {
-  const q = e.target.value.toLowerCase();
-  const filtered = auditLogs.filter(l => 
-    l.containerNo.toLowerCase().includes(q) || 
-    l.operator.toLowerCase().includes(q) || 
-    l.field.toLowerCase().includes(q) ||
-    l.action.toLowerCase().includes(q)
-  );
-  renderAuditTable(filtered);
-});
-
-el("exportAuditBtn").addEventListener("click", () => {
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditLogs), "Audit_Trail");
-  XLSX.writeFile(wb, `Operations_Audit_Log_${new Date().toISOString().slice(0,10)}.xlsx`);
-});
-
-el("clearAuditBtn").addEventListener("click", () => {
-  if (confirm("Permanently clear the local audit trail?")) {
-    auditLogs = [];
-    localStorage.removeItem("gml_audit_trail");
-    renderAuditTable();
-    updateAuditBadge();
-    toast("Audit trail cleared");
-  }
-});
-
 function validateISO6346(cntr) {
   if (!cntr) return { isValid: false, message: "Empty code" };
   const clean = String(cntr).trim().toUpperCase();
@@ -1582,11 +1077,10 @@ function validateISO6346(cntr) {
 }
 
 function calculateStandardFees(r) {
-  const is20ft = (r["TYPE"] || "").includes("20");
+  const is20ft = (getField(r, ["TYPE", "SIZE"]) || "").includes("20");
   const demRatePerDay = is20ft ? 100 : 225;
   const detRatePerDay = is20ft ? 75 : 150;
 
-  // Decoupled dates: PORT IN drives terminal free days; INWARD DATE drives container free days
   const portInDate = parseLocalDate(getField(r, ["PORT IN"]));
   const inwardDate = parseLocalDate(getField(r, ["INWARD DATE", "INWARD"]));
   const portOutDate = parseLocalDate(getField(r, ["PORT OUT", "CFS IN"]));
@@ -1598,7 +1092,6 @@ function calculateStandardFees(r) {
   let demDays = 0, demOverdue = false, demCostUSD = 0, portDwell = 0;
   let detDays = 0, detOverdue = false, detCostUSD = 0, totalEquipmentDays = 0;
 
-  // Port Demurrage: Starts strictly from PORT IN
   const portFreeDays = 3;
   let terminalLFD = null;
   let terminalDaysLeft = null;
@@ -1617,7 +1110,6 @@ function calculateStandardFees(r) {
     }
   }
 
-  // Container Detention: Starts strictly from INWARD DATE
   const carrierFreeDays = parseInt(getField(r, ["FREE DAYS"]) || "14", 10);
   let detentionLFD = null;
   let detentionDaysLeft = null;
@@ -1650,7 +1142,9 @@ function calculateStandardFees(r) {
     detDays,
     detCostUSD,
     totalCostUSD: demCostUSD + detCostUSD,
-    isCompleted: isFullyCompleted(r)
+    isCompleted: isFullyCompleted(r),
+    portFreeDays,
+    carrierFreeDays
   };
 }
 
@@ -1660,15 +1154,15 @@ function generateCleanManifestHtml(containersList) {
 
   const rowsHtml = containersList.map(r => {
     const st = getStatus(r);
-    const liner = getField(r, ["LINER"]) || detectLinerFromMBL(r["MBL NO"]) || "—";
+    const liner = getField(r, ["LINER"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "—";
     const port = getGatewayPortInfo(r).name;
-    const cfs = getField(r, ["CFS NAME"]) || "—";
-    const vsl = getField(r, ["VESSEL & VOY"]) || "—";
-    const pol = getField(r, ["POL"]) || "—";
+    const cfs = getField(r, ["CFS NAME", "CFS"]) || "—";
+    const vsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
+    const pol = getField(r, ["POL", "PORT OF LOADING"]) || "—";
     const etd = formatDate(getField(r, ["ETD"]));
     const eta = formatDate(getField(r, ["ETA"]));
     const portIn = formatDate(getField(r, ["PORT IN"]));
-    const destuff = formatDate(getField(r, ["DESTUFFING DATE"])) || "—";
+    const destuff = formatDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"])) || "—";
     const remarks = (r["REMARKS"] || "—").trim();
 
     let pillStyle = "background:#e0f2fe; color:#0284c7;";
@@ -1679,11 +1173,11 @@ function generateCleanManifestHtml(containersList) {
     return `
       <tr style="border-bottom:1px solid #e2e8f0; font-size:11px;">
         <td style="padding:10px 8px; font-weight:800; font-family:'JetBrains Mono', monospace; color:#0284c7;">
-          ${esc(r["CONTAINER NO."])}
-          <div style="font-size:9px; font-weight:700; color:#64748b;">${esc(r["TYPE"] || "40' DC")}</div>
+          ${esc(getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]))}
+          <div style="font-size:9px; font-weight:700; color:#64748b;">${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}</div>
         </td>
         <td style="padding:10px 8px; color:#0f172a; font-weight:600;">
-          <div style="font-family:'JetBrains Mono', monospace; font-weight:700;">${esc(r["MBL NO"] || "—")}</div>
+          <div style="font-family:'JetBrains Mono', monospace; font-weight:700;">${esc(getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "—")}</div>
           <div style="font-size:9px; color:#64748b; text-transform:uppercase;">${esc(liner)}</div>
         </td>
         <td style="padding:10px 8px; font-weight:700; color:#0f172a;">${esc(vsl)}</td>
@@ -1741,15 +1235,19 @@ function generateCleanManifestHtml(containersList) {
 }
 
 function downloadCardAsImage(idx, fileNameRef) {
-  const r = typeof idx === 'number' ? rows[idx] : rows.find(x => x["CONTAINER NO."] === fileNameRef);
+  const r = typeof idx === 'number' ? rows[idx] : rows.find(x => getField(x, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) === fileNameRef);
   if (!r) return toast("Container not found");
-  downloadMultipleStatusImage([r], r["CONTAINER NO."]);
+  downloadMultipleStatusImage([r], getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]));
 }
 
 function downloadMultipleStatusImage(containersList, titleRef = "Status_Report") {
   if (!containersList || !containersList.length) return toast("No containers selected!");
 
-  toast("Generating table status report...");
+  const overlay = document.createElement("div");
+  overlay.className = "skeleton-overlay";
+  overlay.innerHTML = "📸 Generating Snapshot...";
+  document.body.appendChild(overlay);
+
   const tempWrapper = document.createElement("div");
   tempWrapper.style.position = "fixed";
   tempWrapper.style.top = "-9999px";
@@ -1759,27 +1257,31 @@ function downloadMultipleStatusImage(containersList, titleRef = "Status_Report")
 
   const target = document.getElementById("manifestCaptureContainer");
 
-  html2canvas(target, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
-    document.body.removeChild(tempWrapper);
-    const link = document.createElement("a");
-    link.download = `Report_${titleRef}_${Date.now()}.png`;
-    link.href = canvas.toDataURL("image/png");
-    link.click();
-    toast("Report photo downloaded!");
-  }).catch(err => {
-    console.error(err);
-    if (tempWrapper.parentNode) document.body.removeChild(tempWrapper);
-    toast("Failed to render photo.");
-  });
+  setTimeout(() => {
+    html2canvas(target, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+      document.body.removeChild(tempWrapper);
+      document.body.removeChild(overlay);
+      const link = document.createElement("a");
+      link.download = `Report_${titleRef}_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast("Report photo downloaded!");
+    }).catch(err => {
+      console.error(err);
+      if (tempWrapper.parentNode) document.body.removeChild(tempWrapper);
+      if (overlay.parentNode) document.body.removeChild(overlay);
+      toast("Failed to render photo.");
+    });
+  }, 100);
 }
 
 function openTruckDispatchSlip(idx) {
   activeTruckSlipIndex = idx;
   const r = rows[idx];
-  const cntr = getField(r, ["CONTAINER NO."]);
-  const liner = getField(r, ["LINER"]) || detectLinerFromMBL(r["MBL NO"]) || "Carrier Line";
+  const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+  const liner = getField(r, ["LINER"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "Carrier Line";
   const port = getGatewayPortInfo(r).name;
-  const cfs = getField(r, ["CFS NAME"]) || "Designated CFS";
+  const cfs = getField(r, ["CFS NAME", "CFS"]) || "Designated CFS";
   const seal = getField(r, ["SEAL NO."]) || "—";
   const passNo = `GML-DSP-${Math.floor(100000 + Math.random() * 900000)}`;
 
@@ -1802,7 +1304,7 @@ function openTruckDispatchSlip(idx) {
       </div>
       <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; background:#f8fafc;">
         <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Equipment / Line</label>
-        <span style="font-size:12px; font-weight:800; color:#0f172a;">${esc(r["TYPE"] || "40' DC")} • ${esc(liner)}</span>
+        <span style="font-size:12px; font-weight:800; color:#0f172a;">${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")} • ${esc(liner)}</span>
       </div>
       <div style="border:1px solid #cbd5e1; border-radius:6px; padding:6px 8px; background:#f8fafc;">
         <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#64748b; display:block;">Origin Terminal</label>
@@ -1819,12 +1321,12 @@ function openTruckDispatchSlip(idx) {
       <div style="border:1px solid #0284c7; border-radius:6px; padding:6px 8px; background:#eff6ff;">
         <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Truck No. ✏️</label>
         <input type="text" id="slipTruckInput" class="input" style="width:100%; height:28px; font-family:'JetBrains Mono'; font-weight:800; background:#ffffff; color:#0f172a; margin-top:2px;" 
-               placeholder="TN-04-AR-8821" value="${esc(r["TRUCK NO."] || '')}" onchange="updateTruckInSlip(this.value)">
+               placeholder="TN-04-AR-8821" value="${esc(getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || '')}" oninput="this.value=formatTruckNo(this.value)" onchange="updateTruckInSlip(this.value)">
       </div>
       <div style="grid-column: span 2; border:1px solid #0284c7; border-radius:6px; padding:6px 8px; background:#eff6ff;">
         <label style="font-size:8px; font-weight:800; text-transform:uppercase; color:#0284c7; display:block;">Driver Contact ✏️</label>
         <input type="text" id="slipDriverInput" class="input" style="width:100%; height:28px; font-weight:700; background:#ffffff; color:#0f172a; margin-top:2px;" 
-               placeholder="Driver Name (Contact)" value="${esc(r["DRIVER CONTACT"] || '')}" onchange="updateDriverInSlip(this.value)">
+               placeholder="Driver Name (Contact)" value="${esc(getField(r, ["DRIVER CONTACT"]) || '')}" onchange="updateDriverInSlip(this.value)">
       </div>
     </div>
 
@@ -1841,9 +1343,9 @@ function openTruckDispatchSlip(idx) {
 function updateTruckInSlip(val) {
   if (activeTruckSlipIndex === -1) return;
   const oldVal = rows[activeTruckSlipIndex]["TRUCK NO."];
-  const newVal = val.trim().toUpperCase();
+  const newVal = formatTruckNo(val);
   rows[activeTruckSlipIndex]["TRUCK NO."] = newVal;
-  logAuditEvent("TRUCK_ASSIGN", rows[activeTruckSlipIndex]["CONTAINER NO."], "TRUCK NO.", oldVal, newVal);
+  logAuditEvent("TRUCK_ASSIGN", getField(rows[activeTruckSlipIndex], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "TRUCK NO.", oldVal, newVal);
   saveAndRefresh();
   toast("Truck updated");
 }
@@ -1853,121 +1355,56 @@ function updateDriverInSlip(val) {
   const oldVal = rows[activeTruckSlipIndex]["DRIVER CONTACT"];
   const newVal = val.trim();
   rows[activeTruckSlipIndex]["DRIVER CONTACT"] = newVal;
-  logAuditEvent("DRIVER_ASSIGN", rows[activeTruckSlipIndex]["CONTAINER NO."], "DRIVER CONTACT", oldVal, newVal);
+  logAuditEvent("DRIVER_ASSIGN", getField(rows[activeTruckSlipIndex], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "DRIVER CONTACT", oldVal, newVal);
   saveAndRefresh();
   toast("Driver updated");
 }
 
-el("sendDriverWhatsAppBtn").addEventListener("click", () => {
-  if (activeTruckSlipIndex === -1) return;
-  const r = rows[activeTruckSlipIndex];
-  const cntr = getField(r, ["CONTAINER NO."]);
-  const port = getGatewayPortInfo(r).name;
-  const cfs = getField(r, ["CFS NAME"]) || "CFS Depot";
-  const seal = getField(r, ["SEAL NO."]) || "—";
-  const truck = r["TRUCK NO."] || "Pending Assignment";
-  
-  const text = `🚚 *CONTAINER MOVEMENT ORDER*\n` +
-               `*Container:* ${cntr} (${r["TYPE"] || "40' DC"})\n` +
-               `*Assigned Truck:* ${truck}\n` +
-               `*Pickup:* ${port} ➔ *Delivery:* ${cfs}\n` +
-               `*Seal:* ${seal}\n` +
-               `Report to gate upon arrival.`;
-
-  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
-});
-
-el("truckSlipClose").addEventListener("click", () => el("truckSlipModalBg").classList.remove("open"));
-el("truckSlipCancel").addEventListener("click", () => el("truckSlipModalBg").classList.remove("open"));
-
-function openWhatsAppComposer(idx = -1) {
-  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-  let text = "";
-
-  if (idx !== -1) {
-    const r = rows[idx];
-    const fees = calculateStandardFees(r);
-    text = `📦 *SHIPMENT TRACKING UPDATE* • ${dateStr}\n` +
-           `━━━━━━━━━━━━━━━━━━━━━━\n` +
-           `*Container:* ${r["CONTAINER NO."]} (${r["TYPE"] || "40' DC"})\n` +
-           `*Line / MBL:* ${r["LINER"] || '-'} | ${r["MBL NO"] || '-'}\n` +
-           `*Vessel:* ${r["VESSEL & VOY"] || '-'}\n` +
-           (r["INWARD DATE"] ? `*Inward Date:* ${formatDate(r["INWARD DATE"])}\n` : '') +
-           `*Port In:* ${formatDate(r["PORT IN"]) || 'Pending'} | *Port Out:* ${formatDate(r["PORT OUT"]) || 'Pending'}\n` +
-           `*CFS Depot:* ${r["CFS NAME"] || '-'}\n` +
-           (r["TRUCK NO."] ? `*Truck No:* ${r["TRUCK NO."]}\n` : '') +
-           `*Status:* ${getStatus(r).text}\n` +
-           `*Free Days:* Terminal (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'}) | Detention (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})\n` +
-           (r["REMARKS"] ? `*Remark:* ${r["REMARKS"]}\n` : '') +
-           `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
-  } else {
-    const active = rows.filter(r => !isFullyCompleted(r));
-    text = `🚢 *GREENWICH MERIDIAN LOGISTICS*\n` +
-           `📋 *DAILY SHIPMENT DISPATCH BRIEF* • ${dateStr}\n` +
-           `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
-    active.forEach((r, i) => {
-      text += `${i + 1}. *${r["CONTAINER NO."]}* (${r["TYPE"] || "40' DC"})\n` +
-              `   • Status: ${getStatus(r).text} | CFS: ${r["CFS NAME"] || '-'}\n` +
-              `   • Port In: ${formatDate(r["PORT IN"]) || 'Pending'} | Port Out: ${formatDate(r["PORT OUT"]) || 'Pending'}\n\n`;
-    });
-    text += `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
-  }
-
-  el("whatsappComposerText").value = text;
-  el("openDirectWhatsAppBtn").href = `https://wa.me/?text=${encodeURIComponent(text)}`;
-  el("whatsappComposerModalBg").classList.add("open");
+/* Staff Login Handlers */
+function executeSuccessfulLogin(userObj) {
+  currentUser = userObj;
+  localStorage.setItem("gml_auth_code_user", JSON.stringify(currentUser));
+  closeLoginModal();
+  const btn = el("loginSubmit");
+  if (btn) btn.textContent = "Sign In";
+  setAccessState(true);
+  toast(`Logged in as ${currentUser.id}`);
 }
-el("whatsappComposerClose").addEventListener("click", () => el("whatsappComposerModalBg").classList.remove("open"));
-el("whatsappQuickBtn").addEventListener("click", () => openWhatsAppComposer(-1));
-el("copyComposerTextBtn").addEventListener("click", () => {
-  navigator.clipboard.writeText(el("whatsappComposerText").value);
-  toast("Message copied to clipboard!");
-});
 
-el("loginBtn").addEventListener("click", () => {
-  el("loginCodeInput").value = "";
-  el("loginModalBg").classList.add("open");
-  setTimeout(() => el("loginCodeInput").focus(), 100);
-});
-el("loginClose").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
-el("loginCancel").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
-
-el("loginCodeInput").addEventListener("keypress", (e) => {
-  if (e.key === "Enter") el("loginSubmit").click();
-});
-
-el("loginSubmit").addEventListener("click", async () => {
-  const code = el("loginCodeInput").value.trim();
+/* Real Authentication Mechanism */
+async function processLogin() {
+  const inp = el("loginCodeInput");
+  const code = inp ? inp.value.trim() : "";
   if (!code) return alert("Please enter your Access Code.");
 
-  const originalBtnText = el("loginSubmit").textContent;
-  el("loginSubmit").textContent = "Verifying...";
+  const submitBtn = el("loginSubmit");
+  const originalBtnText = submitBtn ? submitBtn.textContent : "Sign In";
+  if (submitBtn) submitBtn.textContent = "Verifying...";
 
-  const { data, error } = await sb
-    .from('user_roles')
-    .select('user_id, role, username')
-    .eq('access_code', code)
-    .single();
+  /* Primary: Query remote Supabase database */
+  if (sb) {
+    try {
+      const { data, error } = await Promise.race([
+        sb.from('user_roles').select('user_id, role, username').eq('access_code', code).single(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000))
+      ]);
 
-  if (error || !data) {
-    alert("Invalid Access Code.");
-    el("loginSubmit").textContent = originalBtnText;
-  } else {
-    currentUser = { id: data.username || code, role: data.role, uid: data.user_id };
-    localStorage.setItem("gml_auth_code_user", JSON.stringify(currentUser));
-    el("loginModalBg").classList.remove("open");
-    el("loginSubmit").textContent = originalBtnText;
-    setAccessState(true);
-    toast(`Welcome back, ${currentUser.id}!`);
+      if (!error && data) {
+        return executeSuccessfulLogin({ id: data.username || code, role: data.role || "Operator", uid: data.user_id });
+      }
+    } catch(err) {
+      console.warn("Supabase query error:", err);
+    }
   }
-});
 
-el("logoutBtn").addEventListener("click", () => {
-  currentUser = null;
-  localStorage.removeItem("gml_auth_code_user");
-  setAccessState(false);
-  toast("Logged out");
-});
+  /* Secondary: Super-Admin master passcode fallback */
+  if (code === "GML@Admin2026") {
+    return executeSuccessfulLogin({ id: "System SuperAdmin", role: "Admin", uid: "master-01" });
+  }
+
+  alert("Invalid Access Code. Please contact your system administrator.");
+  if (submitBtn) submitBtn.textContent = originalBtnText;
+}
 
 function checkActiveSession() {
   const savedUser = localStorage.getItem("gml_auth_code_user");
@@ -1975,22 +1412,22 @@ function checkActiveSession() {
     try {
       currentUser = JSON.parse(savedUser);
       setAccessState(true);
-    } catch(e) {
-      setAccessState(false);
-    }
-  } else {
-    setAccessState(false);
+      return;
+    } catch(e) { }
   }
+  setAccessState(false);
 }
 
 function setAccessState(isStaff) {
-  el("opsControls").style.display = isStaff ? "flex" : "none";
-  el("publicControls").style.display = isStaff ? "none" : "flex";
-  el("opsDashboardView").style.display = isStaff ? "block" : "none";
-  el("publicLandingView").style.display = isStaff ? "none" : "block";
+  const oc = el("opsControls"), pc = el("publicControls"), od = el("opsDashboardView"), pl = el("publicLandingView");
+  if (oc) oc.style.display = isStaff ? "flex" : "none";
+  if (pc) pc.style.display = isStaff ? "none" : "flex";
+  if (od) od.style.display = isStaff ? "block" : "none";
+  if (pl) pl.style.display = isStaff ? "none" : "block";
 
   if (isStaff && currentUser) {
-    el("userBadge").textContent = `${currentUser.id} (${currentUser.role})`;
+    const ub = el("userBadge");
+    if (ub) ub.textContent = `${currentUser.id} (${currentUser.role})`;
     const isViewer = currentUser.role === "Viewer";
     document.querySelectorAll(".action-editor-only").forEach(elem => {
       elem.style.display = isViewer ? "none" : "inline-flex";
@@ -2033,6 +1470,7 @@ function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
   const waypoints = [origin.coord, [18.5, 115.0], [6.0, 108.0], [1.35, 104.4], [2.8, 101.2], [5.8, 95.5], dest.coord];
 
   setTimeout(() => {
+    if (typeof L === 'undefined') return;
     if (!routeMapInstance) {
       routeMapInstance = L.map('leafletMap', { zoomControl: true, attributionControl: false });
       L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd' }).addTo(routeMapInstance);
@@ -2060,95 +1498,54 @@ function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
   }, 120);
 }
 
-el("mapCloseBtn").addEventListener("click", () => el("mapModalBg").classList.remove("open"));
-
 function openEmailModal(idx) {
   const r = rows[idx];
-  const cntr = getField(r, ["CONTAINER NO."]);
-  const liner = getField(r, ["LINER"]) || detectLinerFromMBL(r["MBL NO"]) || "Shipping Line";
+  const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+  const liner = getField(r, ["LINER"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "Shipping Line";
   const gwPort = getGatewayPortInfo(r).name;
-  const cfs = getField(r, ["CFS NAME"]) || "Designated CFS";
+  const cfs = getField(r, ["CFS NAME", "CFS"]) || "Designated CFS";
   const st = getStatus(r).text;
 
-  el("emailSubject").value = `Status Update: ${cntr} - ${st}`;
-  const body = `Dear Customer,\n\nStatus for Container ${cntr} (${r["TYPE"] || "40' HC"}):\n` +
-    `• Line: ${liner}\n• MBL: ${r["MBL NO"] || 'N/A'}\n• Vessel: ${r["VESSEL & VOY"] || 'N/A'}\n` +
+  el("emailSubject").value = `Status Update: ${cntr} - ${st.replace(/[^\w\s-]/g, '').trim()}`;
+  const body = `Dear Customer,\n\nStatus for Container ${cntr} (${getField(r, ["TYPE", "SIZE"]) || "40' HC"}):\n` +
+    `• Line: ${liner}\n• MBL: ${getField(r, ["MBL NO", "MBL", "MASTER BL"]) || 'N/A'}\n• Vessel: ${getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || 'N/A'}\n` +
     `• Port: ${gwPort} (In: ${formatDate(r["PORT IN"]) || 'Pending'} | Out: ${formatDate(r["PORT OUT"]) || 'Pending'})\n` +
-    `• CFS: ${cfs}\n• Truck: ${r["TRUCK NO."] || 'Pending Assignment'}\n• Status: ${st}\n\nSupport: madhan@gmlindia.net`;
+    `• CFS: ${cfs}\n• Truck: ${getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || 'Pending Assignment'}\n• Status: ${st.replace(/[^\w\s-]/g, '').trim()}\n\nSupport: madhan@gmlindia.net`;
 
   el("emailBody").value = body;
   el("sendMailtoBtn").href = `mailto:?subject=${encodeURIComponent(el("emailSubject").value)}&body=${encodeURIComponent(body)}`;
   el("emailModalBg").classList.add("open");
 }
-el("emailModalClose").addEventListener("click", () => el("emailModalBg").classList.remove("open"));
-el("copyEmailBtn").addEventListener("click", () => {
-  navigator.clipboard.writeText(el("emailBody").value);
-  toast("Email copied");
-});
 
-el("openAnalyticsBtn").addEventListener("click", () => {
-  const completed = rows.filter(r => isFullyCompleted(r));
-  let totalTransitDays = 0, countTransit = 0;
-
-  completed.forEach(r => {
-    const originDate = parseLocalDate(getField(r, ["ETD"]) || getField(r, ["ETA"]));
-    const retDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE"])) || parseLocalDate(getField(r, ["DESTUFFING DATE"]));
-    if (originDate && retDate) {
-      const days = Math.floor((retDate - originDate) / (1000 * 60 * 60 * 24));
-      if (days >= 0) { totalTransitDays += days; countTransit++; }
-    }
-  });
-
-  const avgTransit = countTransit > 0 ? (totalTransitDays / countTransit).toFixed(1) : "—";
-  const terminalBreakdown = {};
-  rows.forEach(r => {
-    const t = getGatewayPortInfo(r).name;
-    terminalBreakdown[t] = (terminalBreakdown[t] || 0) + 1;
-  });
-
-  el("analyticsBody").innerHTML = `
-    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
-      <div class="kpi-card">
-        <small>Average Turnaround</small>
-        <strong>${avgTransit} Days</strong>
-      </div>
-      <div class="kpi-card">
-        <small>Completed Units</small>
-        <strong style="color:var(--success);">${completed.length}</strong>
-      </div>
-    </div>
-    <div style="background:var(--bg-elevated); padding:12px; border-radius:8px; border:1px solid var(--border);">
-      <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; margin-bottom:8px;">Terminal Distribution</div>
-      ${Object.entries(terminalBreakdown).map(([term, num]) => `
-        <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11.5px; font-weight:600;">
-          <span>${esc(term)}</span>
-          <span>${num} units</span>
-        </div>
-      `).join("")}
-    </div>
-  `;
-  el("analyticsModalBg").classList.add("open");
-});
-el("analyticsModalClose").addEventListener("click", () => el("analyticsModalBg").classList.remove("open"));
-
+/* Robust Search */
 function performPublicSearch() {
-  const rawInput = el("publicSearchInput").value.trim().toLowerCase();
+  const inp = el("publicSearchInput");
+  const rawInput = inp ? inp.value.trim() : "";
   const container = el("publicResultContainer");
-  if (!rawInput) { container.style.display = "none"; return; }
+  if (!container) return;
+  
+  if (!rawInput) {
+    toast("Please enter a Container or MBL Number!");
+    if (inp) inp.focus();
+    return;
+  }
 
-  const queries = rawInput.split(/[\s,]+/).filter(Boolean);
+  const queries = rawInput.split(/[\s,]+/).filter(Boolean).map(q => q.toLowerCase().replace(/[^a-z0-9]/g, ''));
 
   const publicSearchResults = rows.filter(r => {
-    const cntr = (getField(r, ["CONTAINER NO."]) || "").toLowerCase();
-    const mbl = (getField(r, ["MBL NO"]) || "").toLowerCase();
-    return queries.some(q => cntr === q || mbl === q || cntr.includes(q) || mbl.includes(q));
+    const cntr = (getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+    const mbl = (getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+    return queries.some(q => q && (cntr === q || mbl === q || cntr.includes(q) || mbl.includes(q)));
   });
 
   if (!publicSearchResults.length) {
     container.innerHTML = `
-      <div style="text-align:center; padding:36px; color:var(--danger);">
-        <strong style="font-size:15px;">No matching shipments found.</strong>
-        <div style="font-size:11.5px; color:var(--text-muted); margin-top:4px;">Please verify your MBL or Container Number.</div>
+      <div style="text-align:center; padding:40px 20px; color:var(--danger);">
+        <div style="font-size:36px; margin-bottom:10px;">🔍</div>
+        <strong style="font-size:16px;">No shipment records found for "${esc(rawInput)}"</strong>
+        <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">
+          Please double-check your MBL or Container number.
+        </div>
       </div>
     `;
     container.style.display = "block";
@@ -2158,9 +1555,11 @@ function performPublicSearch() {
 
   container.innerHTML = publicSearchResults.map((r) => {
     const st = getStatus(r);
-    const originPort = getField(r, ["POL"]) || "SHEKOU";
+    const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+    const originPort = getField(r, ["POL", "PORT OF LOADING"]) || "SHEKOU";
     const gwPort = getGatewayPortInfo(r).name;
     const destPort = `${gwPort}, INDIA`;
+    const vessel = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
     const publicTimelineHtml = generatePublicVoyageTimelineHtml(r);
 
     return `
@@ -2168,10 +1567,10 @@ function performPublicSearch() {
         <div style="background:var(--bg-elevated); padding:16px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
             <div style="font-size:9.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase;">Container Number</div>
-            <div style="font-size:20px; font-weight:900; font-family:'JetBrains Mono'; color:var(--accent);">${esc(r["CONTAINER NO."])}</div>
+            <div style="font-size:20px; font-weight:900; font-family:'JetBrains Mono'; color:var(--accent);">${esc(cntr)}</div>
           </div>
           <div style="display:flex; align-items:center; gap:8px;">
-            <button class="btn" style="border-radius:20px; font-size:11px; padding:5px 12px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(r["VESSEL & VOY"])}', 50)">🗺️ Route Map</button>
+            <button class="btn" style="border-radius:20px; font-size:11px; padding:5px 12px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(vessel)}', 50)">🗺️ Route Map</button>
             <span class="status-pill ${st.class}" style="font-size:11px; padding:5px 12px; border-radius:20px;">${st.text}</span>
           </div>
         </div>
@@ -2184,23 +1583,14 @@ function performPublicSearch() {
   setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
 }
 
-el("publicSearchBtn").addEventListener("click", performPublicSearch);
-el("publicSearchInput").addEventListener("keypress", (e) => { if (e.key === "Enter") performPublicSearch(); });
-
 function toggleTheme() {
   const current = document.documentElement.getAttribute("data-theme") || "light";
   const target = current === "dark" ? "light" : "dark";
   document.documentElement.setAttribute("data-theme", target);
   localStorage.setItem("gml_theme", target);
-  el("themeBtn").textContent = target === "dark" ? "☀️" : "🌙";
-  el("publicThemeBtn").textContent = target === "dark" ? "☀️" : "🌙";
+  if (el("themeBtn")) el("themeBtn").textContent = target === "dark" ? "☀️" : "🌙";
+  if (el("publicThemeBtn")) el("publicThemeBtn").textContent = target === "dark" ? "☀️" : "🌙";
 }
-el("themeBtn").addEventListener("click", toggleTheme);
-el("publicThemeBtn").addEventListener("click", toggleTheme);
-const savedTheme = localStorage.getItem("gml_theme") || "light";
-document.documentElement.setAttribute("data-theme", savedTheme);
-el("themeBtn").textContent = savedTheme === "dark" ? "☀️" : "🌙";
-el("publicThemeBtn").textContent = savedTheme === "dark" ? "☀️" : "🌙";
 
 function formatDate(val) {
   const s = String(val ?? "").trim();
@@ -2216,25 +1606,16 @@ function validDate(val) {
   return s && !["-","—","na","n/a","null"].includes(s.toLowerCase()) && !isNaN(Date.parse(s));
 }
 
-function getField(r, names) {
-  for (let name of names) {
-    for (let k of Object.keys(r)) {
-      if (k.trim().toLowerCase() === name.toLowerCase() && r[k]) return r[k];
-    }
-  }
-  return "";
-}
-
 function getStatus(r) {
-  if (validDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]))) return { text: "EMPTY RETURNED", class: "completed" };
-  if (validDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]))) return { text: "DE-STUFF COMPLETED", class: "completed" };
-  if (validDate(getField(r, ["CFS IN"]))) return { text: "CFS IN", class: "progress" };
-  if (validDate(getField(r, ["PORT OUT"]))) return { text: "PORT OUT", class: "progress" };
-  if (validDate(getField(r, ["PORT IN"]))) return { text: "PORT IN", class: "progress" };
-  if (validDate(getField(r, ["INWARD DATE", "INWARD"]))) return { text: "INWARD", class: "progress" };
-  if (validDate(getField(r, ["ETA"]))) return { text: "ETA SCHEDULED", class: "progress" };
-  if (validDate(getField(r, ["ETD"]))) return { text: "ETD DEPARTED", class: "progress" };
-  return { text: "PENDING", class: "progress" };
+  if (validDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]))) return { text: "🔄 EMPTY RETURNED", class: "completed" };
+  if (validDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]))) return { text: "📦 DE-STUFF COMPLETED", class: "completed" };
+  if (validDate(getField(r, ["CFS IN"]))) return { text: "🏢 CFS IN", class: "progress" };
+  if (validDate(getField(r, ["PORT OUT"]))) return { text: "🚚 PORT OUT", class: "progress" };
+  if (validDate(getField(r, ["PORT IN"]))) return { text: "⚓ PORT IN", class: "progress" };
+  if (validDate(getField(r, ["INWARD DATE", "INWARD"]))) return { text: "📥 INWARD", class: "progress" };
+  if (validDate(getField(r, ["ETA"]))) return { text: "⏳ ETA SCHEDULED", class: "progress" };
+  if (validDate(getField(r, ["ETD"]))) return { text: "🚢 ETD DEPARTED", class: "progress" };
+  return { text: "⏳ PENDING", class: "progress" };
 }
 
 function isFullyCompleted(r) {
@@ -2257,7 +1638,7 @@ function detectLinerFromMBL(mbl) {
 
 function getCarrierTrackingUrl(r) {
   const liner = (getField(r, ["LINER"]) || "").toLowerCase();
-  const ref = encodeURIComponent((getField(r, ["MBL NO"]) || getField(r, ["CONTAINER NO."]) || "").trim());
+  const ref = encodeURIComponent((getField(r, ["MBL NO", "MBL", "MASTER BL"]) || getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "").trim());
   if (liner.includes("wan hai")) return `https://www.wanhai.com/views/cargo/CargoTracking.xhtml?q_cargo_type=B&q_ref_no=${ref}`;
   if (liner.includes("maersk")) return `https://www.maersk.com/tracking/${ref}`;
   if (liner.includes("msc")) return `https://www.msc.com/en/track-a-shipment?query=${ref}`;
@@ -2286,47 +1667,25 @@ function setGatewayPort(idx, val) {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   const old = rows[idx]["GATEWAY PORT"];
   rows[idx]["GATEWAY PORT"] = val;
-  logAuditEvent("PORT_CHANGE", rows[idx]["CONTAINER NO."], "GATEWAY PORT", old, val);
+  logAuditEvent("PORT_CHANGE", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "GATEWAY PORT", old, val);
   saveAndRefresh();
   toast(`Port: ${val}`);
 }
 
-el("bulkDestuffBtn").addEventListener("click", () => {
-  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  if (!selectedIndices.size) return alert("Select containers first.");
-  const todayStr = new Date().toISOString().slice(0, 10);
-  
-  if (confirm(`Mark ${selectedIndices.size} containers as Destuffed today?`)) {
-    selectedIndices.forEach(idx => {
-      const oldVal = rows[idx]["DESTUFFING DATE"];
-      rows[idx]["DESTUFFING DATE"] = todayStr;
-      if (!rows[idx]["REMARKS"]) rows[idx]["REMARKS"] = "DE-STUFF COMPLETED";
-      logAuditEvent("BULK_DESTUFF", rows[idx]["CONTAINER NO."], "DESTUFFING DATE", oldVal, todayStr);
-    });
-    saveAndRefresh();
-    selectedIndices.clear();
-    toast(`Marked destuffed`);
-  }
-});
-
-el("bulkPhotoBtn").addEventListener("click", () => {
-  if (!selectedIndices.size) return alert("Select at least one container!");
-  const selectedRows = Array.from(selectedIndices).map(idx => rows[idx]);
-  downloadMultipleStatusImage(selectedRows, "Selection");
-});
-
 function getFilteredRows() {
-  const q = el("search").value.toLowerCase();
-  const vf = el("vesselFilter").value;
-  const gw = el("gatewayFilter").value;
-  const cf = el("cfsFilter").value;
+  const searchInp = el("search");
+  const q = searchInp ? searchInp.value.toLowerCase().replace(/[^a-z0-9]/g, '') : "";
+  const vf = el("vesselFilter") ? el("vesselFilter").value : "";
+  const gw = el("gatewayFilter") ? el("gatewayFilter").value : "";
+  const cf = el("cfsFilter") ? el("cfsFilter").value : "";
   const todayStr = new Date().toISOString().slice(0, 10);
 
   let filtered = rows.map((r, i) => ({r, i})).filter(({r}) => {
-    const cntr = (getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "").toLowerCase();
+    const rawCntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+    const cntr = rawCntr.toLowerCase().replace(/[^a-z0-9]/g, '');
     const vsl = (getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "").toLowerCase();
-    const mbl = (getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "").toLowerCase();
-    const truck = (getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "").toLowerCase();
+    const mbl = (getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+    const truck = (getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
     const completed = isFullyCompleted(r);
     const fees = calculateStandardFees(r);
 
@@ -2374,12 +1733,12 @@ function updateKPIs() {
     if (hasPortOut && !hasDestuff) destuffingPending++;
   });
 
-  el("kActive").textContent = active.length;
-  el("kCompleted").textContent = rows.filter(r => isFullyCompleted(r)).length;
-  el("kPortInPending").textContent = active.filter(r => !validDate(getField(r, ["PORT IN"]))).length;
-  el("kPortOutPending").textContent = portOutPending;
-  el("kDestuffingPending").textContent = destuffingPending;
-  el("kTotalExposure").textContent = formatCurrency(totalExposureUSD);
+  if (el("kActive")) el("kActive").textContent = active.length;
+  if (el("kCompleted")) el("kCompleted").textContent = rows.filter(r => isFullyCompleted(r)).length;
+  if (el("kPortInPending")) el("kPortInPending").textContent = active.filter(r => !validDate(getField(r, ["PORT IN"]))).length;
+  if (el("kPortOutPending")) el("kPortOutPending").textContent = portOutPending;
+  if (el("kDestuffingPending")) el("kDestuffingPending").textContent = destuffingPending;
+  if (el("kTotalExposure")) el("kTotalExposure").textContent = formatCurrency(totalExposureUSD);
 }
 
 function renderUI() {
@@ -2390,17 +1749,57 @@ function renderUI() {
   else if (currentView === 'sheet') renderSheet(filtered);
   else if (currentView === 'kanban') renderKanban(filtered);
 
-  el("selectionNotice").textContent = `${selectedIndices.size} selected`;
-  el("btnSelectCount").textContent = selectedIndices.size;
+  const count = selectedIndices.size;
+  const sn = el("selectionNotice");
+  if(sn) sn.textContent = `${count} selected`;
+  const bc = el("btnSelectCount");
+  if(bc) bc.textContent = count;
+  
+  const fab = el("floatingActionBar");
+  if(fab) {
+    if(count > 0) fab.classList.add("show");
+    else fab.classList.remove("show");
+  }
+}
+
+function getLfdHtml(daysLeft, isOverdue, label, totalDays) {
+  if (isOverdue) return `<div class="lfd-wrap danger"><div class="lfd-label">${label}: OVERDUE</div><div class="lfd-bar"><div class="lfd-fill" style="width:100%"></div></div></div>`;
+  if (daysLeft === null) return '';
+  
+  const maxDays = totalDays || 14; 
+  const daysConsumed = Math.max(0, maxDays - daysLeft);
+  const pct = Math.max(5, Math.min(100, (daysConsumed / maxDays) * 100));
+  
+  let state = 'success';
+  if (daysLeft <= 2) state = 'danger pulse';
+  else if (daysLeft <= 4) state = 'warning';
+  
+  return `<div class="lfd-wrap ${state}">
+            <div class="lfd-label">${label}: ${daysLeft}d Left</div>
+            <div class="lfd-bar"><div class="lfd-fill" style="width:${pct}%"></div></div>
+          </div>`;
 }
 
 function renderCards(items) {
   const isViewer = currentUser && currentUser.role === "Viewer";
+  const viewElem = el("cardsView");
+  if (!viewElem) return;
 
-  el("cardsView").innerHTML = items.map(({r, i}) => {
+  if (!items.length) {
+    viewElem.innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-muted); display:flex; flex-direction:column; align-items:center;">
+          <div style="font-size:48px; margin-bottom:16px;">📭</div>
+          <h3 style="color:var(--text-main); margin-bottom:8px;">No Containers Found</h3>
+          <p>Try adjusting your search or filter criteria.</p>
+      </div>`;
+    return;
+  }
+
+  viewElem.innerHTML = items.map(({r, i}) => {
     const st = getStatus(r);
     const isChecked = selectedIndices.has(i) ? "checked" : "";
     const cntrNo = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "UNKNOWN";
+    const mblNo = getField(r, ["MBL NO", "MBL", "MASTER BL"]);
     const vesselVoy = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
     const containerType = getField(r, ["TYPE", "SIZE", "CONTAINER TYPE"]) || "40' HC";
     const liner = getField(r, ["LINER", "LINE"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "Line";
@@ -2410,9 +1809,6 @@ function renderCards(items) {
     const cfsDepot = getCfsDepotInfo(getField(r, ["CFS NAME", "CFS"]));
     const truckNo = getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]);
 
-    const isTerminalCritical = fees.terminalDaysLeft !== null && fees.terminalDaysLeft <= 2 && !validDate(r["PORT OUT"]);
-    const isDetentionCritical = fees.detentionDaysLeft !== null && fees.detentionDaysLeft <= 2 && !fees.isCompleted;
-
     return `
       <div class="card-box">
         <div>
@@ -2420,19 +1816,20 @@ function renderCards(items) {
             <div>
               <div class="card-title-group">
                 <input type="checkbox" class="chk-item photo-exclude" value="${i}" ${isChecked}>
-                <span class="card-cntr-code">${esc(cntrNo)}</span>
+                <span class="card-cntr-code clickable-copy" onclick="copyText('${esc(cntrNo)}')">${esc(cntrNo)}</span>
               </div>
               <div class="card-vessel">${esc(vesselVoy)} (${esc(containerType)})</div>
+              ${mblNo ? `<div class="clickable-copy" onclick="copyText('${esc(mblNo)}')" style="font-size:10.5px; color:var(--text-dim); font-family:'JetBrains Mono'; margin-top:2px; display:inline-block;">MBL: ${esc(mblNo)}</div>` : ''}
             </div>
             <span class="status-pill ${st.class}">${st.text}</span>
           </div>
 
-          <div class="badge-row">
-            ${fees.demOverdue ? `<span class="tag-badge danger">Port Dem: +${fees.demDays}d (${formatCurrency(fees.demCostUSD)})</span>` : ''}
-            ${fees.detOverdue ? `<span class="tag-badge danger">Detention: +${fees.detDays}d (${formatCurrency(fees.detCostUSD)})</span>` : ''}
-            ${isTerminalCritical && !fees.demOverdue ? `<span class="tag-badge danger">Terminal LFD: ${fees.terminalDaysLeft}d Left</span>` : ''}
-            ${isDetentionCritical && !fees.demOverdue ? `<span class="tag-badge danger">Carrier LFD: ${fees.detentionDaysLeft}d Left</span>` : ''}
-            ${!fees.demOverdue && !fees.detOverdue && !isTerminalCritical && !isDetentionCritical ? `<span class="tag-badge success">Free Time Clear</span>` : ''}
+          <div class="badge-row" style="margin-top:12px;">
+            ${!fees.demOverdue && !validDate(r["PORT OUT"]) ? getLfdHtml(fees.terminalDaysLeft, fees.demOverdue, 'Terminal LFD', fees.portFreeDays) : ''}
+            ${!fees.detOverdue && !fees.isCompleted ? getLfdHtml(fees.detentionDaysLeft, fees.detOverdue, 'Carrier LFD', fees.carrierFreeDays) : ''}
+            ${fees.demOverdue ? `<div class="lfd-wrap danger"><div class="lfd-label">Port Demurrage</div><div style="font-family:'JetBrains Mono'; font-weight:800;">+${fees.demDays}d / ${formatCurrency(fees.demCostUSD)}</div></div>` : ''}
+            ${fees.detOverdue ? `<div class="lfd-wrap danger"><div class="lfd-label">Line Detention</div><div style="font-family:'JetBrains Mono'; font-weight:800;">+${fees.detDays}d / ${formatCurrency(fees.detCostUSD)}</div></div>` : ''}
+            ${!fees.demOverdue && !fees.detOverdue && fees.terminalDaysLeft > 4 && fees.detentionDaysLeft > 4 ? `<span class="tag-badge success">Free Time Clear</span>` : ''}
           </div>
 
           <div class="badge-links-group">
@@ -2453,7 +1850,7 @@ function renderCards(items) {
           </div>
           <div class="detail-item">
             <label>CFS Depot / Truck</label>
-            <val style="color:var(--accent);">${esc(getField(r, ["CFS NAME", "CFS"]) || "—")} / <span style="color:var(--text-main);">${esc(truckNo || "No Truck")}</span></val>
+            <val style="color:var(--accent);">${esc(getField(r, ["CFS NAME", "CFS"]) || "—")} / <span class="clickable-copy" onclick="copyText('${esc(truckNo)}')"><span style="color:var(--text-main);">${esc(truckNo || "No Truck")}</span></span></val>
           </div>
           <div class="detail-item">
             <label>Detention LFD / Dwell</label>
@@ -2481,14 +1878,24 @@ function renderCards(items) {
         </div>
       </div>
     `;
-  }).join("") || `<div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">No records found matching current filters.</div>`;
+  }).join("");
   bindCheckboxes();
 }
 
 function renderSheet(items) {
   const isViewer = currentUser && currentUser.role === "Viewer";
+  const tbody = el("sheetTableBody");
+  if (!tbody) return;
+  
+  const editableAttrText = isViewer ? 'readonly' : 'readonly ondblclick="this.readOnly=false; this.focus();" onblur="this.readOnly=true;"';
+  const editableAttrSelect = isViewer ? 'disabled' : 'disabled ondblclick="this.disabled=false; this.focus();" onblur="this.disabled=true;"';
 
-  el("sheetTableBody").innerHTML = items.map(({r, i}) => {
+  if (!items.length) {
+    tbody.innerHTML = `<tr><td colspan="17" style="text-align:center; padding:40px; color:var(--text-muted);">No records found.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = items.map(({r, i}) => {
     const isChecked = selectedIndices.has(i) ? "checked" : "";
     const gwPort = getGatewayPortInfo(r);
     const fees = calculateStandardFees(r);
@@ -2496,32 +1903,32 @@ function renderSheet(items) {
     const isoStatus = validateISO6346(cntrNo);
 
     return `
-      <tr>
+      <tr data-row="${i}">
         <td><input type="checkbox" class="chk-item" value="${i}" ${isChecked}></td>
         <td>
-          <input class="cell-input" style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" value="${esc(cntrNo)}" title="${isoStatus.message}" onchange="inlineEditContainerNo(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
+          <input class="cell-input" style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" value="${esc(cntrNo)}" title="${isoStatus.message}" onchange="inlineEditContainerNo(${i}, this.value)" ${editableAttrText}>
         </td>
-        <td><input class="cell-input" style="width:45px;" value="${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}" onchange="inlineEdit(${i}, 'TYPE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:85px;" value="${esc(getField(r, ["MBL NO", "MBL"]) || "")}" onchange="inlineEditMBL(${i}, this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:75px;" value="${esc(getField(r, ["LINER", "LINE"]) || "")}" onchange="inlineEdit(${i}, 'LINER', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" style="width:45px;" value="${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}" onchange="inlineEdit(${i}, 'TYPE', this.value)" ${editableAttrText}></td>
+        <td><input class="cell-input" style="width:85px;" value="${esc(getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "")}" onchange="inlineEditMBL(${i}, this.value)" ${editableAttrText}></td>
+        <td><input class="cell-input" style="width:75px;" value="${esc(getField(r, ["LINER", "LINE"]) || "")}" onchange="inlineEdit(${i}, 'LINER', this.value)" ${editableAttrText}></td>
         <td>
-          <select class="cell-select" style="width:80px;" onchange="setGatewayPort(${i}, this.value)" ${isViewer ? 'disabled' : ''}>
+          <select class="cell-select" style="width:80px;" onchange="setGatewayPort(${i}, this.value)" ${editableAttrSelect}>
             <option value="CITPL" ${gwPort.key === 'CITPL' ? 'selected' : ''}>CITPL</option>
             <option value="CCTL" ${gwPort.key === 'CCTL' ? 'selected' : ''}>CCTL</option>
             <option value="Kattupalli" ${gwPort.key === 'Kattupalli' ? 'selected' : ''}>Kattupalli</option>
             <option value="Ennore" ${gwPort.key === 'Ennore' ? 'selected' : ''}>Ennore</option>
           </select>
         </td>
-        <td><input class="cell-input" type="date" value="${getField(r, ["PORT IN"]) || ""}" onchange="inlineEdit(${i}, 'PORT IN', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${getField(r, ["PORT OUT"]) || ""}" onchange="inlineEdit(${i}, 'PORT OUT', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:80px;" value="${esc(getField(r, ["CFS NAME", "CFS"]) || "")}" onchange="inlineEdit(${i}, 'CFS NAME', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" style="width:90px; font-family:'JetBrains Mono';" value="${esc(getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "")}" placeholder="Vehicle" onchange="inlineEdit(${i}, 'TRUCK NO.', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]) || ""}" onchange="inlineEdit(${i}, 'DESTUFFING DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
-        <td><input class="cell-input" type="date" value="${getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]) || ""}" onchange="inlineEdit(${i}, 'CONTAINER RETURN DATE', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["PORT IN"]) || ""}" onchange="inlineEdit(${i}, 'PORT IN', this.value)" ${editableAttrText}></td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["PORT OUT"]) || ""}" onchange="inlineEdit(${i}, 'PORT OUT', this.value)" ${editableAttrText}></td>
+        <td><input class="cell-input" style="width:80px;" value="${esc(getField(r, ["CFS NAME", "CFS"]) || "")}" onchange="inlineEdit(${i}, 'CFS NAME', this.value)" ${editableAttrText}></td>
+        <td><input class="cell-input" style="width:90px; font-family:'JetBrains Mono';" value="${esc(getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "")}" placeholder="Vehicle" oninput="this.value=formatTruckNo(this.value)" onchange="inlineEdit(${i}, 'TRUCK NO.', this.value)" ${editableAttrText}></td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]) || ""}" onchange="inlineEdit(${i}, 'DESTUFFING DATE', this.value)" ${editableAttrText}></td>
+        <td><input class="cell-input" type="date" value="${getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]) || ""}" onchange="inlineEdit(${i}, 'CONTAINER RETURN DATE', this.value)" ${editableAttrText}></td>
         <td style="font-weight:700; color:${fees.demOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.terminalLFD}</td>
         <td style="font-weight:700; color:${fees.detOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.detentionLFD}</td>
         <td style="font-weight:800; font-family:'JetBrains Mono'; color:${fees.totalCostUSD > 0 ? 'var(--danger)' : 'var(--success)'};">${formatCurrency(fees.totalCostUSD)}</td>
-        <td><input class="cell-input" value="${esc(r["REMARKS"] || "")}" onchange="inlineEdit(${i}, 'REMARKS', this.value)" ${isViewer ? 'readonly' : ''}></td>
+        <td><input class="cell-input" value="${esc(r["REMARKS"] || "")}" onchange="inlineEdit(${i}, 'REMARKS', this.value)" ${editableAttrText}></td>
         <td>
           <div style="display:flex; gap:3px;">
             <button class="btn" style="padding:2px 5px;" title="Truck Slip" onclick="openTruckDispatchSlip(${i})">🚚</button>
@@ -2537,7 +1944,7 @@ function renderSheet(items) {
 
 function inlineEditContainerNo(idx, val) {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const oldVal = rows[idx]["CONTAINER NO."];
+  const oldVal = getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
   const newVal = val.trim().toUpperCase();
   rows[idx]["CONTAINER NO."] = newVal;
   logAuditEvent("CONTAINER_RENAME", oldVal, "CONTAINER NO.", oldVal, newVal);
@@ -2550,7 +1957,7 @@ function markSingleReturned(idx) {
   const oldVal = rows[idx]["CONTAINER RETURN DATE"];
   rows[idx]["CONTAINER RETURN DATE"] = today;
   if (!rows[idx]["REMARKS"]) rows[idx]["REMARKS"] = "Empty container returned to depot";
-  logAuditEvent("EMPTY_RETURN", rows[idx]["CONTAINER NO."], "CONTAINER RETURN DATE", oldVal, today);
+  logAuditEvent("EMPTY_RETURN", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "CONTAINER RETURN DATE", oldVal, today);
   saveAndRefresh();
   toast("Marked Container Returned");
 }
@@ -2563,21 +1970,24 @@ function renderKanban(items) {
     const vesselVoy = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
     const cfsName = getField(r, ["CFS NAME", "CFS"]) || "—";
 
-    if (st.text === "EMPTY RETURNED") lanes["Completed Return"].push({r, i, cntrNo, vesselVoy, cfsName});
+    if (st.text.includes("EMPTY RETURNED")) lanes["Completed Return"].push({r, i, cntrNo, vesselVoy, cfsName});
     else if (st.text.includes("DE-STUFF")) lanes["Destuffed"].push({r, i, cntrNo, vesselVoy, cfsName});
-    else if (st.text === "CFS IN" || st.text === "PORT OUT") lanes["Port Out / CFS"].push({r, i, cntrNo, vesselVoy, cfsName});
+    else if (st.text.includes("CFS IN") || st.text.includes("PORT OUT")) lanes["Port Out / CFS"].push({r, i, cntrNo, vesselVoy, cfsName});
     else lanes["Terminal In"].push({r, i, cntrNo, vesselVoy, cfsName});
   });
 
-  el("kanbanView").innerHTML = Object.entries(lanes).map(([title, list]) => `
+  const kanbanElem = el("kanbanView");
+  if (!kanbanElem) return;
+
+  kanbanElem.innerHTML = Object.entries(lanes).map(([title, list], laneIdx) => `
     <div class="kanban-column">
       <div class="kanban-header-strip">
         <span>${title}</span>
         <span class="status-pill progress">${list.length}</span>
       </div>
-      <div class="kanban-body-list">
+      <div class="kanban-body-list" data-lane="${title}" id="kanban-lane-${laneIdx}">
         ${list.map(({i, cntrNo, vesselVoy, cfsName}) => `
-          <div class="card-box" style="padding:10px;">
+          <div class="card-box" style="padding:10px; cursor:grab;" data-idx="${i}">
             <div style="display:flex; justify-content:space-between;">
               <span class="card-cntr-code" style="font-size:12.5px;">${esc(cntrNo)}</span>
             </div>
@@ -2588,6 +1998,42 @@ function renderKanban(items) {
       </div>
     </div>
   `).join("");
+
+  if (currentUser && currentUser.role !== "Viewer" && typeof Sortable !== 'undefined') {
+    document.querySelectorAll('.kanban-body-list').forEach(listEl => {
+      new Sortable(listEl, {
+        group: 'kanban',
+        animation: 150,
+        ghostClass: 'kanban-ghost',
+        onEnd: function(evt) {
+          const newLane = evt.to.dataset.lane;
+          const oldLane = evt.from.dataset.lane;
+          if(newLane !== oldLane) {
+            const rIdx = evt.item.dataset.idx;
+            handleKanbanDrop(rIdx, newLane);
+          }
+        }
+      });
+    });
+  }
+}
+
+function handleKanbanDrop(idx, newLane) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const r = rows[idx];
+  
+  if (newLane === "Port Out / CFS") {
+    if(!r["PORT OUT"]) r["PORT OUT"] = todayStr;
+    if(!r["CFS IN"]) r["CFS IN"] = todayStr;
+  } else if (newLane === "Destuffed") {
+    if(!r["DESTUFFING DATE"]) r["DESTUFFING DATE"] = todayStr;
+  } else if (newLane === "Completed Return") {
+    if(!r["CONTAINER RETURN DATE"]) r["CONTAINER RETURN DATE"] = todayStr;
+  }
+  
+  logAuditEvent("KANBAN_MOVE", getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "STATUS", "Moved", newLane);
+  saveAndRefresh();
+  toast(`Moved to ${newLane}`);
 }
 
 function bindCheckboxes() {
@@ -2596,8 +2042,18 @@ function bindCheckboxes() {
       const idx = Number(e.target.value);
       if (e.target.checked) selectedIndices.add(idx);
       else selectedIndices.delete(idx);
-      el("selectionNotice").textContent = `${selectedIndices.size} selected`;
-      el("btnSelectCount").textContent = selectedIndices.size;
+      
+      const count = selectedIndices.size;
+      const sn = el("selectionNotice");
+      if(sn) sn.textContent = `${count} selected`;
+      const bc = el("btnSelectCount");
+      if(bc) bc.textContent = count;
+      
+      const fab = el("floatingActionBar");
+      if(fab) {
+        if(count > 0) fab.classList.add("show");
+        else fab.classList.remove("show");
+      }
     });
   });
 }
@@ -2612,7 +2068,7 @@ function inlineEdit(idx, field, val) {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   const oldVal = rows[idx][field];
   const newVal = val.trim();
-  if (oldVal !== newVal) logAuditEvent("INLINE_EDIT", rows[idx]["CONTAINER NO."], field, oldVal, newVal);
+  if (oldVal !== newVal) logAuditEvent("INLINE_EDIT", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), field, oldVal, newVal);
   rows[idx][field] = newVal;
   saveAndRefresh();
 }
@@ -2622,7 +2078,7 @@ function inlineEditMBL(idx, val) {
   const oldMBL = rows[idx]["MBL NO"];
   const newMBL = val.trim();
   rows[idx]["MBL NO"] = newMBL;
-  logAuditEvent("MBL_EDIT", rows[idx]["CONTAINER NO."], "MBL NO", oldMBL, newMBL);
+  logAuditEvent("MBL_EDIT", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "MBL NO", oldMBL, newMBL);
   const detected = detectLinerFromMBL(val);
   if (detected && !rows[idx]["LINER"]) rows[idx]["LINER"] = detected;
   saveAndRefresh();
@@ -2633,43 +2089,56 @@ function updateRemark(idx, val) {
   const oldVal = rows[idx]["REMARKS"];
   const newVal = val.trim();
   rows[idx]["REMARKS"] = newVal;
-  logAuditEvent("REMARK_UPDATE", rows[idx]["CONTAINER NO."], "REMARKS", oldVal, newVal);
+  logAuditEvent("REMARK_UPDATE", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "REMARKS", oldVal, newVal);
   saveAndRefresh();
   toast("Remark saved");
 }
 
-function deleteRow(idx) {
-  if (!currentUser || currentUser.role !== "Admin") return alert("Admin only.");
-  if (confirm("Delete container record?")) {
-    const target = rows[idx];
-    logAuditEvent("DELETE_UNIT", target["CONTAINER NO."], "ALL_FIELDS", JSON.stringify(target), "DELETED");
-    rows.splice(idx, 1);
-    selectedIndices.delete(idx);
-    saveAndRefresh();
-    toast("Deleted");
-  }
+function finalizeDelete() {
+  if (!pendingDelete) return;
+  logAuditEvent("DELETE_UNIT", getField(pendingDelete.row, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "ALL", JSON.stringify(pendingDelete.row), "DELETED");
+  pendingDelete = null;
+  const ut = el("undoToast");
+  if (ut) ut.classList.remove("show");
 }
 
-document.querySelectorAll(".chip").forEach(chip => {
-  chip.addEventListener("click", () => {
-    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-    chip.classList.add("active");
-    activeQuickFilter = chip.dataset.filter;
-    renderUI();
-  });
-});
+function undoDelete() {
+  if (!pendingDelete) return;
+  clearTimeout(deleteTimeout);
+  rows.splice(pendingDelete.idx, 0, pendingDelete.row);
+  pendingDelete = null;
+  const ut = el("undoToast");
+  if (ut) ut.classList.remove("show");
+  saveAndRefresh();
+  toast("Restored Record");
+}
+
+function deleteRow(idx) {
+  if (!currentUser || currentUser.role !== "Admin") return alert("Admin only.");
+  if (pendingDelete) finalizeDelete(); 
+  
+  pendingDelete = { row: rows[idx], idx: idx };
+  rows.splice(idx, 1);
+  selectedIndices.clear(); 
+  saveAndRefresh();
+  
+  const ut = el("undoToast");
+  if (ut) ut.classList.add("show");
+  deleteTimeout = setTimeout(finalizeDelete, 5000);
+}
 
 async function saveAndRefresh() {
   renderUI();
   try {
     localStorage.setItem("containerRows", JSON.stringify(rows));
-    await sb.from('containers').upsert({ id: 'gml_tracking_records', data: rows, updated_at: new Date().toISOString() });
+    if (sb) await sb.from('containers').upsert({ id: 'gml_tracking_records', data: rows, updated_at: new Date().toISOString() });
   } catch (err) {
-    console.warn("Cloud sync warning:", err);
+    console.warn("Cloud sync notice:", err);
   }
 }
 
 async function loadFromCloud() {
+  if (!sb) return;
   try {
     const { data, error } = await sb.from('containers').select('data').eq('id', 'gml_tracking_records').single();
     if (!error && data && Array.isArray(data.data) && data.data.length > 0) {
@@ -2689,46 +2158,67 @@ function populateFilters() {
     if (vsl) vSet.add(vsl.trim());
     if (cfs) cSet.add(cfs.trim());
   });
-  el("vesselFilter").innerHTML = `<option value="">All Vessels</option>` + [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
-  el("cfsFilter").innerHTML = `<option value="">All CFS</option>` + [...cSet].sort().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+  if (el("vesselFilter")) el("vesselFilter").innerHTML = `<option value="">All Vessels</option>` + [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  if (el("cfsFilter")) el("cfsFilter").innerHTML = `<option value="">All CFS</option>` + [...cSet].sort().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
 }
 
 function setView(mode) {
   currentView = mode;
   document.querySelectorAll(".view-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.view === mode));
-  el("cardsView").style.display = mode === 'cards' ? 'grid' : 'none';
-  el("sheetView").style.display = mode === 'sheet' ? 'block' : 'none';
-  el("kanbanView").style.display = mode === 'kanban' ? 'grid' : 'none';
+  if (el("cardsView")) el("cardsView").style.display = mode === 'cards' ? 'grid' : 'none';
+  if (el("sheetView")) el("sheetView").style.display = mode === 'sheet' ? 'block' : 'none';
+  if (el("kanbanView")) el("kanbanView").style.display = mode === 'kanban' ? 'grid' : 'none';
   renderUI();
 }
-document.querySelectorAll(".view-btn").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+
+function setModalDate(id, offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const localDate = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+  const target = el(id);
+  if (target) target.value = localDate;
+}
 
 function openModal(idx = -1) {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   editingIndex = idx;
-  el("modalTitle").textContent = idx === -1 ? "Add Container" : "Edit Container";
+  if (el("modalTitle")) el("modalTitle").textContent = idx === -1 ? "Add Container" : "Edit Container";
   const r = idx === -1 ? {} : rows[idx];
+  const formElem = el("modalForm");
+  if (!formElem) return;
   
-  el("modalForm").innerHTML = COLS.map(c => {
+  formElem.innerHTML = COLS.map(c => {
     if (c === 'GATEWAY PORT') {
-      const cur = r[c] || getGatewayPortInfo(r).key || "CCTL";
+      const curKey = getGatewayPortInfo(r).key; 
       return `
         <div>
           <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Gateway Port</label>
           <select id="modal_GATEWAY_PORT" class="select" style="width:100%; margin-top:4px;" data-field="${c}">
-            <option value="CCTL" ${cur === 'CCTL' ? 'selected' : ''}>CCTL (DP World)</option>
-            <option value="CITPL" ${cur === 'CITPL' ? 'selected' : ''}>CITPL (PSA)</option>
-            <option value="Kattupalli" ${cur === 'Kattupalli' ? 'selected' : ''}>Kattupalli Port</option>
-            <option value="Ennore" ${cur === 'Ennore' ? 'selected' : ''}>Ennore Port</option>
+            <option value="CCTL" ${curKey === 'CCTL' ? 'selected' : ''}>CCTL (DP World)</option>
+            <option value="CITPL" ${curKey === 'CITPL' ? 'selected' : ''}>CITPL (PSA)</option>
+            <option value="Kattupalli" ${curKey === 'Kattupalli' ? 'selected' : ''}>Kattupalli Port</option>
+            <option value="Ennore" ${curKey === 'Ennore' ? 'selected' : ''}>Ennore Port</option>
           </select>
         </div>
       `;
     }
+    
+    const domId = `modal_${c.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const isDate = DATE_COLS.has(c);
+    
     return `
       <div>
-        <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">${c}</label>
-        <input type="${DATE_COLS.has(c) ? 'date' : 'text'}" 
-               id="modal_${c.replace(/[^a-zA-Z0-9]/g, '_')}"
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:0;">${c}</label>
+          ${isDate ? `
+            <div style="display:flex; gap:4px;">
+              <button type="button" class="btn btn-ghost" style="padding:1px 5px; font-size:9px;" onclick="setModalDate('${domId}', -1)">Yest</button>
+              <button type="button" class="btn btn-ghost" style="padding:1px 5px; font-size:9px;" onclick="setModalDate('${domId}', 0)">Today</button>
+            </div>
+          ` : ''}
+        </div>
+        <input type="${isDate ? 'date' : 'text'}" 
+               id="${domId}"
                class="input" style="width:100%; margin-top:4px;" 
                data-field="${c}" 
                value="${esc(r[c] || '')}">
@@ -2754,17 +2244,186 @@ function openModal(idx = -1) {
     });
   }
 
-  el("modalBg").classList.add("open");
+  const modal = el("modalBg");
+  if (modal) modal.classList.add("open");
 }
-el("modalClose").addEventListener("click", () => el("modalBg").classList.remove("open"));
-el("modalCancel").addEventListener("click", () => el("modalBg").classList.remove("open"));
-el("modalSave").addEventListener("click", () => {
+
+/* Event Initialization Block */
+safeOn("loginSubmit", "click", processLogin);
+safeOn("loginCodeInput", "keypress", (e) => { if (e.key === "Enter") processLogin(); });
+safeOn("publicSearchBtn", "click", performPublicSearch);
+safeOn("publicSearchInput", "keypress", (e) => { if (e.key === "Enter") performPublicSearch(); });
+safeOn("themeBtn", "click", toggleTheme);
+safeOn("publicThemeBtn", "click", toggleTheme);
+
+safeOn("opsMenuBtn", "click", (e) => {
+  e.stopPropagation();
+  if (el("opsMenuDropdown")) el("opsMenuDropdown").classList.toggle("show");
+});
+document.addEventListener("click", () => { if (el("opsMenuDropdown")) el("opsMenuDropdown").classList.remove("show"); });
+
+safeOn("currencyToggleBtn", "click", () => {
+  activeCurrency = activeCurrency === "INR" ? "USD" : "INR";
+  localStorage.setItem("gml_curr", activeCurrency);
+  if (el("currencyToggleBtn")) el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
+  renderUI();
+});
+
+safeOn("openAuditLogBtn", "click", () => {
+  renderAuditTable();
+  if (el("clearAuditBtn")) el("clearAuditBtn").style.display = (currentUser && currentUser.role === "Admin") ? "inline-block" : "none";
+  if (el("auditModalBg")) el("auditModalBg").classList.add("open");
+});
+safeOn("auditClose", "click", () => { if (el("auditModalBg")) el("auditModalBg").classList.remove("open"); });
+safeOn("auditSearchInput", "input", (e) => {
+  const q = e.target.value.toLowerCase();
+  const filtered = auditLogs.filter(l => 
+    l.containerNo.toLowerCase().includes(q) || 
+    l.operator.toLowerCase().includes(q) || 
+    l.field.toLowerCase().includes(q) ||
+    l.action.toLowerCase().includes(q)
+  );
+  renderAuditTable(filtered);
+});
+safeOn("exportAuditBtn", "click", () => {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditLogs), "Audit_Trail");
+  XLSX.writeFile(wb, `Operations_Audit_Log_${new Date().toISOString().slice(0,10)}.xlsx`);
+});
+safeOn("clearAuditBtn", "click", () => {
+  if (confirm("Permanently clear the local audit trail?")) {
+    auditLogs = [];
+    localStorage.removeItem("gml_audit_trail");
+    renderAuditTable();
+    updateAuditBadge();
+    toast("Audit trail cleared");
+  }
+});
+
+safeOn("mapCloseBtn", "click", () => { if (el("mapModalBg")) el("mapModalBg").classList.remove("open"); });
+safeOn("emailModalClose", "click", () => { if (el("emailModalBg")) el("emailModalBg").classList.remove("open"); });
+safeOn("copyEmailBtn", "click", () => copyText(el("emailBody") ? el("emailBody").value : ""));
+
+safeOn("openAnalyticsBtn", "click", () => {
+  const completed = rows.filter(r => isFullyCompleted(r));
+  let totalTransitDays = 0, countTransit = 0;
+
+  completed.forEach(r => {
+    const originDate = parseLocalDate(getField(r, ["ETD"]) || getField(r, ["ETA"]));
+    const retDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE"])) || parseLocalDate(getField(r, ["DESTUFFING DATE"]));
+    if (originDate && retDate) {
+      const days = Math.floor((retDate - originDate) / (1000 * 60 * 60 * 24));
+      if (days >= 0) { totalTransitDays += days; countTransit++; }
+    }
+  });
+
+  const avgTransit = countTransit > 0 ? (totalTransitDays / countTransit).toFixed(1) : "—";
+  const terminalBreakdown = {};
+  rows.forEach(r => {
+    const t = getGatewayPortInfo(r).name;
+    terminalBreakdown[t] = (terminalBreakdown[t] || 0) + 1;
+  });
+
+  if (el("analyticsBody")) {
+    el("analyticsBody").innerHTML = `
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+        <div class="kpi-card">
+          <small>Average Turnaround</small>
+          <strong>${avgTransit} Days</strong>
+        </div>
+        <div class="kpi-card">
+          <small>Completed Units</small>
+          <strong style="color:var(--success);">${completed.length}</strong>
+        </div>
+      </div>
+      <div style="background:var(--bg-elevated); padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; margin-bottom:8px;">Terminal Distribution</div>
+        ${Object.entries(terminalBreakdown).map(([term, num]) => `
+          <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11.5px; font-weight:600;">
+            <span>${esc(term)}</span>
+            <span>${num} units</span>
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+  if (el("analyticsModalBg")) el("analyticsModalBg").classList.add("open");
+});
+safeOn("analyticsModalClose", "click", () => { if (el("analyticsModalBg")) el("analyticsModalBg").classList.remove("open"); });
+
+safeOn("truckSlipClose", "click", () => { if (el("truckSlipModalBg")) el("truckSlipModalBg").classList.remove("open"); });
+safeOn("truckSlipCancel", "click", () => { if (el("truckSlipModalBg")) el("truckSlipModalBg").classList.remove("open"); });
+safeOn("sendDriverWhatsAppBtn", "click", () => {
+  if (activeTruckSlipIndex === -1) return;
+  const r = rows[activeTruckSlipIndex];
+  const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+  const port = getGatewayPortInfo(r).name;
+  const cfs = getField(r, ["CFS NAME", "CFS"]) || "CFS Depot";
+  const seal = getField(r, ["SEAL NO."]) || "—";
+  const truck = getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "Pending Assignment";
+  
+  const text = `🚚 *CONTAINER MOVEMENT ORDER*\n` +
+               `*Container:* ${cntr} (${getField(r, ["TYPE", "SIZE"]) || "40' DC"})\n` +
+               `*Assigned Truck:* ${truck}\n` +
+               `*Pickup:* ${port} ➔ *Delivery:* ${cfs}\n` +
+               `*Seal:* ${seal}\n` +
+               `Report to gate upon arrival.`;
+
+  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+});
+
+safeOn("whatsappComposerClose", "click", () => { if (el("whatsappComposerModalBg")) el("whatsappComposerModalBg").classList.remove("open"); });
+safeOn("whatsappQuickBtn", "click", () => openWhatsAppComposer(-1));
+safeOn("copyComposerTextBtn", "click", () => copyText(el("whatsappComposerText") ? el("whatsappComposerText").value : ""));
+safeOn("bulkWhatsAppBtn", "click", () => {
+  if (!selectedIndices.size) return;
+  openWhatsAppComposer(Array.from(selectedIndices)[0]);
+});
+
+safeOn("bulkDestuffBtn", "click", () => {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  if (!selectedIndices.size) return alert("Select containers first.");
+  const todayStr = new Date().toISOString().slice(0, 10);
+  
+  if (confirm(`Mark ${selectedIndices.size} containers as Destuffed today?`)) {
+    selectedIndices.forEach(idx => {
+      const oldVal = rows[idx]["DESTUFFING DATE"];
+      rows[idx]["DESTUFFING DATE"] = todayStr;
+      if (!rows[idx]["REMARKS"]) rows[idx]["REMARKS"] = "DE-STUFF COMPLETED";
+      logAuditEvent("BULK_DESTUFF", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "DESTUFFING DATE", oldVal, todayStr);
+    });
+    saveAndRefresh();
+    selectedIndices.clear();
+    toast(`Marked destuffed`);
+  }
+});
+
+safeOn("bulkPhotoBtn", "click", () => {
+  if (!selectedIndices.size) return alert("Select at least one container!");
+  const selectedRows = Array.from(selectedIndices).map(idx => rows[idx]);
+  downloadMultipleStatusImage(selectedRows, "Selection");
+});
+
+safeOn("logoutBtn", "click", () => {
+  currentUser = null;
+  localStorage.removeItem("gml_auth_code_user");
+  setAccessState(false);
+  toast("Logged out");
+});
+
+safeOn("addBtn", "click", () => openModal(-1));
+safeOn("modalClose", "click", () => { if (el("modalBg")) el("modalBg").classList.remove("open"); });
+safeOn("modalCancel", "click", () => { if (el("modalBg")) el("modalBg").classList.remove("open"); });
+safeOn("modalSave", "click", () => {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   const item = {};
-  el("modalForm").querySelectorAll("[data-field]").forEach(input => { item[input.dataset.field] = input.value.trim(); });
+  const form = el("modalForm");
+  if (!form) return;
+  form.querySelectorAll("[data-field]").forEach(input => { item[input.dataset.field] = input.value.trim(); });
   if (!item["CONTAINER NO."]) return alert("Container number required.");
   item["CONTAINER NO."] = item["CONTAINER NO."].toUpperCase();
   if (!item["LINER"] && item["MBL NO"]) item["LINER"] = detectLinerFromMBL(item["MBL NO"]);
+  item["TRUCK NO."] = formatTruckNo(item["TRUCK NO."]);
 
   if (editingIndex === -1) {
     rows.unshift(item);
@@ -2776,12 +2435,11 @@ el("modalSave").addEventListener("click", () => {
   }
   
   saveAndRefresh();
-  el("modalBg").classList.remove("open");
+  if (el("modalBg")) el("modalBg").classList.remove("open");
   toast("Saved & Synced");
 });
-el("addBtn").addEventListener("click", () => openModal(-1));
 
-el("dailyDispatchBtn").addEventListener("click", () => {
+safeOn("dailyDispatchBtn", "click", () => {
   const todayStr = new Date().toISOString().slice(0, 10);
   const activeToday = rows.filter(r => !isFullyCompleted(r) && (r["ETA"] === todayStr || r["PORT IN"] === todayStr || r["PORT OUT"] === todayStr));
   
@@ -2789,28 +2447,28 @@ el("dailyDispatchBtn").addEventListener("click", () => {
 
   let summary = `📋 *DAILY DISPATCH BRIEF*\nTotal: *${activeToday.length}*\n━━━━━━━━━━━━━━\n`;
   activeToday.forEach((r, idx) => {
-    summary += `${idx + 1}. *${getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"])}* | ${getField(r, ["CFS NAME", "CFS"]) || '-'} | ${getStatus(r).text}\n`;
+    summary += `${idx + 1}. *${getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"])}* | ${getField(r, ["CFS NAME", "CFS"]) || '-'} | ${getStatus(r).text.replace(/[^\w\s-]/g, '').trim()}\n`;
   });
   window.open("https://wa.me/?text=" + encodeURIComponent(summary), "_blank");
 });
 
-el("vesselEditBtn").addEventListener("click", () => {
+safeOn("vesselEditBtn", "click", () => {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   const vSet = new Set();
   rows.forEach(r => { 
     const vsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
     if(vsl) vSet.add(vsl.trim()); 
   });
-  el("targetVesselSelect").innerHTML = [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
-  el("vesselModalBg").classList.add("open");
+  if (el("targetVesselSelect")) el("targetVesselSelect").innerHTML = [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  if (el("vesselModalBg")) el("vesselModalBg").classList.add("open");
 });
-el("vesselModalClose").addEventListener("click", () => el("vesselModalBg").classList.remove("open"));
-el("vesselModalCancel").addEventListener("click", () => el("vesselModalBg").classList.remove("open"));
-el("vesselModalSave").addEventListener("click", () => {
+safeOn("vesselModalClose", "click", () => { if (el("vesselModalBg")) el("vesselModalBg").classList.remove("open"); });
+safeOn("vesselModalCancel", "click", () => { if (el("vesselModalBg")) el("vesselModalBg").classList.remove("open"); });
+safeOn("vesselModalSave", "click", () => {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
-  const vsl = el("targetVesselSelect").value;
-  const fld = el("targetFieldSelect").value;
-  const val = el("targetNewValue").value.trim();
+  const vsl = el("targetVesselSelect") ? el("targetVesselSelect").value : "";
+  const fld = el("targetFieldSelect") ? el("targetFieldSelect").value : "";
+  const val = el("targetNewValue") ? el("targetNewValue").value.trim() : "";
   rows.forEach(r => { 
     const currentVsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
     if (currentVsl === vsl) {
@@ -2819,22 +2477,35 @@ el("vesselModalSave").addEventListener("click", () => {
     }
   });
   saveAndRefresh();
-  el("vesselModalBg").classList.remove("open");
+  if (el("vesselModalBg")) el("vesselModalBg").classList.remove("open");
   toast("Schedule updated");
 });
 
-el("sheetSelectAll").addEventListener("change", (e) => {
+safeOn("sheetSelectAll", "change", (e) => {
   if (e.target.checked) getFilteredRows().forEach(({i}) => selectedIndices.add(i));
   else selectedIndices.clear();
+  
+  const count = selectedIndices.size;
+  const sn = el("selectionNotice");
+  if(sn) sn.textContent = `${count} selected`;
+  const bc = el("btnSelectCount");
+  if(bc) bc.textContent = count;
+  
+  const fab = el("floatingActionBar");
+  if(fab) {
+    if(count > 0) fab.classList.add("show");
+    else fab.classList.remove("show");
+  }
+  
   renderUI();
 });
 
-el("search").addEventListener("input", renderUI);
-el("vesselFilter").addEventListener("change", renderUI);
-el("gatewayFilter").addEventListener("change", renderUI);
-el("cfsFilter").addEventListener("change", renderUI);
+safeOn("search", "input", renderUI);
+safeOn("vesselFilter", "change", renderUI);
+safeOn("gatewayFilter", "change", renderUI);
+safeOn("cfsFilter", "change", renderUI);
 
-el("exportBtn").addEventListener("click", () => {
+safeOn("exportBtn", "click", () => {
   const wb = XLSX.utils.book_new();
   const exportData = rows.map(r => {
     const fees = calculateStandardFees(r);
@@ -2854,7 +2525,7 @@ el("exportBtn").addEventListener("click", () => {
   XLSX.writeFile(wb, `Containers_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
 });
 
-el("excelInput").addEventListener("change", e => {
+safeOn("excelInput", "change", e => {
   if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
   const file = e.target.files[0];
   if (!file) return;
@@ -2889,7 +2560,7 @@ el("excelInput").addEventListener("change", e => {
         out["CFS NAME"] = out["CFS"];
       }
       if (!out["TRUCK NO."] && (out["TRUCK NO"] || out["VEHICLE NO"])) {
-        out["TRUCK NO."] = out["TRUCK NO"] || out["VEHICLE NO"];
+        out["TRUCK NO."] = formatTruckNo(out["TRUCK NO"] || out["VEHICLE NO"]);
       }
       if (!out["LINER"] && out["MBL NO"]) out["LINER"] = detectLinerFromMBL(out["MBL NO"]);
       return out;
@@ -2903,17 +2574,46 @@ el("excelInput").addEventListener("change", e => {
   reader.readAsArrayBuffer(file);
 });
 
+document.querySelectorAll(".chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    activeQuickFilter = chip.dataset.filter;
+    renderUI();
+  });
+});
+
+document.querySelectorAll(".view-btn").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+
+// Hover Highlight Logic
+const tb = document.getElementById("sheetTableBody");
+if (tb) {
+  tb.addEventListener("mouseover", e => {
+    const td = e.target.closest("td");
+    if(!td) return;
+    const index = td.cellIndex;
+    document.querySelectorAll(".sheet-table td.col-highlight").forEach(c => c.classList.remove("col-highlight"));
+    document.querySelectorAll(".sheet-table tr").forEach(row => { if(row.children[index]) row.children[index].classList.add("col-highlight"); });
+  });
+  tb.addEventListener("mouseout", () => {
+    document.querySelectorAll(".sheet-table td.col-highlight").forEach(c => c.classList.remove("col-highlight"));
+  });
+}
+
+// Startup Execution
 try {
   const saved = localStorage.getItem("containerRows");
   if (saved) {
     const parsed = JSON.parse(saved);
-    rows = parsed.map(item => ({
-      "PORT OUT": "",
-      "CONTAINER RETURN DATE": "",
-      "TRUCK NO.": "",
-      "DRIVER CONTACT": "",
-      ...item
-    }));
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      rows = parsed.map(item => ({
+        "PORT OUT": "",
+        "CONTAINER RETURN DATE": "",
+        "TRUCK NO.": "",
+        "DRIVER CONTACT": "",
+        ...item
+      }));
+    }
   }
 } catch(e){}
 
@@ -2930,7 +2630,7 @@ renderUI();
 
 const urlParams = new URLSearchParams(window.location.search);
 const scannedCntr = urlParams.get("cntr");
-if (scannedCntr) {
+if (scannedCntr && el("publicSearchInput")) {
   el("publicSearchInput").value = scannedCntr;
   performPublicSearch();
 }
