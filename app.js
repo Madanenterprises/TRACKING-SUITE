@@ -679,22 +679,20 @@ function getVesselFinderUrl(vesselName) {
   return clean ? `https://www.vesselfinder.com/vessels?name=${encodeURIComponent(clean)}` : `https://www.vesselfinder.com/`;
 }
 
-function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
+// Upgraded Live AIS Integration
+async function openRouteMap(originStr, destStr, vesselStr) {
   const cleanVessel = getCleanVesselName(vesselStr);
   const vfUrl = getVesselFinderUrl(vesselStr);
 
-  el("mapModalTitle").innerHTML = `${esc(cleanVessel || 'Ocean Vessel')} • ${esc(originStr)} → ${esc(destStr)}`;
-  el("mapVesselText").textContent = `${cleanVessel || 'Container Vessel'} (${progressPercent}% Route)`;
+  el("mapModalTitle").innerHTML = `📡 Live AIS: ${esc(cleanVessel || 'Ocean Vessel')} • ${esc(originStr)} → ${esc(destStr)}`;
+  el("mapVesselText").textContent = `Locating ${cleanVessel}...`;
 
   const vfBtn = el("vesselFinderExternalBtn");
   if (vfBtn) vfBtn.href = vfUrl;
 
   el("mapModalBg").classList.add("open");
 
-  const origin = resolveCoords(originStr, [22.48, 113.91]);
-  const dest = resolveCoords(destStr, [13.0827, 80.2707]);
-  const waypoints = [origin.coord, [18.5, 115.0], [6.0, 108.0], [1.35, 104.4], [2.8, 101.2], [5.8, 95.5], dest.coord];
-
+  // Initialize Map if needed
   setTimeout(() => {
     if (!routeMapInstance) {
       routeMapInstance = L.map('leafletMap', { zoomControl: true, attributionControl: false });
@@ -704,26 +702,50 @@ function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
         if (layer instanceof L.Polyline || layer instanceof L.Marker) routeMapInstance.removeLayer(layer);
       });
     }
-
     routeMapInstance.invalidateSize();
-    const seaPath = L.polyline(waypoints, { color: '#38bdf8', weight: 2.5, dashArray: '4, 6', opacity: 0.85 }).addTo(routeMapInstance);
+  }, 120);
 
+  try {
+    // NOTE: Replace this URL with your actual Marine API endpoint (e.g., Datalastic or Spire)
+    // Example: `https://api.datalastic.com/api/v0/vessel_history?api-key=YOUR_KEY&name=${cleanVessel}`
+    const response = await fetch(`https://api.example-marine.com/vessel?name=${encodeURIComponent(cleanVessel)}`);
+    
+    if (!response.ok) throw new Error("API limits or vessel out of range");
+    const aisData = await response.json();
+
+    // Assuming API returns { lat: 14.5, lon: 82.1, speed: 18.5, course: 210, last_update: '...' }
+    const liveCoord = [aisData.lat, aisData.lon];
+    const origin = resolveCoords(originStr, [22.48, 113.91]);
+    const dest = resolveCoords(destStr, [13.0827, 80.2707]);
+
+    // Draw Live Route
+    const seaPath = L.polyline([origin.coord, liveCoord, dest.coord], { 
+      color: '#38bdf8', weight: 2.5, dashArray: '4, 6', opacity: 0.85 
+    }).addTo(routeMapInstance);
+
+    // Plot Markers
     L.marker(origin.coord, { icon: L.divIcon({ html: `<div style="background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${origin.name}</div>` }) }).addTo(routeMapInstance);
     L.marker(dest.coord, { icon: L.divIcon({ html: `<div style="background:#10b981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">⚓ ${dest.name}</div>` }) }).addTo(routeMapInstance);
-
-    let vesselPos = waypoints[0];
-    if (progressPercent >= 100) vesselPos = dest.coord;
-    else if (progressPercent >= 75) vesselPos = waypoints[5];
-    else if (progressPercent >= 50) vesselPos = waypoints[3];
-    else if (progressPercent >= 25) vesselPos = waypoints[1];
-
-    L.marker(vesselPos, { icon: L.divIcon({ html: `<div style="background:#2563eb; color:#fff; padding:2px 6px; border-radius:6px; font-weight:800; font-size:9.5px;">🚢 ${esc(cleanVessel || 'Vessel')}</div>` }) }).addTo(routeMapInstance);
+    
+    // Plot Live Vessel
+    L.marker(liveCoord, { icon: L.divIcon({ html: `<div style="background:#2563eb; color:#fff; padding:2px 6px; border-radius:6px; font-weight:800; font-size:9.5px;">🚢 ${esc(cleanVessel)} (${aisData.speed}kn)</div>` }) }).addTo(routeMapInstance);
 
     routeMapInstance.fitBounds(seaPath.getBounds(), { padding: [30, 30] });
-  }, 120);
-}
+    el("mapVesselText").textContent = `Speed: ${aisData.speed}kn | Heading: ${aisData.course}° | Last Ping: ${aisData.last_update}`;
 
-el("mapCloseBtn").addEventListener("click", () => el("mapModalBg").classList.remove("open"));
+  } catch (error) {
+    // Fallback to simulated route if vessel is in deep ocean / API fails
+    el("mapVesselText").textContent = `Live AIS unavailable. Showing simulated route.`;
+    const origin = resolveCoords(originStr, [22.48, 113.91]);
+    const dest = resolveCoords(destStr, [13.0827, 80.2707]);
+    const waypoints = [origin.coord, [18.5, 115.0], [6.0, 108.0], [1.35, 104.4], dest.coord];
+    
+    const seaPath = L.polyline(waypoints, { color: '#64748b', weight: 2, dashArray: '4, 6', opacity: 0.5 }).addTo(routeMapInstance);
+    L.marker(origin.coord, { icon: L.divIcon({ html: `<div style="background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${origin.name}</div>` }) }).addTo(routeMapInstance);
+    L.marker(dest.coord, { icon: L.divIcon({ html: `<div style="background:#10b981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">⚓ ${dest.name}</div>` }) }).addTo(routeMapInstance);
+    routeMapInstance.fitBounds(seaPath.getBounds(), { padding: [30, 30] });
+  }
+}
 
 function openEmailModal(idx) {
   const r = rows[idx];
