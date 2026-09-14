@@ -6,7 +6,7 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Change these values anytime to instantly update the whole app
 const COMPANY_CONFIG = {
   supportEmail: "madhan@gmlindia.net",
-  whatsappNumber: "91984070344" // Use country code (91) without the '+' or spaces
+  whatsappNumber: "919840000000" // Use country code (91) without the '+' or spaces
 };
 
 const USD_TO_INR = 84;
@@ -57,7 +57,7 @@ let routeMapInstance = null;
 let activeTruckSlipIndex = -1;
 let pendingDelete = null;
 let deleteTimeout = null;
-let lastEditedId = -1; // Added for flash highlight
+let lastEditedId = -1; 
 
 // Pagination variables
 let currentPage = 1;
@@ -84,7 +84,6 @@ function resetToLanding() {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Realistic Ticker Animation
 function animateValue(obj, start, end, duration, isCurrency = false) {
   if (!obj) return;
   let startTimestamp = null;
@@ -768,12 +767,13 @@ function openEmailModal(idx) {
   const body = `Dear Customer,\n\nStatus for Container ${cntr} (${getField(r, ["TYPE", "SIZE"]) || "40' HC"}):\n` +
     `• Line: ${liner}\n• MBL: ${getField(r, ["MBL NO", "MBL", "MASTER BL"]) || 'N/A'}\n• Vessel: ${getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || 'N/A'}\n` +
     `• Port: ${gwPort} (In: ${formatDate(r["PORT IN"]) || 'Pending'} | Out: ${formatDate(r["PORT OUT"]) || 'Pending'})\n` +
-    `• CFS: ${cfs}\n• Truck: ${getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || 'Pending Assignment'}\n• Status: ${st.replace(/[^\w\s-]/g, '').trim()}`... \n\nSupport: ${COMPANY_CONFIG.supportEmail}`;
+    `• CFS: ${cfs}\n• Truck: ${getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || 'Pending Assignment'}\n• Status: ${st.replace(/[^\w\s-]/g, '').trim()}\n\nSupport: ${COMPANY_CONFIG.supportEmail}`;
 
   el("emailBody").value = body;
   el("sendMailtoBtn").href = `mailto:?subject=${encodeURIComponent(el("emailSubject").value)}&body=${encodeURIComponent(body)}`;
   el("emailModalBg").classList.add("open");
 }
+
 el("emailModalClose").addEventListener("click", () => el("emailModalBg").classList.remove("open"));
 el("copyEmailBtn").addEventListener("click", () => copyText(el("emailBody").value));
 
