@@ -1,1 +1,1956 @@
+const SUPABASE_URL = "https://ykeucqritoexykqrggzz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_olbFhK5Wu6hGiaGGDdXMeA_6szko2wZ";
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+const USD_TO_INR = 84;
+let activeCurrency = localStorage.getItem("gml_curr") || "INR";
+
+const COLS = [
+  'CONTAINER NO.', 'TYPE', 'MBL NO', 'LINER', 'GATEWAY PORT', 'CFS NAME', 
+  'POL', 'ETD', 'FREE DAYS', 'SEAL NO.', 'VESSEL & VOY', 
+  'ETA', 'SPLIT DATE', 'INWARD DATE', 'PORT IN', 'PORT OUT', 'CFS IN', 'TRUCK NO.', 
+  'DRIVER CONTACT', 'PLANNING', 'DESTUFFING DATE', 'CONTAINER RETURN DATE', 'REMARKS'
+];
+const DATE_COLS = new Set(['ETD', 'ETA', 'SPLIT DATE', 'INWARD DATE', 'PORT IN', 'PORT OUT', 'CFS IN', 'DESTUFFING DATE', 'CONTAINER RETURN DATE']);
+
+const DEFAULT_ROWS = [
+  {
+    "CONTAINER NO.": "SKHU9422886", "TYPE": "40' DC", "MBL NO": "SNK003C260801543", "LINER": "PAREKH", 
+    "GATEWAY PORT": "CCTL", "CFS NAME": "ECCT", "POL": "SHEKOU", "ETD": "2026-08-26", "FREE DAYS": "14", "SEAL NO.": "ML-99824",
+    "VESSEL & VOY": "TS QINGDAO V 2618W", "ETA": "2026-09-04", "SPLIT DATE": "2026-09-03", "INWARD DATE": "2026-09-04", 
+    "PORT IN": "2026-09-04", "PORT OUT": "2026-09-05", "CFS IN": "2026-09-05", "TRUCK NO.": "TN-04-AR-8821",
+    "DRIVER CONTACT": "Ravi Kumar (98401XXXXX)", "PLANNING": "", "DESTUFFING DATE": "2026-09-05", "CONTAINER RETURN DATE": "", "REMARKS": ""
+  },
+  {
+    "CONTAINER NO.": "SKHU6385027", "TYPE": "40' DC", "MBL NO": "SNK003C260801543", "LINER": "PAREKH", 
+    "GATEWAY PORT": "CCTL", "CFS NAME": "ECCT", "POL": "SHEKOU", "ETD": "2026-08-26", "FREE DAYS": "14", "SEAL NO.": "ML-99825",
+    "VESSEL & VOY": "TS QINGDAO V 2618W", "ETA": "2026-09-04", "SPLIT DATE": "", "INWARD DATE": "", 
+    "PORT IN": "2026-09-04", "PORT OUT": "", "CFS IN": "", "TRUCK NO.": "",
+    "DRIVER CONTACT": "", "PLANNING": "", "DESTUFFING DATE": "", "CONTAINER RETURN DATE": "", "REMARKS": "NOT MOVED"
+  },
+  {
+    "CONTAINER NO.": "IAAU1753030", "TYPE": "40' DC", "MBL NO": "A56GX21515", "LINER": "IAL",
+    "GATEWAY PORT": "CCTL", "CFS NAME": "ECCT", "POL": "SHANGHAI", "ETD": "2026-08-18", "FREE DAYS": "14", "SEAL NO.": "IAL-44120",
+    "VESSEL & VOY": "REN JIAN 23 V 2633W", "ETA": "2026-09-13", "SPLIT DATE": "2026-09-12", "INWARD DATE": "2026-09-14",
+    "PORT IN": "", "PORT OUT": "", "CFS IN": "", "TRUCK NO.": "",
+    "DRIVER CONTACT": "", "PLANNING": "", "DESTUFFING DATE": "", "CONTAINER RETURN DATE": "", "REMARKS": ""
+  }
+];
+
+let rows = [...DEFAULT_ROWS];
+
+let currentUser = null;
+let selectedIndices = new Set();
+let currentView = 'cards';
+let activeQuickFilter = 'all'; 
+let editingIndex = -1;
+let sortField = 'ETA';
+let sortAsc = true;
+let routeMapInstance = null;
+let activeTruckSlipIndex = -1;
+let pendingDelete = null;
+let deleteTimeout = null;
+let lastEditedId = -1; // Added for flash highlight
+
+// Pagination variables
+let currentPage = 1;
+const ITEMS_PER_PAGE = 25;
+
+let auditLogs = [];
+try {
+  const savedLogs = localStorage.getItem("gml_audit_trail");
+  if (savedLogs) auditLogs = JSON.parse(savedLogs);
+} catch(e) {}
+
+const PORT_COORDS = {
+  "SHEKOU": [22.48, 113.91], "BUSAN": [35.10, 129.04], "SHANGHAI": [31.23, 121.47],
+  "NINGBO": [29.86, 121.54], "QINGDAO": [36.06, 120.38], "SINGAPORE": [1.29, 103.85],
+  "PORT KLANG": [3.00, 101.40], "CCTL": [13.085, 80.298], "CITPL": [13.098, 80.305],
+  "KATTUPALLI": [13.315, 80.345], "ENNORE": [13.250, 80.332], "CHENNAI": [13.0827, 80.2707]
+};
+
+const el = id => document.getElementById(id);
+const esc = v => String(v ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function resetToLanding() {
+  setAccessState(false);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Realistic Ticker Animation
+function animateValue(obj, start, end, duration, isCurrency = false) {
+  if (!obj) return;
+  let startTimestamp = null;
+  const step = (timestamp) => {
+    if (!startTimestamp) startTimestamp = timestamp;
+    const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+    const easeOut = progress * (2 - progress); 
+    const currentVal = Math.floor(easeOut * (end - start) + start);
+    obj.innerHTML = isCurrency ? formatCurrency(currentVal) : currentVal;
+    if (progress < 1) window.requestAnimationFrame(step);
+  };
+  window.requestAnimationFrame(step);
+}
+
+function formatCurrency(valUSD) {
+  if (activeCurrency === "USD") return `$${Math.round(valUSD).toLocaleString()}`;
+  return `₹${Math.round(valUSD * USD_TO_INR).toLocaleString()}`;
+}
+
+function copyText(txt) {
+  if(!txt) return;
+  if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(txt).then(() => toast("Copied!")).catch(() => fallbackCopy(txt));
+  } else {
+      fallbackCopy(txt);
+  }
+}
+
+function fallbackCopy(txt) {
+  let textArea = document.createElement("textarea");
+  textArea.value = txt;
+  textArea.style.position = "fixed";
+  textArea.style.left = "-999999px";
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  try { document.execCommand('copy'); toast("Copied!"); } catch(err) { }
+  textArea.remove();
+}
+
+function formatTruckNo(val) {
+  let v = String(val || "").toUpperCase().replace(/[^A-Z0-9]/g, '');
+  if(v.length > 2) v = v.substring(0,2) + '-' + v.substring(2);
+  if(v.length > 5) v = v.substring(0,5) + '-' + v.substring(5);
+  if(v.length > 8) v = v.substring(0,8) + '-' + v.substring(8);
+  if(v.length > 13) v = v.substring(0,13);
+  return v;
+}
+
+function openDrawer() { el("filterDrawer").classList.add("open"); el("filterDrawerOverlay").classList.add("open"); }
+function closeDrawer() { el("filterDrawer").classList.remove("open"); el("filterDrawerOverlay").classList.remove("open"); }
+
+el("opsMenuBtn").addEventListener("click", (e) => {
+  e.stopPropagation();
+  el("opsMenuDropdown").classList.toggle("show");
+});
+document.addEventListener("click", () => el("opsMenuDropdown").classList.remove("show"));
+
+el("currencyToggleBtn").addEventListener("click", () => {
+  activeCurrency = activeCurrency === "INR" ? "USD" : "INR";
+  localStorage.setItem("gml_curr", activeCurrency);
+  el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
+  renderUI();
+});
+el("currencyToggleBtn").textContent = `💱 ${activeCurrency}`;
+
+function toast(msg) {
+  const t = el("toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+function parseLocalDate(str) {
+  if (!str) return null;
+  const clean = String(str).trim().slice(0, 10);
+  const parts = clean.split("-").map(Number);
+  if (parts.length === 3 && !isNaN(parts[0]) && !isNaN(parts[1]) && !isNaN(parts[2])) {
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+  const d = new Date(clean);
+  return isNaN(d) ? null : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+function getField(r, names) {
+  if (!r) return "";
+  for (let name of names) {
+    const cleanName = name.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (let k of Object.keys(r)) {
+      const cleanK = k.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanK === cleanName && r[k] !== undefined && r[k] !== null && String(r[k]).trim() !== "") {
+        return String(r[k]).trim();
+      }
+    }
+  }
+  return "";
+}
+
+function generatePublicVoyageTimelineHtml(r) {
+  const mblNo = esc(getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "—");
+  const vesselName = esc(getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—");
+  const cfsName = esc(getField(r, ["CFS NAME", "CFS"]) || "—");
+  const liner = esc(getField(r, ["LINER", "LINE"]) || detectLinerFromMBL(mblNo) || "—");
+  const pol = esc(getField(r, ["POL", "PORT OF LOADING"]) || "—");
+  const eta = formatDate(getField(r, ["ETA"])) || 'Pending';
+
+  const igmSplit = formatDate(getField(r, ["SPLIT DATE", "SPLIT"]));
+  const inward = formatDate(getField(r, ["INWARD DATE", "INWARD"]));
+  const berthedPort = formatDate(getField(r, ["PORT IN"]));
+  const portOut = formatDate(getField(r, ["PORT OUT"]));
+  const cfsIn = formatDate(getField(r, ["CFS IN"]));
+  const destuffed = formatDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]));
+  const containerReturned = formatDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
+
+  const steps = [
+    { label: "Inward Granted", date: inward, done: !!inward },
+    { label: "Vessel Berthed", date: berthedPort, done: !!berthedPort },
+    { label: "Port Discharged", date: portOut, done: !!portOut },
+    { label: "CFS In-Gate", date: cfsIn, done: !!cfsIn },
+    { label: "Destuffed", date: destuffed, done: !!destuffed },
+    { label: "Empty Returned", date: containerReturned, done: !!containerReturned }
+  ];
+
+  let currentStatusTxt = "Pending Arrival";
+  let nextStepTxt = inward ? "Vessel Berthing" : "Inward Granted";
+  let statusColor = "var(--warning)";
+
+  if (containerReturned) { currentStatusTxt = `Empty Returned (${containerReturned})`; nextStepTxt = "Tracking Complete"; statusColor = "var(--success)"; }
+  else if (destuffed) { currentStatusTxt = `Destuffed (${destuffed})`; nextStepTxt = "Empty Return to Depot"; statusColor = "var(--success)"; }
+  else if (cfsIn) { currentStatusTxt = `Gated into CFS (${cfsIn})`; nextStepTxt = "Destuffing"; statusColor = "var(--accent)"; }
+  else if (portOut) { currentStatusTxt = `Port Discharged (${portOut})`; nextStepTxt = "CFS In-Gate"; statusColor = "var(--accent)"; }
+  else if (berthedPort) { currentStatusTxt = `Vessel Berthed (${berthedPort})`; nextStepTxt = "Port Discharge"; statusColor = "var(--accent)"; }
+  else if (inward) { currentStatusTxt = `Inward Granted (${inward})`; nextStepTxt = "Vessel Berthing"; statusColor = "var(--warning)"; }
+
+  return `
+    <div>
+      <div class="timeline-stepper">
+        ${steps.map((s, idx) => `
+          <div class="step-node ${s.done ? 'completed' : (idx === 0 || steps[idx-1].done ? 'active' : '')}">
+            <div class="step-dot">${s.done ? '✓' : idx + 1}</div>
+            <div class="step-label">${s.label}</div>
+            <div class="step-date">${s.date || 'Pending'}</div>
+          </div>
+        `).join("")}
+      </div>
+
+      <div style="padding: 0 24px 24px 24px;">
+        <div class="cascade-item" style="background: var(--bg-surface); border-left: 4px solid ${statusColor}; padding: 16px 20px; border-radius: 8px; margin: 24px 0; box-shadow: var(--shadow-sm); display: flex; gap: 32px; animation-delay: 100ms; flex-wrap: wrap;">
+          <div>
+            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.05em;">Current Status</div>
+            <div style="font-size:15px; font-weight:800; color:var(--text-main);">${currentStatusTxt}</div>
+          </div>
+          <div>
+            <div style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:4px; letter-spacing:0.05em;">Awaiting</div>
+            <div style="font-size:15px; font-weight:700; color:var(--text-dim);">${nextStepTxt}</div>
+          </div>
+        </div>
+
+        <div class="info-panel cascade-item" style="animation-delay: 200ms;">
+          <div class="info-item"><label>Line / MBL</label><val>${liner} • ${mblNo}</val></div>
+          <div class="info-item"><label>Vessel & Voyage</label><val>${vesselName}</val></div>
+          <div class="info-item"><label>Estimated Arrival</label><val>${eta}</val></div>
+          <div class="info-item"><label>Port of Loading</label><val>${pol}</val></div>
+          <div class="info-item"><label>Designated CFS</label><val>${cfsName}</val></div>
+          <div class="info-item"><label>Equipment Size</label><val>${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}</val></div>
+          ${igmSplit ? `<div class="info-item"><label>IGM Split</label><val>${igmSplit}</val></div>` : ''}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function logAuditEvent(action, containerNo, field, oldVal, newVal) {
+  const operator = currentUser ? `${currentUser.id} (${currentUser.role})` : "System / Auto";
+  const entry = {
+    id: `LOG-${Date.now()}-${Math.floor(Math.random()*1000)}`,
+    timestamp: new Date().toISOString(),
+    operator,
+    action,
+    containerNo: containerNo || "—",
+    field: field || "—",
+    oldVal: String(oldVal ?? "—").trim() || "—",
+    newVal: String(newVal ?? "—").trim() || "—"
+  };
+
+  auditLogs.unshift(entry);
+  if (auditLogs.length > 500) auditLogs.pop();
+
+  try {
+    localStorage.setItem("gml_audit_trail", JSON.stringify(auditLogs));
+    sb.from('audit_logs').insert([entry]).then(() => {}).catch(() => {});
+  } catch(e) {}
+
+  updateAuditBadge();
+}
+
+function updateAuditBadge() {
+  const badge = el("auditCountBadge");
+  if (badge) badge.textContent = auditLogs.length;
+}
+
+function renderAuditTable(filteredList = auditLogs) {
+  const tbody = el("auditTableBody");
+  if (!filteredList.length) {
+    tbody.innerHTML = `<tr><td colspan="6" style="padding:20px; text-align:center; color:var(--text-muted);">No activity recorded yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = filteredList.map(log => {
+    const d = new Date(log.timestamp);
+    const dateFormatted = d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
+    const timeFormatted = d.toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+
+    let actionBadge = `<span class="tag-badge" style="background:var(--accent-glow); color:var(--accent); font-weight:800;">${esc(log.action)}</span>`;
+    if (log.action.includes("DELETE")) actionBadge = `<span class="tag-badge danger">${esc(log.action)}</span>`;
+    if (log.action.includes("DESTUFF") || log.action.includes("RETURN")) actionBadge = `<span class="tag-badge success">${esc(log.action)}</span>`;
+
+    return `
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:6px 10px; font-family:'JetBrains Mono'; white-space:nowrap; color:var(--text-muted);">${dateFormatted} ${timeFormatted}</td>
+        <td style="padding:6px 10px; font-weight:700;">${esc(log.operator)}</td>
+        <td style="padding:6px 10px;">${actionBadge}</td>
+        <td style="padding:6px 10px; font-family:'JetBrains Mono'; font-weight:800; color:var(--accent);">${esc(log.containerNo)}</td>
+        <td style="padding:6px 10px; font-weight:600;">${esc(log.field)}</td>
+        <td style="padding:6px 10px; font-family:'JetBrains Mono'; font-size:10.5px;">
+          <span style="color:var(--text-dim); text-decoration:line-through;">${esc(log.oldVal)}</span>
+          <span style="color:var(--text-muted); margin:0 4px;">➔</span>
+          <span style="color:var(--success); font-weight:700;">${esc(log.newVal)}</span>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+el("openAuditLogBtn").addEventListener("click", () => {
+  renderAuditTable();
+  el("clearAuditBtn").style.display = (currentUser && currentUser.role === "Admin") ? "inline-block" : "none";
+  el("auditModalBg").classList.add("open");
+});
+el("auditClose").addEventListener("click", () => el("auditModalBg").classList.remove("open"));
+
+el("auditSearchInput").addEventListener("input", (e) => {
+  const q = e.target.value.toLowerCase();
+  const filtered = auditLogs.filter(l => 
+    l.containerNo.toLowerCase().includes(q) || 
+    l.operator.toLowerCase().includes(q) || 
+    l.field.toLowerCase().includes(q) ||
+    l.action.toLowerCase().includes(q)
+  );
+  renderAuditTable(filtered);
+});
+
+el("exportAuditBtn").addEventListener("click", () => {
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(auditLogs), "Audit_Trail");
+  XLSX.writeFile(wb, `Operations_Audit_Log_${new Date().toISOString().slice(0,10)}.xlsx`);
+});
+
+el("clearAuditBtn").addEventListener("click", () => {
+  if (confirm("Permanently clear the local audit trail?")) {
+    auditLogs = [];
+    localStorage.removeItem("gml_audit_trail");
+    renderAuditTable();
+    updateAuditBadge();
+    toast("Audit trail cleared");
+  }
+});
+
+function validateISO6346(cntr) {
+  if (!cntr) return { isValid: false, message: "Empty code" };
+  const clean = String(cntr).trim().toUpperCase();
+  if (clean.length !== 11) return { isValid: false, message: "Must be 11 characters" };
+
+  const charValues = {
+    'A':10,'B':12,'C':13,'D':14,'E':15,'F':16,'G':17,'H':18,'I':19,'J':20,
+    'K':21,'L':23,'M':24,'N':25,'O':26,'P':27,'Q':28,'R':29,'S':30,'T':31,
+    'U':32,'V':34,'W':35,'X':36,'Y':37,'Z':38
+  };
+
+  let sum = 0;
+  for (let i = 0; i < 10; i++) {
+    const c = clean[i];
+    let val;
+    if (c >= '0' && c <= '9') val = parseInt(c, 10);
+    else if (charValues[c]) val = charValues[c];
+    else return { isValid: false, message: "Invalid character" };
+    sum += val * Math.pow(2, i);
+  }
+
+  const checkDigit = (sum % 11) % 10;
+  const actualCheck = parseInt(clean[10], 10);
+  const isValid = checkDigit === actualCheck;
+
+  return { isValid, message: isValid ? "Valid ISO 6346" : `Checksum error (Expected ${checkDigit})` };
+}
+
+function calculateStandardFees(r) {
+  const is20ft = (getField(r, ["TYPE", "SIZE"]) || "").includes("20");
+  const demRatePerDay = is20ft ? 100 : 225;
+  const detRatePerDay = is20ft ? 75 : 150;
+
+  const portInDate = parseLocalDate(getField(r, ["PORT IN"]));
+  const inwardDate = parseLocalDate(getField(r, ["INWARD DATE", "INWARD"]));
+  const portOutDate = parseLocalDate(getField(r, ["PORT OUT", "CFS IN"]));
+  const returnDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
+  
+  const today = new Date();
+  const nowDay = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  let demDays = 0, demOverdue = false, demCostUSD = 0, portDwell = 0;
+  let detDays = 0, detOverdue = false, detCostUSD = 0, totalEquipmentDays = 0;
+
+  const portFreeDays = 3;
+  let terminalLFD = null;
+  let terminalDaysLeft = null;
+
+  if (portInDate) {
+    terminalLFD = new Date(portInDate);
+    terminalLFD.setDate(terminalLFD.getDate() + portFreeDays);
+    terminalDaysLeft = Math.floor((terminalLFD - nowDay) / (1000 * 60 * 60 * 24));
+
+    const endPortDate = portOutDate || nowDay;
+    portDwell = Math.max(0, Math.floor((endPortDate - portInDate) / (1000 * 60 * 60 * 24)));
+    if (portDwell > portFreeDays) {
+      demOverdue = true;
+      demDays = portDwell - portFreeDays;
+      demCostUSD = demDays * demRatePerDay;
+    }
+  }
+
+  const carrierFreeDays = parseInt(getField(r, ["FREE DAYS"]) || "14", 10);
+  let detentionLFD = null;
+  let detentionDaysLeft = null;
+
+  if (inwardDate) {
+    detentionLFD = new Date(inwardDate);
+    detentionLFD.setDate(detentionLFD.getDate() + carrierFreeDays);
+    detentionDaysLeft = Math.floor((detentionLFD - nowDay) / (1000 * 60 * 60 * 24));
+
+    const endDetDate = returnDate || nowDay;
+    totalEquipmentDays = Math.max(0, Math.floor((endDetDate - inwardDate) / (1000 * 60 * 60 * 24)));
+    if (totalEquipmentDays > carrierFreeDays && !isFullyCompleted(r)) {
+      detOverdue = true;
+      detDays = totalEquipmentDays - carrierFreeDays;
+      detCostUSD = detDays * detRatePerDay;
+    }
+  }
+
+  return {
+    is20ft,
+    portDwell,
+    totalEquipmentDays,
+    terminalLFD: terminalLFD ? formatDate(terminalLFD.toISOString().slice(0,10)) : "—",
+    terminalDaysLeft,
+    detentionLFD: detentionLFD ? formatDate(detentionLFD.toISOString().slice(0,10)) : "—",
+    detentionDaysLeft,
+    demOverdue,
+    demDays,
+    demCostUSD,
+    detDays,
+    detCostUSD,
+    totalCostUSD: demCostUSD + detCostUSD,
+    isCompleted: isFullyCompleted(r),
+    portFreeDays,
+    carrierFreeDays
+  };
+}
+
+function generateCleanManifestHtml(containersList) {
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
+
+  const rowsHtml = containersList.map(r => {
+    const st = getStatus(r);
+    const liner = getField(r, ["LINER"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "—";
+    const port = getGatewayPortInfo(r).name;
+    const cfs = getField(r, ["CFS NAME", "CFS"]) || "—";
+    const vsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
+    const pol = getField(r, ["POL", "PORT OF LOADING"]) || "—";
+    const etd = formatDate(getField(r, ["ETD"]));
+    const eta = formatDate(getField(r, ["ETA"]));
+    const portIn = formatDate(getField(r, ["PORT IN"]));
+    const destuff = formatDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"])) || "—";
+    const remarks = (r["REMARKS"] || "—").trim();
+
+    let pillStyle = "background:#e0f2fe; color:#0284c7;";
+    if (st.text.includes("DE-STUFF") || st.text.includes("RETURNED")) {
+      pillStyle = "background:#dcfce7; color:#15803d;";
+    }
+
+    return `
+      <tr style="border-bottom:1px solid #e2e8f0; font-size:11px;">
+        <td style="padding:10px 8px; font-weight:800; font-family:'JetBrains Mono', monospace; color:#0284c7;">
+          ${esc(getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]))}
+          <div style="font-size:9px; font-weight:700; color:#64748b;">${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}</div>
+        </td>
+        <td style="padding:10px 8px; color:#0f172a; font-weight:600;">
+          <div style="font-family:'JetBrains Mono', monospace; font-weight:700;">${esc(getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "—")}</div>
+          <div style="font-size:9px; color:#64748b; text-transform:uppercase;">${esc(liner)}</div>
+        </td>
+        <td style="padding:10px 8px; font-weight:700; color:#0f172a;">${esc(vsl)}</td>
+        <td style="padding:10px 8px; font-weight:800; color:#b45309;">${esc(port)}</td>
+        <td style="padding:10px 8px; color:#0f172a; font-weight:600;">
+          <div>${esc(pol)}</div>
+          <div style="font-size:8.5px; color:#64748b;">${etd ? 'ETD: ' + etd : ''}</div>
+        </td>
+        <td style="padding:10px 8px; font-weight:800; color:#0284c7;">${esc(cfs)}</td>
+        <td style="padding:10px 8px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:600;">
+          ${eta || '—'} / <br><span style="color:#0284c7;">${portIn || '—'}</span>
+        </td>
+        <td style="padding:10px 8px; font-family:'JetBrains Mono', monospace; color:#0f172a; font-weight:700;">${destuff}</td>
+        <td style="padding:10px 8px; text-align:center;">
+          <span style="display:inline-block; padding:3px 6px; border-radius:4px; font-size:9px; font-weight:800; text-transform:uppercase; ${pillStyle}">
+            ${st.text}
+          </span>
+        </td>
+        <td style="padding:10px 8px; font-weight:700; font-size:9.5px; color:#475569;">${esc(remarks)}</td>
+      </tr>
+    `;
+  }).join("");
+
+  return `
+    <div id="manifestCaptureContainer" style="width:1100px; background:#ffffff; padding:28px; border:1px solid #cbd5e1; border-radius:10px; font-family:'Plus Jakarta Sans', sans-serif; color:#0f172a;">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:14px;">
+        <div>
+          <h1 style="font-size:18px; font-weight:900; color:#091e42; margin:0;">GREENWICH MERIDIAN LOGISTICS (INDIA) PVT. LTD.</h1>
+          <div style="font-size:11px; font-weight:700; color:#64748b;">Live Status Report • Chennai Operations Desk</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px; font-weight:800; color:#0284c7; font-family:'JetBrains Mono', monospace;">${dateStr}</div>
+        </div>
+      </div>
+      <div style="height:2px; background:#0f172a; margin-bottom:14px;"></div>
+      <table style="width:100%; border-collapse:collapse; text-align:left;">
+        <thead>
+          <tr style="background:#0f172a; color:#ffffff; font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.04em;">
+            <th style="padding:8px;">CONTAINER NO</th>
+            <th style="padding:8px;">MBL / LINE</th>
+            <th style="padding:8px;">VESSEL</th>
+            <th style="padding:8px;">PORT</th>
+            <th style="padding:8px;">POL</th>
+            <th style="padding:8px;">CFS</th>
+            <th style="padding:8px;">ETA / PORT IN</th>
+            <th style="padding:8px;">DESTUFF</th>
+            <th style="padding:8px; text-align:center;">STATUS</th>
+            <th style="padding:8px;">REMARKS</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function downloadMultipleStatusImage(containersList, titleRef = "Status_Report") {
+  if (!containersList || !containersList.length) return toast("No containers selected!");
+
+  const overlay = document.createElement("div");
+  overlay.className = "skeleton-overlay";
+  overlay.innerHTML = "📸 Generating Snapshot...";
+  document.body.appendChild(overlay);
+
+  const tempWrapper = document.createElement("div");
+  tempWrapper.style.position = "fixed";
+  tempWrapper.style.top = "-9999px";
+  tempWrapper.style.left = "-9999px";
+  tempWrapper.innerHTML = generateCleanManifestHtml(containersList);
+  document.body.appendChild(tempWrapper);
+
+  const target = document.getElementById("manifestCaptureContainer");
+
+  setTimeout(() => {
+    html2canvas(target, { scale: 2, useCORS: true, backgroundColor: "#ffffff" }).then(canvas => {
+      document.body.removeChild(tempWrapper);
+      document.body.removeChild(overlay);
+      const link = document.createElement("a");
+      link.download = `Report_${titleRef}_${Date.now()}.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+      toast("Report photo downloaded!");
+    }).catch(err => {
+      console.error(err);
+      if (tempWrapper.parentNode) document.body.removeChild(tempWrapper);
+      if (overlay.parentNode) document.body.removeChild(overlay);
+      toast("Failed to render photo.");
+    });
+  }, 100);
+}
+
+/* Staff Login Handlers */
+function executeSuccessfulLogin(userObj) {
+  currentUser = userObj;
+  localStorage.setItem("gml_auth_code_user", JSON.stringify(currentUser));
+  el("loginModalBg").classList.remove("open");
+  el("loginSubmit").textContent = "Sign In";
+  setAccessState(true);
+  toast(`Logged in as ${currentUser.id}`);
+}
+
+el("loginBtn").addEventListener("click", () => {
+  el("loginCodeInput").value = "";
+  el("loginModalBg").classList.add("open");
+  setTimeout(() => el("loginCodeInput").focus(), 100);
+});
+el("loginClose").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
+el("loginCancel").addEventListener("click", () => el("loginModalBg").classList.remove("open"));
+
+el("loginCodeInput").addEventListener("keypress", (e) => {
+  if (e.key === "Enter") el("loginSubmit").click();
+});
+
+el("loginSubmit").addEventListener("click", async () => {
+  const code = el("loginCodeInput").value.trim().toLowerCase();
+  if (!code) return alert("Please enter your Access Code.");
+
+  const originalBtnText = el("loginSubmit").textContent;
+  el("loginSubmit").textContent = "Verifying...";
+
+  try {
+    const { data, error } = await Promise.race([
+      sb.from('user_roles').select('user_id, role, username').eq('access_code', code).single(),
+      new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 4000))
+    ]);
+
+    if (error || !data) {
+      alert("Invalid Access Code.");
+      el("loginSubmit").textContent = originalBtnText;
+    } else {
+      executeSuccessfulLogin({ id: data.username || code, role: data.role || "Operator", uid: data.user_id });
+    }
+  } catch(err) {
+    console.warn("Supabase auth error:", err);
+    alert("Database connection slow or failed. Please try again.");
+    el("loginSubmit").textContent = originalBtnText;
+  }
+});
+
+el("logoutBtn").addEventListener("click", () => {
+  currentUser = null;
+  localStorage.removeItem("gml_auth_code_user");
+  setAccessState(false);
+  toast("Logged out");
+});
+
+function checkActiveSession() {
+  const savedUser = localStorage.getItem("gml_auth_code_user");
+  if (savedUser) {
+    try {
+      currentUser = JSON.parse(savedUser);
+      setAccessState(true);
+      return;
+    } catch(e) { }
+  }
+  setAccessState(false);
+}
+
+function setAccessState(isStaff) {
+  el("opsControls").style.display = isStaff ? "flex" : "none";
+  el("publicControls").style.display = isStaff ? "none" : "flex";
+  
+  if (isStaff) {
+    el("publicLandingView").style.display = "none";
+    el("opsDashboardView").style.display = "block";
+    el("opsDashboardView").classList.remove("fade-in");
+    void el("opsDashboardView").offsetWidth;
+    el("opsDashboardView").classList.add("fade-in");
+  } else {
+    el("opsDashboardView").style.display = "none";
+    el("publicLandingView").style.display = "block";
+    el("publicLandingView").classList.remove("fade-in");
+    void el("publicLandingView").offsetWidth;
+    el("publicLandingView").classList.add("fade-in");
+  }
+
+  if (isStaff && currentUser) {
+    el("userBadge").textContent = `${currentUser.id} (${currentUser.role})`;
+    const isViewer = currentUser.role === "Viewer";
+    document.querySelectorAll(".action-editor-only").forEach(elem => {
+      elem.style.display = isViewer ? "none" : "inline-flex";
+    });
+    renderUI();
+  }
+}
+
+function resolveCoords(name, defaultCoord) {
+  const upper = String(name || "").toUpperCase();
+  for (const [k, coord] of Object.entries(PORT_COORDS)) {
+    if (upper.includes(k)) return { name: k, coord };
+  }
+  return { name: upper || "PORT", coord: defaultCoord };
+}
+
+function getCleanVesselName(vsl) {
+  return String(vsl || "").replace(/\b(V|VOY|VOYAGE)\.?\s*[0-9A-Z\/\-]+$/i, "").trim();
+}
+
+function getVesselFinderUrl(vesselName) {
+  const clean = getCleanVesselName(vesselName);
+  return clean ? `https://www.vesselfinder.com/vessels?name=${encodeURIComponent(clean)}` : `https://www.vesselfinder.com/`;
+}
+
+function openRouteMap(originStr, destStr, vesselStr, progressPercent) {
+  const cleanVessel = getCleanVesselName(vesselStr);
+  const vfUrl = getVesselFinderUrl(vesselStr);
+
+  el("mapModalTitle").innerHTML = `${esc(cleanVessel || 'Ocean Vessel')} • ${esc(originStr)} → ${esc(destStr)}`;
+  el("mapVesselText").textContent = `${cleanVessel || 'Container Vessel'} (${progressPercent}% Route)`;
+
+  const vfBtn = el("vesselFinderExternalBtn");
+  if (vfBtn) vfBtn.href = vfUrl;
+
+  el("mapModalBg").classList.add("open");
+
+  const origin = resolveCoords(originStr, [22.48, 113.91]);
+  const dest = resolveCoords(destStr, [13.0827, 80.2707]);
+  const waypoints = [origin.coord, [18.5, 115.0], [6.0, 108.0], [1.35, 104.4], [2.8, 101.2], [5.8, 95.5], dest.coord];
+
+  setTimeout(() => {
+    if (!routeMapInstance) {
+      routeMapInstance = L.map('leafletMap', { zoomControl: true, attributionControl: false });
+      L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { maxZoom: 18, subdomains: 'abcd' }).addTo(routeMapInstance);
+    } else {
+      routeMapInstance.eachLayer(layer => {
+        if (layer instanceof L.Polyline || layer instanceof L.Marker) routeMapInstance.removeLayer(layer);
+      });
+    }
+
+    routeMapInstance.invalidateSize();
+    const seaPath = L.polyline(waypoints, { color: '#38bdf8', weight: 2.5, dashArray: '4, 6', opacity: 0.85 }).addTo(routeMapInstance);
+
+    L.marker(origin.coord, { icon: L.divIcon({ html: `<div style="background:#0284c7; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">${origin.name}</div>` }) }).addTo(routeMapInstance);
+    L.marker(dest.coord, { icon: L.divIcon({ html: `<div style="background:#10b981; color:#fff; padding:2px 6px; border-radius:4px; font-weight:800; font-size:9px;">⚓ ${dest.name}</div>` }) }).addTo(routeMapInstance);
+
+    let vesselPos = waypoints[0];
+    if (progressPercent >= 100) vesselPos = dest.coord;
+    else if (progressPercent >= 75) vesselPos = waypoints[5];
+    else if (progressPercent >= 50) vesselPos = waypoints[3];
+    else if (progressPercent >= 25) vesselPos = waypoints[1];
+
+    L.marker(vesselPos, { icon: L.divIcon({ html: `<div style="background:#2563eb; color:#fff; padding:2px 6px; border-radius:6px; font-weight:800; font-size:9.5px;">🚢 ${esc(cleanVessel || 'Vessel')}</div>` }) }).addTo(routeMapInstance);
+
+    routeMapInstance.fitBounds(seaPath.getBounds(), { padding: [30, 30] });
+  }, 120);
+}
+
+el("mapCloseBtn").addEventListener("click", () => el("mapModalBg").classList.remove("open"));
+
+function openEmailModal(idx) {
+  const r = rows[idx];
+  const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+  const liner = getField(r, ["LINER"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "Shipping Line";
+  const gwPort = getGatewayPortInfo(r).name;
+  const cfs = getField(r, ["CFS NAME", "CFS"]) || "Designated CFS";
+  const st = getStatus(r).text;
+
+  el("emailSubject").value = `Status Update: ${cntr} - ${st.replace(/[^\w\s-]/g, '').trim()}`;
+  const body = `Dear Customer,\n\nStatus for Container ${cntr} (${getField(r, ["TYPE", "SIZE"]) || "40' HC"}):\n` +
+    `• Line: ${liner}\n• MBL: ${getField(r, ["MBL NO", "MBL", "MASTER BL"]) || 'N/A'}\n• Vessel: ${getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || 'N/A'}\n` +
+    `• Port: ${gwPort} (In: ${formatDate(r["PORT IN"]) || 'Pending'} | Out: ${formatDate(r["PORT OUT"]) || 'Pending'})\n` +
+    `• CFS: ${cfs}\n• Truck: ${getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || 'Pending Assignment'}\n• Status: ${st.replace(/[^\w\s-]/g, '').trim()}\n\nSupport: madhan@gmlindia.net`;
+
+  el("emailBody").value = body;
+  el("sendMailtoBtn").href = `mailto:?subject=${encodeURIComponent(el("emailSubject").value)}&body=${encodeURIComponent(body)}`;
+  el("emailModalBg").classList.add("open");
+}
+el("emailModalClose").addEventListener("click", () => el("emailModalBg").classList.remove("open"));
+el("copyEmailBtn").addEventListener("click", () => copyText(el("emailBody").value));
+
+el("openAnalyticsBtn").addEventListener("click", () => {
+  const completed = rows.filter(r => isFullyCompleted(r));
+  let totalTransitDays = 0, countTransit = 0;
+
+  completed.forEach(r => {
+    const originDate = parseLocalDate(getField(r, ["ETD"]) || getField(r, ["ETA"]));
+    const retDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE"])) || parseLocalDate(getField(r, ["DESTUFFING DATE"]));
+    if (originDate && retDate) {
+      const days = Math.floor((retDate - originDate) / (1000 * 60 * 60 * 24));
+      if (days >= 0) { totalTransitDays += days; countTransit++; }
+    }
+  });
+
+  const avgTransit = countTransit > 0 ? (totalTransitDays / countTransit).toFixed(1) : "—";
+  const terminalBreakdown = {};
+  rows.forEach(r => {
+    const t = getGatewayPortInfo(r).name;
+    terminalBreakdown[t] = (terminalBreakdown[t] || 0) + 1;
+  });
+
+  el("analyticsBody").innerHTML = `
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px;">
+      <div class="kpi-card">
+        <small>Average Turnaround</small>
+        <strong>${avgTransit} Days</strong>
+      </div>
+      <div class="kpi-card">
+        <small>Completed Units</small>
+        <strong style="color:var(--success);">${completed.length}</strong>
+      </div>
+    </div>
+    <div style="background:var(--bg-elevated); padding:12px; border-radius:8px; border:1px solid var(--border);">
+      <div style="font-size:10.5px; font-weight:800; text-transform:uppercase; margin-bottom:8px;">Terminal Distribution</div>
+      ${Object.entries(terminalBreakdown).map(([term, num]) => `
+        <div style="margin-bottom:6px; display:flex; justify-content:space-between; font-size:11.5px; font-weight:600;">
+          <span>${esc(term)}</span>
+          <span>${num} units</span>
+        </div>
+      `).join("")}
+    </div>
+  `;
+  el("analyticsModalBg").classList.add("open");
+});
+el("analyticsModalClose").addEventListener("click", () => el("analyticsModalBg").classList.remove("open"));
+
+function getSkeletonHTML() {
+  return `
+    <div style="background:var(--bg-surface); border:1px solid var(--border); border-radius:18px; padding:24px; margin-bottom:20px; box-shadow:var(--shadow-lg);">
+      <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
+        <div>
+          <div class="skeleton-box" style="width:100px; height:12px; margin-bottom:8px;"></div>
+          <div class="skeleton-box" style="width:180px; height:24px;"></div>
+        </div>
+        <div class="skeleton-box" style="width:120px; height:32px; border-radius:20px;"></div>
+      </div>
+      <div style="display:flex; justify-content:space-between; margin-top:30px; position:relative;">
+        <div class="skeleton-box" style="position:absolute; top:13px; left:0; right:0; height:2px;"></div>
+        ${[1,2,3,4,5,6].map(() => `
+          <div style="display:flex; flex-direction:column; align-items:center; gap:8px; z-index:2;">
+            <div class="skeleton-box" style="width:28px; height:28px; border-radius:50%; border:2px solid var(--border);"></div>
+            <div class="skeleton-box" style="width:70px; height:10px;"></div>
+            <div class="skeleton-box" style="width:50px; height:10px;"></div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `;
+}
+
+function performPublicSearch() {
+  const rawInput = el("publicSearchInput").value.trim();
+  const container = el("publicResultContainer");
+  const btn = el("publicSearchBtn");
+  
+  if (!rawInput) {
+    toast("Please enter a Container or MBL Number!");
+    el("publicSearchInput").focus();
+    return;
+  }
+
+  // Trigger Realistic Loading Skeleton
+  btn.classList.add("btn-loading");
+  container.style.display = "block";
+  container.innerHTML = getSkeletonHTML();
+  container.classList.add("fade-in");
+  container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+  setTimeout(() => {
+    btn.classList.remove("btn-loading");
+    const queries = rawInput.split(/[\s,]+/).filter(Boolean).map(q => q.toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+    const publicSearchResults = rows.filter(r => {
+      const cntr = (getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+      const mbl = (getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+      return queries.some(q => q && (cntr === q || mbl === q || cntr.includes(q) || mbl.includes(q)));
+    });
+
+    if (!publicSearchResults.length) {
+      container.innerHTML = `
+        <div style="text-align:center; padding:40px 20px; color:var(--danger);">
+          <div style="font-size:36px; margin-bottom:10px;">🔍</div>
+          <strong style="font-size:16px;">No shipment records found for "${esc(rawInput)}"</strong>
+          <div style="font-size:12px; color:var(--text-muted); margin-top:6px;">
+            Try searching test units: <code>SKHU9422886</code>, <code>IAAU1753030</code>, or MBL <code>A56GX21515</code>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = publicSearchResults.map((r, i) => {
+      const st = getStatus(r);
+      const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+      const originPort = getField(r, ["POL", "PORT OF LOADING"]) || "SHEKOU";
+      const gwPort = getGatewayPortInfo(r).name;
+      const destPort = `${gwPort}, INDIA`;
+      const vessel = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
+      const publicTimelineHtml = generatePublicVoyageTimelineHtml(r);
+      const publicUrl = window.location.href.split('?')[0] + '?cntr=' + encodeURIComponent(cntr);
+
+      return `
+        <div class="cascade-item" style="animation-delay: ${i * 100}ms">
+          <div style="background:var(--bg-elevated); padding:20px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <div style="font-size:9.5px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em;">Container Number</div>
+              <div style="font-size:22px; font-weight:900; font-family:'JetBrains Mono'; color:var(--accent); margin-top:2px;">${esc(cntr)}</div>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <button class="btn btn-ghost" style="padding:6px 12px; font-size:11px;" onclick="copyText('${publicUrl}')" title="Copy Public Tracking Link">🔗 Copy Link</button>
+              <button class="btn btn-ghost" style="padding:6px 12px; font-size:11px;" onclick="window.print()" title="Print Summary">🖨️ Print</button>
+              <button class="btn" style="border-radius:20px; font-size:11px; padding:6px 14px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(vessel)}', 50)">🗺️ Route Map</button>
+              <span class="public-badge ${st.class === 'completed' ? 'completed' : ''}">${st.text}</span>
+            </div>
+          </div>
+          ${publicTimelineHtml}
+        </div>
+      `;
+    }).join("<hr style='border:0; border-top:1px solid var(--border);'>");
+
+    // Trigger sequential timeline drawing
+    setTimeout(() => {
+      document.querySelectorAll('.timeline-stepper').forEach(stepper => {
+         const nodes = stepper.querySelectorAll('.step-node');
+         nodes.forEach((node, idx) => {
+             if (nodes[idx + 1] && (nodes[idx + 1].classList.contains('completed') || nodes[idx + 1].classList.contains('active'))) {
+                 setTimeout(() => node.classList.add('draw-line'), idx * 300);
+             }
+         });
+      });
+    }, 50);
+
+  }, 1200); // 1.2s for realistic load feel
+}
+
+el("publicSearchBtn").addEventListener("click", performPublicSearch);
+el("publicSearchInput").addEventListener("keypress", (e) => { if (e.key === "Enter") performPublicSearch(); });
+
+function toggleTheme() {
+  const current = document.documentElement.getAttribute("data-theme") || "light";
+  const target = current === "dark" ? "light" : "dark";
+  document.documentElement.setAttribute("data-theme", target);
+  localStorage.setItem("gml_theme", target);
+  el("themeBtn").textContent = target === "dark" ? "☀️" : "🌙";
+  el("publicThemeBtn").textContent = target === "dark" ? "☀️" : "🌙";
+}
+el("themeBtn").addEventListener("click", toggleTheme);
+el("publicThemeBtn").addEventListener("click", toggleTheme);
+const savedTheme = localStorage.getItem("gml_theme") || "light";
+document.documentElement.setAttribute("data-theme", savedTheme);
+el("themeBtn").textContent = savedTheme === "dark" ? "☀️" : "🌙";
+el("publicThemeBtn").textContent = savedTheme === "dark" ? "☀️" : "🌙";
+
+function formatDate(val) {
+  const s = String(val ?? "").trim();
+  if(!s || ["-","—","na","n/a","null"].includes(s.toLowerCase())) return "";
+  let d = parseLocalDate(s);
+  if (!d) return s;
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return `${String(d.getDate()).padStart(2, '0')}-${months[d.getMonth()]}`;
+}
+
+function validDate(val) {
+  const s = String(val ?? "").trim();
+  return s && !["-","—","na","n/a","null"].includes(s.toLowerCase()) && !isNaN(Date.parse(s));
+}
+
+function getStatus(r) {
+  if (validDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]))) return { text: "🔄 EMPTY RETURNED", class: "completed" };
+  if (validDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]))) return { text: "📦 DE-STUFF COMPLETED", class: "completed" };
+  if (validDate(getField(r, ["CFS IN"]))) return { text: "🏢 CFS IN", class: "progress" };
+  if (validDate(getField(r, ["PORT OUT"]))) return { text: "🚚 PORT OUT", class: "progress" };
+  if (validDate(getField(r, ["PORT IN"]))) return { text: "⚓ PORT IN", class: "progress" };
+  if (validDate(getField(r, ["INWARD DATE", "INWARD"]))) return { text: "📥 INWARD", class: "progress" };
+  if (validDate(getField(r, ["ETA"]))) return { text: "⏳ ETA SCHEDULED", class: "progress" };
+  if (validDate(getField(r, ["ETD"]))) return { text: "🚢 ETD DEPARTED", class: "progress" };
+  return { text: "⏳ PENDING", class: "progress" };
+}
+
+function isFullyCompleted(r) {
+  return validDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
+}
+
+function detectLinerFromMBL(mbl) {
+  const s = String(mbl || "").trim().toUpperCase();
+  if (/^(027|WHLC|WHL)/.test(s)) return "WAN HAI";
+  if (/^(274|MAEU|MSK)/.test(s)) return "MAERSK";
+  if (/^(MEDU|MSCU)/.test(s)) return "MSC";
+  if (/^(ONEY|ONE)/.test(s)) return "ONE";
+  if (/^(CMDU|CMA)/.test(s)) return "CMA CGM";
+  if (/^(HLCU|HL)/.test(s)) return "HAPAG-LLOYD";
+  if (/^(EGLV|EGL)/.test(s)) return "EVERGREEN";
+  if (/^(COSU|COS)/.test(s)) return "COSCO";
+  if (/^(SNK|SIT)/.test(s)) return "SITC / PAREKH";
+  return "";
+}
+
+function getCarrierTrackingUrl(r) {
+  const liner = (getField(r, ["LINER"]) || "").toLowerCase();
+  const ref = encodeURIComponent((getField(r, ["MBL NO", "MBL", "MASTER BL"]) || getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "").trim());
+  if (liner.includes("wan hai")) return `https://www.wanhai.com/views/cargo/CargoTracking.xhtml?q_cargo_type=B&q_ref_no=${ref}`;
+  if (liner.includes("maersk")) return `https://www.maersk.com/tracking/${ref}`;
+  if (liner.includes("msc")) return `https://www.msc.com/en/track-a-shipment?query=${ref}`;
+  if (liner.includes("one") || liner.includes("ocean network")) return `https://ecomm.one-line.com/one-ecom/manage-shipment/cargo-tracking?ctrac-field=${ref}`;
+  if (liner.includes("cma")) return `https://www.cma-cgm.com/ebusiness/tracking/search?SearchBy=BL&Search=${ref}`;
+  return `https://www.google.com/search?q=${encodeURIComponent(liner + ' tracking ' + ref)}`;
+}
+
+function getGatewayPortInfo(r) {
+  const portField = (getField(r, ["GATEWAY PORT", "GATEWAY"]) || "").toUpperCase();
+  if (portField.includes("CITPL") || portField.includes("PSA")) return { name: "CITPL", url: "https://cp.citpl.co.in/enquiry/ctrHist", key: "CITPL" };
+  if (portField.includes("CCTL") || portField.includes("DP")) return { name: "CCTL", url: "https://122.252.230.102/DPWCCTTracking/Index.php", key: "CCTL" };
+  if (portField.includes("KATTUPALLI")) return { name: "Kattupalli", url: "https://www.adaniports.com/", key: "Kattupalli" };
+  if (portField.includes("ENNORE")) return { name: "Ennore", url: "https://timetocargo.com/", key: "Ennore" };
+  return { name: "CCTL", url: "https://122.252.230.102/DPWCCTTracking/Index.php", key: "CCTL" };
+}
+
+function getCfsDepotInfo(cfsName) {
+  const name = (cfsName || "").toUpperCase();
+  if (name.includes("ECCT")) return { name: "ECCT CFS", url: "http://ecctcfs.com/containerTrackAndTrace.jsp" };
+  if (name.includes("TRIWAY")) return { name: "Triway CFS", url: "https://www.triway.in/" };
+  return { name: name || "CFS", url: `https://www.google.com/search?q=${encodeURIComponent(cfsName + ' cfs chennai')}` };
+}
+
+function setGatewayPort(idx, val) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const old = rows[idx]["GATEWAY PORT"];
+  rows[idx]["GATEWAY PORT"] = val;
+  logAuditEvent("PORT_CHANGE", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "GATEWAY PORT", old, val);
+  lastEditedId = idx;
+  saveAndRefresh();
+  toast(`Port: ${val}`);
+}
+
+el("bulkDestuffBtn").addEventListener("click", () => {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  if (!selectedIndices.size) return alert("Select containers first.");
+  const todayStr = new Date().toISOString().slice(0, 10);
+  
+  if (confirm(`Mark ${selectedIndices.size} containers as Destuffed today?`)) {
+    selectedIndices.forEach(idx => {
+      const oldVal = rows[idx]["DESTUFFING DATE"];
+      rows[idx]["DESTUFFING DATE"] = todayStr;
+      if (!rows[idx]["REMARKS"]) rows[idx]["REMARKS"] = "DE-STUFF COMPLETED";
+      logAuditEvent("BULK_DESTUFF", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "DESTUFFING DATE", oldVal, todayStr);
+    });
+    saveAndRefresh();
+    selectedIndices.clear();
+    toast(`Marked destuffed`);
+  }
+});
+
+// Upgraded WhatsApp Composer to handle Bulk Arrays
+function openWhatsAppComposer(idx = -1, selectedArr = null) {
+  const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  let text = "";
+
+  if (idx !== -1) {
+    const r = rows[idx];
+    const fees = calculateStandardFees(r);
+    const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+    text = `📦 *SHIPMENT TRACKING UPDATE* • ${dateStr}\n` +
+           `━━━━━━━━━━━━━━━━━━━━━━\n` +
+           `*Container:* ${cntr} (${getField(r, ["TYPE", "SIZE"]) || "40' DC"})\n` +
+           `*Line / MBL:* ${getField(r, ["LINER"]) || '-'} | ${getField(r, ["MBL NO", "MBL", "MASTER BL"]) || '-'}\n` +
+           `*Vessel:* ${getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || '-'}\n` +
+           (r["INWARD DATE"] ? `*Inward Date:* ${formatDate(r["INWARD DATE"])}\n` : '') +
+           `*Port In:* ${formatDate(r["PORT IN"]) || 'Pending'} | *Port Out:* ${formatDate(r["PORT OUT"]) || 'Pending'}\n` +
+           `*CFS Depot:* ${getField(r, ["CFS NAME", "CFS"]) || '-'}\n` +
+           (getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) ? `*Truck No:* ${getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"])}\n` : '') +
+           `*Status:* ${getStatus(r).text.replace(/[^\w\s-]/g, '').trim()}\n` +
+           `*Free Days:* Terminal (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'}) | Detention (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})\n` +
+           (r["REMARKS"] ? `*Remark:* ${r["REMARKS"]}\n` : '') +
+           `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
+  } else {
+    // Aggregates all selected containers into one broadcast list
+    const active = selectedArr ? selectedArr.map(i => rows[i]) : rows.filter(r => !isFullyCompleted(r));
+    text = `🚢 *GREENWICH MERIDIAN LOGISTICS*\n` +
+           `📋 *BULK DISPATCH BRIEF* • ${dateStr}\n` +
+           `━━━━━━━━━━━━━━━━━━━━━━\n\n`;
+    active.forEach((r, i) => {
+      text += `${i + 1}. *${getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"])}* (${getField(r, ["TYPE", "SIZE"]) || "40' DC"})\n` +
+              `   • Status: ${getStatus(r).text.replace(/[^\w\s-]/g, '').trim()} | CFS: ${getField(r, ["CFS NAME", "CFS"]) || '-'}\n` +
+              `   • Port In: ${formatDate(r["PORT IN"]) || 'Pending'} | Port Out: ${formatDate(r["PORT OUT"]) || 'Pending'}\n\n`;
+    });
+    text += `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
+  }
+
+  el("whatsappComposerText").value = text;
+  el("openDirectWhatsAppBtn").href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  el("whatsappComposerModalBg").classList.add("open");
+}
+
+el("whatsappComposerClose").addEventListener("click", () => el("whatsappComposerModalBg").classList.remove("open"));
+el("copyComposerTextBtn").addEventListener("click", () => copyText(el("whatsappComposerText").value));
+
+// Bind the Broadcast button to pass ALL selected containers
+el("bulkWhatsAppBtn").addEventListener("click", () => {
+  if (!selectedIndices.size) return alert("Select at least one container!");
+  openWhatsAppComposer(-1, Array.from(selectedIndices));
+});
+
+// Bind the Snapshot button
+el("bulkPhotoBtn").addEventListener("click", () => {
+  if (!selectedIndices.size) return alert("Select at least one container!");
+  const selectedRows = Array.from(selectedIndices).map(idx => rows[idx]);
+  downloadMultipleStatusImage(selectedRows, "Bulk_Snapshot");
+});
+
+function getFilteredRows() {
+  const q = el("search").value.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const vf = el("vesselFilter").value;
+  const gw = el("gatewayFilter").value;
+  const cf = el("cfsFilter").value;
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  let filtered = rows.map((r, i) => ({r, i})).filter(({r}) => {
+    const rawCntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+    const cntr = rawCntr.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const vsl = (getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "").toLowerCase();
+    const mbl = (getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+    const truck = (getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "").toLowerCase().replace(/[^a-z0-9]/g, '');
+    const completed = isFullyCompleted(r);
+    const fees = calculateStandardFees(r);
+
+    if (q && !cntr.includes(q) && !vsl.includes(q) && !mbl.includes(q) && !truck.includes(q)) return false;
+    if (vf && getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) !== vf) return false;
+    if (gw && !(getField(r, ["GATEWAY PORT", "PORT"]) || "").toLowerCase().includes(gw.toLowerCase())) return false;
+    if (cf && getField(r, ["CFS NAME", "CFS"]) !== cf) return false;
+
+    if (activeQuickFilter === "active" && completed) return false;
+    if (activeQuickFilter === "completed" && !completed) return false;
+    if (activeQuickFilter === "today" && (getField(r, ["ETA"]) !== todayStr && getField(r, ["PORT IN"]) !== todayStr)) return false;
+    if (activeQuickFilter === "demurrage" && (completed || !fees.demOverdue)) return false;
+    if (activeQuickFilter === "detention" && (completed || !fees.detOverdue)) return false;
+    if (activeQuickFilter === "critical_lfd" && (completed || ((fees.terminalDaysLeft > 2 || fees.terminalDaysLeft === null) && (fees.detentionDaysLeft > 2 || fees.detentionDaysLeft === null)))) return false;
+
+    return true;
+  });
+
+  if (sortField) {
+    filtered.sort((a, b) => {
+      const vA = (a.r[sortField] || "").toLowerCase();
+      const vB = (b.r[sortField] || "").toLowerCase();
+      return sortAsc ? vA.localeCompare(vB) : vB.localeCompare(vA);
+    });
+  }
+
+  return filtered;
+}
+
+function updateKPIs() {
+  const active = rows.filter(r => !isFullyCompleted(r));
+  let portOutPending = 0;
+  let destuffingPending = 0;
+  let totalExposureUSD = 0;
+
+  active.forEach(r => {
+    const fees = calculateStandardFees(r);
+    totalExposureUSD += fees.totalCostUSD;
+
+    const hasPortIn = validDate(getField(r, ["PORT IN"]));
+    const hasPortOut = validDate(getField(r, ["PORT OUT"]));
+    const hasDestuff = validDate(getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]));
+
+    if (hasPortIn && !hasPortOut) portOutPending++;
+    if (hasPortOut && !hasDestuff) destuffingPending++;
+  });
+
+  // Animate metrics on render
+  animateValue(el("kActive"), 0, active.length, 800);
+  animateValue(el("kCompleted"), 0, rows.filter(r => isFullyCompleted(r)).length, 800);
+  animateValue(el("kPortInPending"), 0, active.filter(r => !validDate(getField(r, ["PORT IN"]))).length, 800);
+  animateValue(el("kPortOutPending"), 0, portOutPending, 800);
+  animateValue(el("kDestuffingPending"), 0, destuffingPending, 800);
+  animateValue(el("kTotalExposure"), 0, totalExposureUSD, 1000, true);
+}
+
+function renderUI() {
+  const filtered = getFilteredRows();
+  updateKPIs();
+
+  if (currentView === 'cards') renderCards(filtered);
+  else if (currentView === 'sheet') renderSheet(filtered);
+  else if (currentView === 'kanban') renderKanban(filtered);
+
+  const count = selectedIndices.size;
+  const sn = el("selectionNotice");
+  if(sn) sn.textContent = `${count} selected`;
+  const bc = el("btnSelectCount");
+  if(bc) bc.textContent = count;
+  
+  const fab = el("floatingActionBar");
+  if(fab) {
+    if(count > 0) fab.classList.add("show");
+    else fab.classList.remove("show");
+  }
+}
+
+function getLfdHtml(daysLeft, isOverdue, label, totalDays) {
+  if (isOverdue) return `<div class="lfd-wrap danger"><div class="lfd-label">${label}: OVERDUE</div><div class="lfd-bar"><div class="lfd-fill" style="width:100%"></div></div></div>`;
+  if (daysLeft === null) return '';
+  
+  const maxDays = totalDays || 14; 
+  const daysConsumed = Math.max(0, maxDays - daysLeft);
+  const pct = Math.max(5, Math.min(100, (daysConsumed / maxDays) * 100));
+  
+  let state = 'success';
+  if (daysLeft <= 2) state = 'danger pulse';
+  else if (daysLeft <= 4) state = 'warning';
+  
+  return `<div class="lfd-wrap ${state}">
+            <div class="lfd-label">${label}: ${daysLeft}d Left</div>
+            <div class="lfd-bar"><div class="lfd-fill" style="width:${pct}%"></div></div>
+          </div>`;
+}
+
+function renderCards(items) {
+  const isViewer = currentUser && currentUser.role === "Viewer";
+
+  if (!items.length) {
+    el("cardsView").innerHTML = `
+      <div style="grid-column:1/-1; text-align:center; padding:60px 20px; color:var(--text-muted); display:flex; flex-direction:column; align-items:center;">
+          <div style="font-size:48px; margin-bottom:16px;">📭</div>
+          <h3 style="color:var(--text-main); margin-bottom:8px;">No Containers Found</h3>
+          <p>Try adjusting your search or filter criteria.</p>
+      </div>`;
+    return;
+  }
+
+  el("cardsView").innerHTML = items.map(({r, i}, loopIdx) => {
+    const st = getStatus(r);
+    const isChecked = selectedIndices.has(i) ? "checked" : "";
+    const cntrNo = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "UNKNOWN";
+    const mblNo = getField(r, ["MBL NO", "MBL", "MASTER BL"]);
+    const vesselVoy = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
+    const containerType = getField(r, ["TYPE", "SIZE", "CONTAINER TYPE"]) || "40' HC";
+    const liner = getField(r, ["LINER", "LINE"]) || detectLinerFromMBL(getField(r, ["MBL NO", "MBL", "MASTER BL"])) || "Line";
+    const trackUrl = getCarrierTrackingUrl(r);
+    const fees = calculateStandardFees(r);
+    const gwPort = getGatewayPortInfo(r);
+    const cfsDepot = getCfsDepotInfo(getField(r, ["CFS NAME", "CFS"]));
+    const truckNo = getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]);
+    const flashClass = lastEditedId === i ? "card-saved" : "";
+
+    return `
+      <div class="card-box cascade-item ${flashClass}" style="animation-delay: ${loopIdx * 40}ms">
+        <div>
+          <div class="card-header-top">
+            <div>
+              <div class="card-title-group">
+                <input type="checkbox" class="chk-item photo-exclude" value="${i}" ${isChecked}>
+                <span class="card-cntr-code clickable-copy" onclick="copyText('${esc(cntrNo)}')">${esc(cntrNo)}</span>
+              </div>
+              <div class="card-vessel">${esc(vesselVoy)} (${esc(containerType)})</div>
+              ${mblNo ? `<div class="clickable-copy" onclick="copyText('${esc(mblNo)}')" style="font-size:10.5px; color:var(--text-dim); font-family:'JetBrains Mono'; margin-top:2px; display:inline-block;">MBL: ${esc(mblNo)}</div>` : ''}
+            </div>
+            <span class="status-pill ${st.class}">${st.text}</span>
+          </div>
+
+          <div class="badge-row" style="margin-top:12px;">
+            ${!fees.demOverdue && !validDate(r["PORT OUT"]) ? getLfdHtml(fees.terminalDaysLeft, fees.demOverdue, 'Terminal LFD', fees.portFreeDays) : ''}
+            ${!fees.detOverdue && !fees.isCompleted ? getLfdHtml(fees.detentionDaysLeft, fees.detOverdue, 'Carrier LFD', fees.carrierFreeDays) : ''}
+            ${fees.demOverdue ? `<div class="lfd-wrap danger"><div class="lfd-label">Port Demurrage</div><div style="font-family:'JetBrains Mono'; font-weight:800;">+${fees.demDays}d / ${formatCurrency(fees.demCostUSD)}</div></div>` : ''}
+            ${fees.detOverdue ? `<div class="lfd-wrap danger"><div class="lfd-label">Line Detention</div><div style="font-family:'JetBrains Mono'; font-weight:800;">+${fees.detDays}d / ${formatCurrency(fees.detCostUSD)}</div></div>` : ''}
+            ${!fees.demOverdue && !fees.detOverdue && fees.terminalDaysLeft > 4 && fees.detentionDaysLeft > 4 ? `<span class="tag-badge success">Free Time Clear</span>` : ''}
+          </div>
+
+          <div class="badge-links-group">
+            <a href="${trackUrl}" target="_blank" class="link-pill">🌐 ${esc(liner)} ↗</a>
+            <a href="${gwPort.url}" target="_blank" class="link-pill">⚓ ${esc(gwPort.name)}</a>
+            <a href="${cfsDepot.url}" target="_blank" class="link-pill">🏢 ${esc(cfsDepot.name)}</a>
+          </div>
+        </div>
+
+        <div class="card-details-grid">
+          <div class="detail-item">
+            <label>Port In / Out</label>
+            <val style="color:var(--warning)">${formatDate(getField(r, ["PORT IN"])) || "—"} / ${formatDate(getField(r, ["PORT OUT"])) || "—"}</val>
+          </div>
+          <div class="detail-item">
+            <label>Terminal LFD / Dwell</label>
+            <val style="${fees.demOverdue ? 'color:var(--danger)' : ''}">${fees.terminalLFD} (${fees.portDwell}d / Free 3d)</val>
+          </div>
+          <div class="detail-item">
+            <label>CFS Depot / Truck</label>
+            <val style="color:var(--accent);">${esc(getField(r, ["CFS NAME", "CFS"]) || "—")} / <span class="clickable-copy" onclick="copyText('${esc(truckNo)}')"><span style="color:var(--text-main);">${esc(truckNo || "No Truck")}</span></span></val>
+          </div>
+          <div class="detail-item">
+            <label>Detention LFD / Dwell</label>
+            <val style="${fees.detOverdue ? 'color:var(--danger)' : ''}">${fees.detentionLFD} (${fees.totalEquipmentDays}d / Free ${esc(getField(r, ["FREE DAYS"]) || "14")}d)</val>
+          </div>
+        </div>
+
+        ${fees.totalCostUSD > 0 ? `
+          <div class="fee-breakdown-box">
+            <span style="font-weight:700; color:var(--danger)">⚠️ Total Surcharges</span>
+            <strong style="font-family:'JetBrains Mono'; color:var(--danger); font-size:12px;">${formatCurrency(fees.totalCostUSD)}</strong>
+          </div>
+        ` : ''}
+
+        <div>
+          <input type="text" class="input" style="width:100%; margin-bottom:6px; height:32px;" value="${esc(r["REMARKS"] || "")}" placeholder="Remark..." onchange="updateRemark(${i}, this.value)" ${isViewer ? 'readonly' : ''}>
+          <div class="card-footer-btns photo-exclude">
+            <button class="btn" style="padding:4px 8px;" onclick="openEmailModal(${i})">✉️ Email</button>
+            ${!isViewer ? `<button class="btn" style="padding:4px 8px;" onclick="openModal(${i})">✏️ Edit</button>` : ''}
+            ${currentUser && currentUser.role === 'Admin' ? `<button class="btn btn-danger" style="padding:4px 8px;" onclick="deleteRow(${i})">🗑️</button>` : ''}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join("");
+  bindCheckboxes();
+  lastEditedId = -1; // reset flash
+}
+
+function renderSheet(items) {
+  const isViewer = currentUser && currentUser.role === "Viewer";
+  
+  const editableAttrText = isViewer ? 'readonly' : 'readonly ondblclick="this.readOnly=false; this.focus();" onblur="this.readOnly=true;"';
+  const editableAttrSelect = isViewer ? 'disabled' : 'disabled ondblclick="this.disabled=false; this.focus();" onblur="this.disabled=true;"';
+
+  if (!items.length) {
+    el("sheetTableBody").innerHTML = `<tr><td colspan="17" style="text-align:center; padding:40px; color:var(--text-muted);">No records found.</td></tr>`;
+    el("paginationWrapper").innerHTML = "";
+    return;
+  }
+
+  // Pagination Logic
+  const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE) || 1;
+  if (currentPage > totalPages) currentPage = totalPages;
+  const startIdx = (currentPage - 1) * ITEMS_PER_PAGE;
+  const paginatedItems = items.slice(startIdx, startIdx + ITEMS_PER_PAGE);
+
+  el("sheetTableBody").innerHTML = paginatedItems.map(({r, i}, loopIdx) => {
+    const isChecked = selectedIndices.has(i) ? "checked" : "";
+    const gwPort = getGatewayPortInfo(r);
+    const fees = calculateStandardFees(r);
+    const cntrNo = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "";
+    const isoStatus = validateISO6346(cntrNo);
+    const flashClass = lastEditedId === i ? "row-saved" : "";
+
+    return `
+      <tr data-row="${i}" class="cascade-item ${flashClass}" style="animation-delay: ${loopIdx * 20}ms">
+        <td><input type="checkbox" class="chk-item" value="${i}" ${isChecked}></td>
+        <td data-label="Container No.">
+          <input class="cell-input" style="font-family:'JetBrains Mono'; font-weight:700; color:var(--accent);" value="${esc(cntrNo)}" title="${isoStatus.message}" onchange="inlineEditContainerNo(${i}, this.value)" ${editableAttrText}>
+        </td>
+        <td data-label="Type"><input class="cell-input" style="width:45px;" value="${esc(getField(r, ["TYPE", "SIZE"]) || "40' DC")}" onchange="inlineEdit(${i}, 'TYPE', this.value)" ${editableAttrText}></td>
+        <td data-label="MBL No"><input class="cell-input" style="width:85px;" value="${esc(getField(r, ["MBL NO", "MBL", "MASTER BL"]) || "")}" onchange="inlineEditMBL(${i}, this.value)" ${editableAttrText}></td>
+        <td data-label="Liner"><input class="cell-input" style="width:75px;" value="${esc(getField(r, ["LINER", "LINE"]) || "")}" onchange="inlineEdit(${i}, 'LINER', this.value)" ${editableAttrText}></td>
+        <td data-label="Port">
+          <select class="cell-select" style="width:80px;" onchange="setGatewayPort(${i}, this.value)" ${editableAttrSelect}>
+            <option value="CITPL" ${gwPort.key === 'CITPL' ? 'selected' : ''}>CITPL</option>
+            <option value="CCTL" ${gwPort.key === 'CCTL' ? 'selected' : ''}>CCTL</option>
+            <option value="Kattupalli" ${gwPort.key === 'Kattupalli' ? 'selected' : ''}>Kattupalli</option>
+            <option value="Ennore" ${gwPort.key === 'Ennore' ? 'selected' : ''}>Ennore</option>
+          </select>
+        </td>
+        <td data-label="Port In"><input class="cell-input" type="date" value="${getField(r, ["PORT IN"]) || ""}" onchange="inlineEdit(${i}, 'PORT IN', this.value)" ${editableAttrText}></td>
+        <td data-label="Port Out"><input class="cell-input" type="date" value="${getField(r, ["PORT OUT"]) || ""}" onchange="inlineEdit(${i}, 'PORT OUT', this.value)" ${editableAttrText}></td>
+        <td data-label="CFS Depot"><input class="cell-input" style="width:80px;" value="${esc(getField(r, ["CFS NAME", "CFS"]) || "")}" onchange="inlineEdit(${i}, 'CFS NAME', this.value)" ${editableAttrText}></td>
+        <td data-label="Truck No"><input class="cell-input" style="width:90px; font-family:'JetBrains Mono';" value="${esc(getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || "")}" placeholder="Vehicle" oninput="this.value=formatTruckNo(this.value)" onchange="inlineEdit(${i}, 'TRUCK NO.', this.value)" ${editableAttrText}></td>
+        <td data-label="Destuffed"><input class="cell-input" type="date" value="${getField(r, ["DESTUFFING DATE", "DESTUFF DATE"]) || ""}" onchange="inlineEdit(${i}, 'DESTUFFING DATE', this.value)" ${editableAttrText}></td>
+        <td data-label="Empty Return"><input class="cell-input" type="date" value="${getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]) || ""}" onchange="inlineEdit(${i}, 'CONTAINER RETURN DATE', this.value)" ${editableAttrText}></td>
+        <td data-label="Terminal LFD" style="font-weight:700; color:${fees.demOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.terminalLFD}</td>
+        <td data-label="Detention LFD" style="font-weight:700; color:${fees.detOverdue ? 'var(--danger)' : 'var(--text-muted)'};">${fees.detentionLFD}</td>
+        <td data-label="Exposure" style="font-weight:800; font-family:'JetBrains Mono'; color:${fees.totalCostUSD > 0 ? 'var(--danger)' : 'var(--success)'};">${formatCurrency(fees.totalCostUSD)}</td>
+        <td data-label="Remarks"><input class="cell-input" value="${esc(r["REMARKS"] || "")}" onchange="inlineEdit(${i}, 'REMARKS', this.value)" ${editableAttrText}></td>
+        <td data-label="Actions">
+          <div style="display:flex; gap:3px;">
+            ${!isViewer ? `<button class="btn" style="padding:2px 5px; color:var(--accent)" title="Mark Returned" onclick="markSingleReturned(${i})">🔄</button>` : ''}
+            ${currentUser && currentUser.role === 'Admin' ? `<button class="btn btn-danger" style="padding:2px 5px;" onclick="deleteRow(${i})">🗑️</button>` : ''}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join("");
+
+  el("paginationWrapper").innerHTML = `
+    <div style="display:flex; justify-content:space-between; padding:12px 16px; border-top:1px solid var(--border); align-items:center; background:var(--bg-elevated);">
+      <span style="font-size:11px; font-weight:700; color:var(--text-muted)">Showing ${startIdx + 1}-${Math.min(startIdx + ITEMS_PER_PAGE, items.length)} of ${items.length} records</span>
+      <div style="display:flex; gap:6px;">
+        <button class="btn btn-ghost" onclick="changePage(-1)" ${currentPage === 1 ? 'disabled' : ''}>&larr; Previous</button>
+        <button class="btn btn-ghost" onclick="changePage(1)" ${currentPage === totalPages ? 'disabled' : ''}>Next &rarr;</button>
+      </div>
+    </div>
+  `;
+
+  bindCheckboxes();
+  lastEditedId = -1; // reset flash
+}
+
+// Ensure changePage is globally available
+window.changePage = function(direction) {
+  currentPage += direction;
+  renderUI();
+  el("sheetView").scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+function inlineEditContainerNo(idx, val) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const oldVal = getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
+  const newVal = val.trim().toUpperCase();
+  rows[idx]["CONTAINER NO."] = newVal;
+  logAuditEvent("CONTAINER_RENAME", oldVal, "CONTAINER NO.", oldVal, newVal);
+  lastEditedId = idx;
+  saveAndRefresh();
+}
+
+function markSingleReturned(idx) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const today = new Date().toISOString().slice(0, 10);
+  const oldVal = rows[idx]["CONTAINER RETURN DATE"];
+  rows[idx]["CONTAINER RETURN DATE"] = today;
+  if (!rows[idx]["REMARKS"]) rows[idx]["REMARKS"] = "Empty container returned to depot";
+  logAuditEvent("EMPTY_RETURN", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "CONTAINER RETURN DATE", oldVal, today);
+  lastEditedId = idx;
+  saveAndRefresh();
+  toast("Marked Container Returned");
+}
+
+function renderKanban(items) {
+  const lanes = { "Terminal In": [], "Port Out / CFS": [], "Destuffed": [], "Completed Return": [] };
+  items.forEach(({r, i}) => {
+    const st = getStatus(r);
+    const cntrNo = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]) || "";
+    const vesselVoy = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || "—";
+    const cfsName = getField(r, ["CFS NAME", "CFS"]) || "—";
+
+    if (st.text.includes("EMPTY RETURNED")) lanes["Completed Return"].push({r, i, cntrNo, vesselVoy, cfsName});
+    else if (st.text.includes("DE-STUFF")) lanes["Destuffed"].push({r, i, cntrNo, vesselVoy, cfsName});
+    else if (st.text.includes("CFS IN") || st.text.includes("PORT OUT")) lanes["Port Out / CFS"].push({r, i, cntrNo, vesselVoy, cfsName});
+    else lanes["Terminal In"].push({r, i, cntrNo, vesselVoy, cfsName});
+  });
+
+  el("kanbanView").innerHTML = Object.entries(lanes).map(([title, list], laneIdx) => `
+    <div class="kanban-column">
+      <div class="kanban-header-strip">
+        <span>${title}</span>
+        <span class="status-pill progress">${list.length}</span>
+      </div>
+      <div class="kanban-body-list" data-lane="${title}" id="kanban-lane-${laneIdx}">
+        ${list.map(({i, cntrNo, vesselVoy, cfsName}, loopIdx) => {
+          const flashClass = lastEditedId === i ? "card-saved" : "";
+          return `
+          <div class="card-box cascade-item ${flashClass}" style="padding:10px; cursor:grab; animation-delay: ${loopIdx * 30}ms" data-idx="${i}">
+            <div style="display:flex; justify-content:space-between;">
+              <span class="card-cntr-code" style="font-size:12.5px;">${esc(cntrNo)}</span>
+            </div>
+            <div class="card-vessel" style="font-size:10px;">${esc(vesselVoy)}</div>
+            <div style="font-size:10px; color:var(--accent); margin-top:2px;">${esc(cfsName)}</div>
+          </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+  `).join("");
+
+  if (currentUser && currentUser.role !== "Viewer" && typeof Sortable !== 'undefined') {
+    document.querySelectorAll('.kanban-body-list').forEach(listEl => {
+      new Sortable(listEl, {
+        group: 'kanban',
+        animation: 150,
+        ghostClass: 'kanban-ghost',
+        onEnd: function(evt) {
+          const newLane = evt.to.dataset.lane;
+          const oldLane = evt.from.dataset.lane;
+          if(newLane !== oldLane) {
+            const rIdx = evt.item.dataset.idx;
+            handleKanbanDrop(rIdx, newLane);
+          }
+        }
+      });
+    });
+  }
+  lastEditedId = -1; // reset flash
+}
+
+function handleKanbanDrop(idx, newLane) {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const r = rows[idx];
+  
+  if (newLane === "Port Out / CFS") {
+    if(!r["PORT OUT"]) r["PORT OUT"] = todayStr;
+    if(!r["CFS IN"]) r["CFS IN"] = todayStr;
+  } else if (newLane === "Destuffed") {
+    if(!r["DESTUFFING DATE"]) r["DESTUFFING DATE"] = todayStr;
+  } else if (newLane === "Completed Return") {
+    if(!r["CONTAINER RETURN DATE"]) r["CONTAINER RETURN DATE"] = todayStr;
+  }
+  
+  logAuditEvent("KANBAN_MOVE", getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "STATUS", "Moved", newLane);
+  lastEditedId = parseInt(idx, 10);
+  saveAndRefresh();
+  toast(`Moved to ${newLane}`);
+}
+
+function bindCheckboxes() {
+  document.querySelectorAll(".chk-item").forEach(chk => {
+    chk.addEventListener("change", (e) => {
+      const idx = Number(e.target.value);
+      if (e.target.checked) selectedIndices.add(idx);
+      else selectedIndices.delete(idx);
+      
+      const count = selectedIndices.size;
+      const sn = el("selectionNotice");
+      if(sn) sn.textContent = `${count} selected`;
+      const bc = el("btnSelectCount");
+      if(bc) bc.textContent = count;
+      
+      const fab = el("floatingActionBar");
+      if(fab) {
+        if(count > 0) fab.classList.add("show");
+        else fab.classList.remove("show");
+      }
+    });
+  });
+}
+
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+function sortSheet(field) {
+  if (sortField === field) sortAsc = !sortAsc;
+  else { sortField = field; sortAsc = true; }
+  renderUI();
+}
+
+function inlineEdit(idx, field, val) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const oldVal = rows[idx][field];
+  const newVal = val.trim();
+  if (oldVal !== newVal) logAuditEvent("INLINE_EDIT", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), field, oldVal, newVal);
+  rows[idx][field] = newVal;
+  lastEditedId = idx;
+  saveAndRefresh();
+}
+
+function inlineEditMBL(idx, val) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const oldMBL = rows[idx]["MBL NO"];
+  const newMBL = val.trim();
+  rows[idx]["MBL NO"] = newMBL;
+  logAuditEvent("MBL_EDIT", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "MBL NO", oldMBL, newMBL);
+  const detected = detectLinerFromMBL(val);
+  if (detected && !rows[idx]["LINER"]) rows[idx]["LINER"] = detected;
+  lastEditedId = idx;
+  saveAndRefresh();
+}
+
+function updateRemark(idx, val) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const oldVal = rows[idx]["REMARKS"];
+  const newVal = val.trim();
+  rows[idx]["REMARKS"] = newVal;
+  logAuditEvent("REMARK_UPDATE", getField(rows[idx], ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "REMARKS", oldVal, newVal);
+  lastEditedId = idx;
+  saveAndRefresh();
+  toast("Remark saved");
+}
+
+function finalizeDelete() {
+  if (!pendingDelete) return;
+  logAuditEvent("DELETE_UNIT", getField(pendingDelete.row, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), "ALL", JSON.stringify(pendingDelete.row), "DELETED");
+  pendingDelete = null;
+  el("undoToast").classList.remove("show");
+}
+
+function undoDelete() {
+  if (!pendingDelete) return;
+  clearTimeout(deleteTimeout);
+  rows.splice(pendingDelete.idx, 0, pendingDelete.row);
+  lastEditedId = pendingDelete.idx;
+  pendingDelete = null;
+  el("undoToast").classList.remove("show");
+  saveAndRefresh();
+  toast("Restored Record");
+}
+
+function deleteRow(idx) {
+  if (!currentUser || currentUser.role !== "Admin") return alert("Admin only.");
+  if (pendingDelete) finalizeDelete(); 
+  
+  pendingDelete = { row: rows[idx], idx: idx };
+  rows.splice(idx, 1);
+  selectedIndices.clear(); 
+  saveAndRefresh();
+  
+  el("undoToast").classList.add("show");
+  deleteTimeout = setTimeout(finalizeDelete, 5000);
+}
+
+document.querySelectorAll(".chip").forEach(chip => {
+  chip.addEventListener("click", () => {
+    document.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+    chip.classList.add("active");
+    activeQuickFilter = chip.dataset.filter;
+    currentPage = 1; // Reset to page 1 on filter
+    renderUI();
+  });
+});
+
+async function saveAndRefresh() {
+  renderUI();
+  try {
+    localStorage.setItem("containerRows", JSON.stringify(rows));
+    await sb.from('containers').upsert({ id: 'gml_tracking_records', data: rows, updated_at: new Date().toISOString() });
+  } catch (err) {
+    console.warn("Cloud sync notice:", err);
+  }
+}
+
+async function loadFromCloud() {
+  try {
+    const { data, error } = await sb.from('containers').select('data').eq('id', 'gml_tracking_records').single();
+    if (!error && data && Array.isArray(data.data) && data.data.length > 0) {
+      rows = data.data;
+      localStorage.setItem("containerRows", JSON.stringify(rows));
+      populateFilters();
+      renderUI();
+    }
+  } catch(err){}
+}
+
+function populateFilters() {
+  const vSet = new Set(), cSet = new Set();
+  rows.forEach(r => {
+    const vsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
+    const cfs = getField(r, ["CFS NAME", "CFS"]);
+    if (vsl) vSet.add(vsl.trim());
+    if (cfs) cSet.add(cfs.trim());
+  });
+  el("vesselFilter").innerHTML = `<option value="">All Vessels</option>` + [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  el("cfsFilter").innerHTML = `<option value="">All CFS</option>` + [...cSet].sort().map(c => `<option value="${esc(c)}">${esc(c)}</option>`).join("");
+}
+
+function setView(mode) {
+  currentView = mode;
+  document.querySelectorAll(".view-btn").forEach(btn => btn.classList.toggle("active", btn.dataset.view === mode));
+  
+  // Clear displays to reset animation
+  ['cardsView', 'sheetView', 'kanbanView'].forEach(id => {
+    el(id).style.display = 'none';
+    el(id).classList.remove('fade-in');
+  });
+
+  const activeViewId = mode === 'cards' ? 'cardsView' : mode === 'sheet' ? 'sheetView' : 'kanbanView';
+  el(activeViewId).style.display = mode === 'cards' || mode === 'kanban' ? 'grid' : 'block';
+  
+  // Trigger reflow to restart CSS animation, then add class
+  void el(activeViewId).offsetWidth;
+  el(activeViewId).classList.add('fade-in');
+  
+  renderUI();
+}
+document.querySelectorAll(".view-btn").forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
+
+function setModalDate(id, offsetDays) {
+  const d = new Date();
+  d.setDate(d.getDate() + offsetDays);
+  const localDate = new Date(d.getTime() - (d.getTimezoneOffset() * 60000)).toISOString().slice(0, 10);
+  el(id).value = localDate;
+}
+
+function openModal(idx = -1) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  editingIndex = idx;
+  el("modalTitle").textContent = idx === -1 ? "Add Container" : "Edit Container";
+  const r = idx === -1 ? {} : rows[idx];
+  
+  el("modalForm").innerHTML = COLS.map(c => {
+    if (c === 'GATEWAY PORT') {
+      const curKey = getGatewayPortInfo(r).key; 
+      return `
+        <div>
+          <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase;">Gateway Port</label>
+          <select id="modal_GATEWAY_PORT" class="select" style="width:100%; margin-top:4px;" data-field="${c}">
+            <option value="CCTL" ${curKey === 'CCTL' ? 'selected' : ''}>CCTL (DP World)</option>
+            <option value="CITPL" ${curKey === 'CITPL' ? 'selected' : ''}>CITPL (PSA)</option>
+            <option value="Kattupalli" ${curKey === 'Kattupalli' ? 'selected' : ''}>Kattupalli Port</option>
+            <option value="Ennore" ${curKey === 'Ennore' ? 'selected' : ''}>Ennore Port</option>
+          </select>
+        </div>
+      `;
+    }
+    
+    const domId = `modal_${c.replace(/[^a-zA-Z0-9]/g, '_')}`;
+    const isDate = DATE_COLS.has(c);
+    
+    return `
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <label style="font-size:10px; font-weight:800; color:var(--text-muted); text-transform:uppercase; margin-bottom:0;">${c}</label>
+          ${isDate ? `
+            <div style="display:flex; gap:4px;">
+              <button type="button" class="btn btn-ghost" style="padding:1px 5px; font-size:9px;" onclick="setModalDate('${domId}', -1)">Yest</button>
+              <button type="button" class="btn btn-ghost" style="padding:1px 5px; font-size:9px;" onclick="setModalDate('${domId}', 0)">Today</button>
+            </div>
+          ` : ''}
+        </div>
+        <input type="${isDate ? 'date' : 'text'}" 
+               id="${domId}"
+               class="input" style="width:100%; margin-top:4px;" 
+               data-field="${c}" 
+               value="${esc(r[c] || '')}">
+      </div>
+    `;
+  }).join("");
+
+  const cntrInp = document.getElementById("modal_CONTAINER_NO_");
+  if (cntrInp) {
+    cntrInp.addEventListener("input", (e) => {
+      const iso = validateISO6346(e.target.value);
+      cntrInp.style.borderColor = iso.isValid ? "#10b981" : "#ef4444";
+      cntrInp.title = iso.message;
+    });
+  }
+
+  const mblInp = document.getElementById("modal_MBL_NO");
+  const linerInp = document.getElementById("modal_LINER");
+  if (mblInp && linerInp) {
+    mblInp.addEventListener("input", (e) => {
+      const detected = detectLinerFromMBL(e.target.value);
+      if (detected) linerInp.value = detected;
+    });
+  }
+
+  el("modalBg").classList.add("open");
+}
+el("modalClose").addEventListener("click", () => el("modalBg").classList.remove("open"));
+el("modalCancel").addEventListener("click", () => el("modalBg").classList.remove("open"));
+
+el("modalSave").addEventListener("click", () => {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  
+  const item = {};
+  el("modalForm").querySelectorAll("[data-field]").forEach(input => { item[input.dataset.field] = input.value.trim(); });
+  if (!item["CONTAINER NO."]) return alert("Container number required.");
+  
+  // Date Chronology Validation
+  const pIn = item["PORT IN"] ? new Date(item["PORT IN"]) : null;
+  const pOut = item["PORT OUT"] ? new Date(item["PORT OUT"]) : null;
+  const cfsIn = item["CFS IN"] ? new Date(item["CFS IN"]) : null;
+  const destuff = item["DESTUFFING DATE"] ? new Date(item["DESTUFFING DATE"]) : null;
+  const rtn = item["CONTAINER RETURN DATE"] ? new Date(item["CONTAINER RETURN DATE"]) : null;
+
+  if (pIn && pOut && pOut < pIn) return alert("Validation Error: Port Out cannot be before Port In.");
+  if (pOut && cfsIn && cfsIn < pOut) return alert("Validation Error: CFS In cannot be before Port Out.");
+  if (cfsIn && destuff && destuff < cfsIn) return alert("Validation Error: Destuffing cannot occur before CFS In.");
+  if (destuff && rtn && rtn < destuff) return alert("Validation Error: Return Date cannot be before Destuffing Date.");
+
+  item["CONTAINER NO."] = item["CONTAINER NO."].toUpperCase();
+  if (!item["LINER"] && item["MBL NO"]) item["LINER"] = detectLinerFromMBL(item["MBL NO"]);
+  item["TRUCK NO."] = formatTruckNo(item["TRUCK NO."]);
+
+  if (editingIndex === -1) {
+    rows.unshift(item);
+    logAuditEvent("CREATE_UNIT", item["CONTAINER NO."], "ALL", "NEW", JSON.stringify(item));
+    lastEditedId = 0; // The new item will be at index 0
+  } else {
+    const old = rows[editingIndex];
+    rows[editingIndex] = item;
+    logAuditEvent("MODAL_UPDATE", item["CONTAINER NO."], "RECORD", JSON.stringify(old), JSON.stringify(item));
+    lastEditedId = editingIndex;
+  }
+  
+  saveAndRefresh();
+  el("modalBg").classList.remove("open");
+  toast("Saved & Synced");
+});
+
+el("addBtn").addEventListener("click", () => openModal(-1));
+
+el("dailyDispatchBtn").addEventListener("click", () => {
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const activeToday = rows.filter(r => !isFullyCompleted(r) && (r["ETA"] === todayStr || r["PORT IN"] === todayStr || r["PORT OUT"] === todayStr));
+  
+  if (!activeToday.length) return alert("No active shipments scheduled for today.");
+
+  let summary = `📋 *DAILY DISPATCH BRIEF*\nTotal: *${activeToday.length}*\n━━━━━━━━━━━━━━\n`;
+  activeToday.forEach((r, idx) => {
+    summary += `${idx + 1}. *${getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"])}* | ${getField(r, ["CFS NAME", "CFS"]) || '-'} | ${getStatus(r).text.replace(/[^\w\s-]/g, '').trim()}\n`;
+  });
+  window.open("https://wa.me/?text=" + encodeURIComponent(summary), "_blank");
+});
+
+el("vesselEditBtn").addEventListener("click", () => {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const vSet = new Set();
+  rows.forEach(r => { 
+    const vsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
+    if(vsl) vSet.add(vsl.trim()); 
+  });
+  el("targetVesselSelect").innerHTML = [...vSet].sort().map(v => `<option value="${esc(v)}">${esc(v)}</option>`).join("");
+  el("vesselModalBg").classList.add("open");
+});
+el("vesselModalClose").addEventListener("click", () => el("vesselModalBg").classList.remove("open"));
+el("vesselModalCancel").addEventListener("click", () => el("vesselModalBg").classList.remove("open"));
+el("vesselModalSave").addEventListener("click", () => {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  const vsl = el("targetVesselSelect").value;
+  const fld = el("targetFieldSelect").value;
+  const val = el("targetNewValue").value.trim();
+  rows.forEach(r => { 
+    const currentVsl = getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]);
+    if (currentVsl === vsl) {
+      logAuditEvent("BULK_VESSEL_UPDATE", getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]), `${vsl}:${fld}`, r[fld], val);
+      r[fld] = val; 
+    }
+  });
+  saveAndRefresh();
+  el("vesselModalBg").classList.remove("open");
+  toast("Schedule updated");
+});
+
+el("sheetSelectAll").addEventListener("change", (e) => {
+  // Only selects filtered rows
+  if (e.target.checked) getFilteredRows().forEach(({i}) => selectedIndices.add(i));
+  else selectedIndices.clear();
+  
+  const count = selectedIndices.size;
+  const sn = el("selectionNotice");
+  if(sn) sn.textContent = `${count} selected`;
+  const bc = el("btnSelectCount");
+  if(bc) bc.textContent = count;
+  
+  const fab = el("floatingActionBar");
+  if(fab) {
+    if(count > 0) fab.classList.add("show");
+    else fab.classList.remove("show");
+  }
+  
+  renderUI();
+});
+
+el("search").addEventListener("input", debounce(() => { currentPage = 1; renderUI(); }, 250));
+el("vesselFilter").addEventListener("change", () => { currentPage = 1; renderUI(); });
+el("gatewayFilter").addEventListener("change", () => { currentPage = 1; renderUI(); });
+el("cfsFilter").addEventListener("change", () => { currentPage = 1; renderUI(); });
+
+el("exportBtn").addEventListener("click", () => {
+  const wb = XLSX.utils.book_new();
+  const exportData = rows.map(r => {
+    const fees = calculateStandardFees(r);
+    return {
+      ...r,
+      "PORT DWELL (DAYS)": fees.portDwell,
+      "TERMINAL LFD": fees.terminalLFD,
+      "DEMURRAGE (USD)": fees.demCostUSD,
+      "TOTAL EQUIPMENT DWELL (DAYS)": fees.totalEquipmentDays,
+      "DETENTION LFD": fees.detentionLFD,
+      "DETENTION (USD)": fees.detCostUSD,
+      "TOTAL EXPOSURE (USD)": fees.totalCostUSD,
+      "TOTAL EXPOSURE (INR)": Math.round(fees.totalCostUSD * USD_TO_INR)
+    };
+  });
+  XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(exportData), "Tracking & Surcharge");
+  XLSX.writeFile(wb, `Containers_Report_${new Date().toISOString().slice(0,10)}.xlsx`);
+});
+
+// Centralized Excel Parser for Input & Drag/Drop
+function processExcelFile(file) {
+  if (currentUser && currentUser.role === "Viewer") return alert("Read-only access.");
+  if (!file) return;
+  
+  const overlay = el("dragDropOverlay");
+  overlay.innerHTML = `<div class="btn-loading" style="width:50px; height:50px; margin-bottom:16px;"></div>Processing Import...`;
+  overlay.classList.add("open");
+
+  const reader = new FileReader();
+  reader.onload = evt => {
+    try {
+      const data = new Uint8Array(evt.target.result);
+      const wb = XLSX.read(data, {type: 'array', cellDates: true});
+      let imported = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval: ""});
+      
+      rows = imported.map(r => {
+        const out = {};
+        Object.keys(r).forEach(k => {
+          let val = r[k];
+          if (val instanceof Date) val = val.toISOString().split('T')[0];
+          const cleanKey = k.trim().toUpperCase();
+          out[cleanKey] = String(val ?? "").trim();
+        });
+
+        if (!out["CONTAINER NO."] && (out["CONTAINER"] || out["CONTAINER NO"] || out["CNTR NO"])) {
+          out["CONTAINER NO."] = out["CONTAINER"] || out["CONTAINER NO"] || out["CNTR NO"];
+        }
+        if (!out["MBL NO"] && (out["MBL"] || out["MASTER BL"])) {
+          out["MBL NO"] = out["MBL"] || out["MASTER BL"];
+        }
+        if (!out["LINER"] && out["LINE"]) {
+          out["LINER"] = out["LINE"];
+        }
+        if (!out["VESSEL & VOY"] && (out["VESSEL"] || out["VESSEL NAME"])) {
+          out["VESSEL & VOY"] = out["VESSEL"] || out["VESSEL NAME"];
+        }
+        if (!out["CFS NAME"] && out["CFS"]) {
+          out["CFS NAME"] = out["CFS"];
+        }
+        if (!out["TRUCK NO."] && (out["TRUCK NO"] || out["VEHICLE NO"])) {
+          out["TRUCK NO."] = formatTruckNo(out["TRUCK NO"] || out["VEHICLE NO"]);
+        }
+        if (!out["LINER"] && out["MBL NO"]) out["LINER"] = detectLinerFromMBL(out["MBL NO"]);
+        return out;
+      });
+
+      logAuditEvent("BULK_EXCEL_IMPORT", "ALL", "SHEET_DATA", "N/A", `${rows.length} units imported`);
+      populateFilters();
+      saveAndRefresh();
+      toast(`Imported ${rows.length} records!`);
+    } catch(err) {
+      alert("Invalid Excel File.");
+    } finally {
+      overlay.classList.remove("open");
+      // Reset overlay html
+      setTimeout(() => {
+        overlay.innerHTML = `<div style="font-size:64px; margin-bottom:16px;">📥</div>Drop Excel File to Import<div style="font-size:12px; font-weight:600; margin-top:8px; opacity:0.8;">Updates records automatically</div>`;
+      }, 300);
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+el("excelInput").addEventListener("change", e => processExcelFile(e.target.files[0]));
+
+// Drag & Drop Listeners
+const ddOverlay = el("dragDropOverlay");
+window.addEventListener("dragover", (e) => { 
+  e.preventDefault(); 
+  if(currentUser && currentUser.role !== "Viewer") ddOverlay.classList.add("open"); 
+});
+ddOverlay.addEventListener("dragleave", (e) => { 
+  e.preventDefault(); 
+  ddOverlay.classList.remove("open"); 
+});
+ddOverlay.addEventListener("drop", (e) => {
+  e.preventDefault();
+  if(e.dataTransfer.files[0] && e.dataTransfer.files[0].name.match(/\.(xlsx|xls|csv)$/i)) {
+    processExcelFile(e.dataTransfer.files[0]);
+  } else {
+    ddOverlay.classList.remove("open");
+  }
+});
+
+// Load storage with safety fallback
+try {
+  const saved = localStorage.getItem("containerRows");
+  if (saved) {
+    const parsed = JSON.parse(saved);
+    if (Array.isArray(parsed) && parsed.length > 0) {
+      rows = parsed.map(item => ({
+        "PORT OUT": "",
+        "CONTAINER RETURN DATE": "",
+        "TRUCK NO.": "",
+        "DRIVER CONTACT": "",
+        ...item
+      }));
+    }
+  }
+} catch(e){}
+
+populateFilters();
+loadFromCloud();
+updateAuditBadge();
+checkActiveSession();
+
+activeQuickFilter = 'all';
+document.querySelectorAll(".chip").forEach(c => {
+  c.classList.toggle("active", c.dataset.filter === 'all');
+});
+renderUI();
+
+const urlParams = new URLSearchParams(window.location.search);
+const scannedCntr = urlParams.get("cntr");
+if (scannedCntr) {
+  el("publicSearchInput").value = scannedCntr;
+  performPublicSearch();
+}
