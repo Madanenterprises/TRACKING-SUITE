@@ -14,7 +14,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com">
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="./style.css">
 </head>
 <body>
 
@@ -208,6 +208,8 @@
   <button class="btn btn-emerald" id="bulkPhotoBtn">📷 Snapshot (<span id="btnSelectCount">0</span>)</button>
   <button class="btn btn-purple" id="bulkWhatsAppBtn">💬 Broadcast</button>
   <button class="btn action-editor-only" id="bulkDestuffBtn" style="background:var(--danger-bg); color:var(--danger); border-color:transparent;">✅ Destuff Today</button>
+  <div style="width:1px; height:20px; background:var(--border); margin-left:4px;"></div>
+  <button class="btn btn-ghost" id="clearSelectionBtn" style="padding:4px 8px; border-radius:50%;" title="Clear Selection">✕</button>
 </div>
 
 <!-- Undo Toast -->
@@ -284,7 +286,7 @@
 <div class="modal-bg" id="loginModalBg">
   <div class="modal-dialog" style="max-width:380px;">
     <div class="modal-header">
-      <span>🔐Login</span>
+      <span>🔐 Staff Portal Login</span>
       <button class="btn btn-ghost" id="loginClose">✕</button>
     </div>
     <div class="modal-body" style="padding:20px;">
@@ -397,6 +399,6 @@
 
 <div class="toast-popup" id="toast"></div>
 
-<script src="app.js"></script>
+<script src="./app.js"></script>
 </body>
 </html>
