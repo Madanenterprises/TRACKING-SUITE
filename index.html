@@ -212,7 +212,7 @@ body {
   background-color: #0c182b;
   background-image: 
     linear-gradient(to right, rgba(9, 13, 22, 0.15) 0%, rgba(9, 13, 22, 0.5) 55%, rgba(9, 13, 22, 0.88) 100%),
-    url("e5f8c9ed-933f-4d12-8619-11f1af33ae40.png");
+    url("https://ykeucqritoexykqrggzz.supabase.co/storage/v1/object/public/website-assets/chennai-port-hero.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -236,7 +236,7 @@ body {
     padding: 36px 0 54px 0;
     background-image: 
       linear-gradient(to bottom, rgba(9, 13, 22, 0.25) 0%, rgba(9, 13, 22, 0.72) 48%, rgba(9, 13, 22, 0.94) 100%),
-      url("e5f8c9ed-933f-4d12-8619-11f1af33ae40.png");
+      url("https://ykeucqritoexykqrggzz.supabase.co/storage/v1/object/public/website-assets/chennai-port-hero.png");
     background-position: center;
     background-size: cover;
   }
@@ -1188,6 +1188,7 @@ body {
           <option value="POL">POL</option>
           <option value="ETD">ETD</option>
           <option value="ETA">ETA</option>
+          <option value="INWARD DATE">Inward Date</option>
           <option value="PORT IN">Port In</option>
           <option value="PORT OUT">Port Out</option>
           <option value="CFS IN">CFS In</option>
@@ -1354,6 +1355,7 @@ function generatePublicVoyageTimelineHtml(r) {
   const eta = formatDate(r["ETA"]) || 'Pending';
 
   const igmSplit = formatDate(r["SPLIT DATE"]);
+  const inward = formatDate(r["INWARD DATE"]);
   const berthedPort = formatDate(r["PORT IN"]);
   const portOut = formatDate(r["PORT OUT"]);
   const cfsIn = formatDate(r["CFS IN"]);
@@ -1361,6 +1363,7 @@ function generatePublicVoyageTimelineHtml(r) {
   const containerReturned = formatDate(r["CONTAINER RETURN DATE"]);
 
   const steps = [
+    { label: "Inward Granted", date: inward, done: !!inward },
     { label: "Vessel Berthed", date: berthedPort, done: !!berthedPort },
     { label: "Port Discharged", date: portOut, done: !!portOut },
     { label: "CFS In-Gate", date: cfsIn, done: !!cfsIn },
@@ -1422,6 +1425,10 @@ function generatePublicVoyageTimelineHtml(r) {
             <div class="ref-data-box">
               <label>IGM Split</label>
               <val>${igmSplit || 'Pending'}</val>
+            </div>
+            <div class="ref-data-box">
+              <label>Inward Granted</label>
+              <val>${inward || 'Pending'}</val>
             </div>
             <div class="ref-data-box">
               <label>Berthed Into Port</label>
@@ -1579,7 +1586,9 @@ function calculateStandardFees(r) {
   const demRatePerDay = is20ft ? 100 : 225;
   const detRatePerDay = is20ft ? 75 : 150;
 
-  const portInDate = parseLocalDate(getField(r, ["PORT IN", "INWARD DATE"]));
+  // Decoupled dates: PORT IN drives terminal free days; INWARD DATE drives container free days
+  const portInDate = parseLocalDate(getField(r, ["PORT IN"]));
+  const inwardDate = parseLocalDate(getField(r, ["INWARD DATE", "INWARD"]));
   const portOutDate = parseLocalDate(getField(r, ["PORT OUT", "CFS IN"]));
   const returnDate = parseLocalDate(getField(r, ["CONTAINER RETURN DATE", "EMPTY RETURN DATE"]));
   
@@ -1589,6 +1598,7 @@ function calculateStandardFees(r) {
   let demDays = 0, demOverdue = false, demCostUSD = 0, portDwell = 0;
   let detDays = 0, detOverdue = false, detCostUSD = 0, totalEquipmentDays = 0;
 
+  // Port Demurrage: Starts strictly from PORT IN
   const portFreeDays = 3;
   let terminalLFD = null;
   let terminalDaysLeft = null;
@@ -1607,17 +1617,18 @@ function calculateStandardFees(r) {
     }
   }
 
+  // Container Detention: Starts strictly from INWARD DATE
   const carrierFreeDays = parseInt(getField(r, ["FREE DAYS"]) || "14", 10);
   let detentionLFD = null;
   let detentionDaysLeft = null;
 
-  if (portInDate) {
-    detentionLFD = new Date(portInDate);
+  if (inwardDate) {
+    detentionLFD = new Date(inwardDate);
     detentionLFD.setDate(detentionLFD.getDate() + carrierFreeDays);
     detentionDaysLeft = Math.floor((detentionLFD - nowDay) / (1000 * 60 * 60 * 24));
 
     const endDetDate = returnDate || nowDay;
-    totalEquipmentDays = Math.max(0, Math.floor((endDetDate - portInDate) / (1000 * 60 * 60 * 24)));
+    totalEquipmentDays = Math.max(0, Math.floor((endDetDate - inwardDate) / (1000 * 60 * 60 * 24)));
     if (totalEquipmentDays > carrierFreeDays && !isFullyCompleted(r)) {
       detOverdue = true;
       detDays = totalEquipmentDays - carrierFreeDays;
@@ -1881,6 +1892,7 @@ function openWhatsAppComposer(idx = -1) {
            `*Container:* ${r["CONTAINER NO."]} (${r["TYPE"] || "40' DC"})\n` +
            `*Line / MBL:* ${r["LINER"] || '-'} | ${r["MBL NO"] || '-'}\n` +
            `*Vessel:* ${r["VESSEL & VOY"] || '-'}\n` +
+           (r["INWARD DATE"] ? `*Inward Date:* ${formatDate(r["INWARD DATE"])}\n` : '') +
            `*Port In:* ${formatDate(r["PORT IN"]) || 'Pending'} | *Port Out:* ${formatDate(r["PORT OUT"]) || 'Pending'}\n` +
            `*CFS Depot:* ${r["CFS NAME"] || '-'}\n` +
            (r["TRUCK NO."] ? `*Truck No:* ${r["TRUCK NO."]}\n` : '') +
@@ -2219,6 +2231,7 @@ function getStatus(r) {
   if (validDate(getField(r, ["CFS IN"]))) return { text: "CFS IN", class: "progress" };
   if (validDate(getField(r, ["PORT OUT"]))) return { text: "PORT OUT", class: "progress" };
   if (validDate(getField(r, ["PORT IN"]))) return { text: "PORT IN", class: "progress" };
+  if (validDate(getField(r, ["INWARD DATE", "INWARD"]))) return { text: "INWARD", class: "progress" };
   if (validDate(getField(r, ["ETA"]))) return { text: "ETA SCHEDULED", class: "progress" };
   if (validDate(getField(r, ["ETD"]))) return { text: "ETD DEPARTED", class: "progress" };
   return { text: "PENDING", class: "progress" };
