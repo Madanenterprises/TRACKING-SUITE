@@ -2,6 +2,13 @@ const SUPABASE_URL = "https://ykeucqritoexykqrggzz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_olbFhK5Wu6hGiaGGDdXMeA_6szko2wZ";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// --- COMPANY CONFIGURATION TABLE ---
+// Change these values anytime to instantly update the whole app
+const COMPANY_CONFIG = {
+  supportEmail: "madhan@gmlindia.net",
+  whatsappNumber: "919840000000" // Use country code (91) without the '+' or spaces
+};
+
 const USD_TO_INR = 84;
 let activeCurrency = localStorage.getItem("gml_curr") || "INR";
 
