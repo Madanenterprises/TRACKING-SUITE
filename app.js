@@ -747,6 +747,8 @@ async function openRouteMap(originStr, destStr, vesselStr) {
   }
 }
 
+el("mapCloseBtn").addEventListener("click", () => el("mapModalBg").classList.remove("open"));
+
 function openEmailModal(idx) {
   const r = rows[idx];
   const cntr = getField(r, ["CONTAINER NO.", "CONTAINER", "CONTAINER NO", "CNTR NO"]);
@@ -898,7 +900,7 @@ function performPublicSearch() {
             <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
               <button class="btn btn-ghost" style="padding:6px 12px; font-size:11px;" onclick="copyText('${publicUrl}')" title="Copy Public Tracking Link">🔗 Copy Link</button>
               <button class="btn btn-ghost" style="padding:6px 12px; font-size:11px;" onclick="window.print()" title="Print Summary">🖨️ Print</button>
-              <button class="btn" style="border-radius:20px; font-size:11px; padding:6px 14px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(vessel)}', 50)">🗺️ Route Map</button>
+              <button class="btn" style="border-radius:20px; font-size:11px; padding:6px 14px;" onclick="openRouteMap('${esc(originPort)}', '${esc(destPort)}', '${esc(vessel)}')">🗺️ Route Map</button>
               <span class="public-badge ${st.class === 'completed' ? 'completed' : ''}">${st.text}</span>
             </div>
           </div>
