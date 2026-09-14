@@ -768,7 +768,7 @@ function openEmailModal(idx) {
   const body = `Dear Customer,\n\nStatus for Container ${cntr} (${getField(r, ["TYPE", "SIZE"]) || "40' HC"}):\n` +
     `• Line: ${liner}\n• MBL: ${getField(r, ["MBL NO", "MBL", "MASTER BL"]) || 'N/A'}\n• Vessel: ${getField(r, ["VESSEL & VOY", "VESSEL", "VESSEL NAME"]) || 'N/A'}\n` +
     `• Port: ${gwPort} (In: ${formatDate(r["PORT IN"]) || 'Pending'} | Out: ${formatDate(r["PORT OUT"]) || 'Pending'})\n` +
-    `• CFS: ${cfs}\n• Truck: ${getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || 'Pending Assignment'}\n• Status: ${st.replace(/[^\w\s-]/g, '').trim()}\n\nSupport: madhan@gmlindia.net`;
+    `• CFS: ${cfs}\n• Truck: ${getField(r, ["TRUCK NO.", "TRUCK NO", "VEHICLE NO"]) || 'Pending Assignment'}\n• Status: ${st.replace(/[^\w\s-]/g, '').trim()}`... \n\nSupport: ${COMPANY_CONFIG.supportEmail}`;
 
   el("emailBody").value = body;
   el("sendMailtoBtn").href = `mailto:?subject=${encodeURIComponent(el("emailSubject").value)}&body=${encodeURIComponent(body)}`;
@@ -1069,7 +1069,7 @@ function openWhatsAppComposer(idx = -1, selectedArr = null) {
            `*Status:* ${getStatus(r).text.replace(/[^\w\s-]/g, '').trim()}\n` +
            `*Free Days:* Terminal (${fees.terminalDaysLeft !== null ? fees.terminalDaysLeft + 'd' : '—'}) | Detention (${fees.detentionDaysLeft !== null ? fees.detentionDaysLeft + 'd' : '—'})\n` +
            (r["REMARKS"] ? `*Remark:* ${r["REMARKS"]}\n` : '') +
-           `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
+           `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: ${COMPANY_CONFIG.supportEmail}`;
   } else {
     // Aggregates all selected containers into one broadcast list
     const active = selectedArr ? selectedArr.map(i => rows[i]) : rows.filter(r => !isFullyCompleted(r));
@@ -1081,11 +1081,11 @@ function openWhatsAppComposer(idx = -1, selectedArr = null) {
               `   • Status: ${getStatus(r).text.replace(/[^\w\s-]/g, '').trim()} | CFS: ${getField(r, ["CFS NAME", "CFS"]) || '-'}\n` +
               `   • Port In: ${formatDate(r["PORT IN"]) || 'Pending'} | Port Out: ${formatDate(r["PORT OUT"]) || 'Pending'}\n\n`;
     });
-    text += `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: madhan@gmlindia.net`;
+    text += `━━━━━━━━━━━━━━━━━━━━━━\nInquiries: ${COMPANY_CONFIG.supportEmail}`;
   }
 
   el("whatsappComposerText").value = text;
-  el("openDirectWhatsAppBtn").href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+  el("openDirectWhatsAppBtn").href = `https://wa.me/${COMPANY_CONFIG.whatsappNumber}?text=${encodeURIComponent(text)}`;
   el("whatsappComposerModalBg").classList.add("open");
 }
 
