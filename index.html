@@ -109,7 +109,7 @@ body { background-color: var(--bg-app); color: var(--text-main); font-family: 'P
   100% { background-color: var(--bg-surface); box-shadow: none inset; }
 }
 .row-saved td { animation: saveFlash 1.5s ease-out forwards; }
-.card-saved { animation: saveFlash 1.5s ease-out forwards; }
+.card-saved { animation: cascadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards, saveFlash 1.5s ease-out forwards; }
 
 .btn-loading { position: relative !important; color: transparent !important; pointer-events: none; }
 .btn-loading::after {
