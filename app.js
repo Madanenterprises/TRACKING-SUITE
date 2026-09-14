@@ -1846,6 +1846,18 @@ el("vesselFilter").addEventListener("change", () => { currentPage = 1; renderUI(
 el("gatewayFilter").addEventListener("change", () => { currentPage = 1; renderUI(); });
 el("cfsFilter").addEventListener("change", () => { currentPage = 1; renderUI(); });
 
+// Clear Selection Button Logic
+el("clearSelectionBtn").addEventListener("click", () => {
+  selectedIndices.clear();
+  
+  // Uncheck the master "Select All" toggle in the table view if it's checked
+  const sheetSelectAll = el("sheetSelectAll");
+  if (sheetSelectAll) sheetSelectAll.checked = false;
+  
+  // Re-render UI to wipe all individual checkmarks and hide the FAB
+  renderUI();
+});
+
 el("exportBtn").addEventListener("click", () => {
   const wb = XLSX.utils.book_new();
   const exportData = rows.map(r => {
